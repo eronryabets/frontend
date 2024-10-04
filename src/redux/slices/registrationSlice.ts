@@ -12,7 +12,7 @@ interface RegistrationData {
 interface RegistrationState {
     loading: boolean;
     success: boolean;
-    error: string | null;
+    error: Record<string, string[]> | null;
     responseData: ResponseData | null; // Используем интерфейс для строгой типизации JSON данных
 }
 
@@ -48,8 +48,7 @@ export const registerUser = createAsyncThunk(
 
         } catch (error: any) {
             if (axios.isAxiosError(error) && error.response) {
-                console.log(typeof (error.response?.data)) //object
-                return rejectWithValue(error.response?.data); //"custom user with this username already exists."
+                return rejectWithValue(error.response.data); //"custom user with this username already exists."
             } else {
                 console.log(typeof (error.message)) //string
                 return rejectWithValue(error.message); //Network Error
@@ -79,7 +78,7 @@ const registrationSlice = createSlice({
             })
             .addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload as Record<string, string[]>;
 
             });
     },

@@ -28,6 +28,7 @@ export const RegistrationPage: React.FC = () => {
         dispatch(registerUser({username, password, email}));
     };
 
+
     return (
         <Box component="form" onSubmit={handleSubmit}
              sx={{width: '300px', margin: 'auto', mt: 5}}>
@@ -36,13 +37,9 @@ export const RegistrationPage: React.FC = () => {
                 {success ? `Success registration ${responseData?.username}!` : null}
             </Typography>
 
-            {/*<Typography variant="h5" sx={{mb: 2, color: 'red'}}>*/}
-            {/*    {responseData ? `Error: ${responseData}!` : null}*/}
-            {/*</Typography>*/}
-
-            {/* <Typography variant="h5" sx={{mb: 2, color: 'red'}}>*/}
-            {/*    {error ? `${error}!` : null}*/}
-            {/*</Typography>*/}
+             <Typography variant="h5" sx={{mb: 2, color: 'red'}}>
+                {typeof error === 'string' ? error : null}
+            </Typography>
 
 
             <Typography variant="h5" sx={{mb: 2}}>
@@ -58,8 +55,8 @@ export const RegistrationPage: React.FC = () => {
                 fullWidth
                 sx={{mb: 2}}
                 autoComplete="username"
-                // error={!!error?.username}
-                // helperText={error?.username ? error.username.join(' ') : ''}
+                error={!!error?.username}
+                helperText={error?.username ? error.username.join(' ') : ''}
             />
 
             <TextField
@@ -97,8 +94,8 @@ export const RegistrationPage: React.FC = () => {
                 required
                 fullWidth
                 sx={{mb: 2}}
-                // error={!!error?.email}
-                // helperText={error?.email ? error.email.join(' ') : ''}
+                error={!!error?.email}
+                helperText={error?.email ? error.email.join(' ') : ''}
             />
 
 
