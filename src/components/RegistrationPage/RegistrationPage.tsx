@@ -15,29 +15,47 @@ export const RegistrationPage: React.FC = () => {
 
 
     //Создали локальный Стейт - где хранить данные заполеные в Форме
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    // const [username, setUsername] = useState('');
+    // const [password, setPassword] = useState('');
+    // const [email, setEmail] = useState('');
+    // const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+        confirmPassword: '',
+        email: '',
+    });
+
+    const {username, password, confirmPassword, email} = formData;
 
     // Локальное состояние для ошибок формы
     const [localError, setLocalError] = useState<{ confirm_password?: string }>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        //
+        const {name, value} = e.target;
+
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+
+      // Очистить ошибку при изменении поля "confirm_password"
+      if (name === 'confirmPassword') {
+        setLocalError((prev) => ({ ...prev, confirm_password: undefined }));
+      }
+
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Проверка на совпадение паролей
         if (password !== confirmPassword) {
             setLocalError({confirm_password: `Passwords don't match!`});
             return;
         }
 
-        //отправляем данные на регистрацию
-        dispatch(registerUser({username, password, email}));
+        dispatch(registerUser(formData));
     };
 
 
@@ -62,7 +80,8 @@ export const RegistrationPage: React.FC = () => {
                 label="Username"
                 name="username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                // onChange={(e) => setUsername(e.target.value)}
+                onChange={handleChange}
                 required
                 fullWidth
                 sx={{mb: 2}}
@@ -76,7 +95,7 @@ export const RegistrationPage: React.FC = () => {
                 label="Password"
                 name="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handleChange}
                 required
                 fullWidth
                 sx={{mb: 2}}
@@ -88,7 +107,7 @@ export const RegistrationPage: React.FC = () => {
                 label="Password confirm"
                 name="confirmPassword"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={handleChange}
                 required
                 fullWidth
                 sx={{mb: 2}}
@@ -102,7 +121,7 @@ export const RegistrationPage: React.FC = () => {
                 label="Email"
                 name="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleChange}
                 required
                 fullWidth
                 sx={{mb: 2}}

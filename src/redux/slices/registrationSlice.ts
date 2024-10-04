@@ -21,6 +21,7 @@ interface ResponseData {
     id: string;
     username: string;
     email: string;
+
     [key: string]: any; // Опционально, для дополнительных полей, которые могут присутствовать
 }
 
@@ -37,12 +38,14 @@ const initialState: RegistrationState = {
 export const registerUser = createAsyncThunk(
     'registration/registerUser', // name/action
     // PayloadCreator //rejectWithValue - сообщение об ошибке в случае ошибки
-    async (userData: RegistrationData, {rejectWithValue}) => {
+    async (formData: RegistrationData, {rejectWithValue}) => {
         try {
-            const response = await axios.post('http://auth.localhost/auth/register/', userData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            const response = await axios.post('http://auth.localhost/auth/register/', {
+                username: formData.username,
+                password: formData.password,
+                email: formData.email,
+            }, {
+                withCredentials: true, //позже нужны будут для второго запроса на сервис2
             });
             return response.data; // Успешный результат возвращаем - ответ от сервера
 
