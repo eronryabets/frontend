@@ -18,6 +18,10 @@ export const RegistrationPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Локальное состояние для ошибок формы
+    const [localError, setLocalError] = useState<{ confirm_password?: string }>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         //
@@ -25,6 +29,14 @@ export const RegistrationPage: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Проверка на совпадение паролей
+        if (password !== confirmPassword) {
+            setLocalError({confirm_password: `Passwords don't match!`});
+            return;
+        }
+
+        //отправляем данные на регистрацию
         dispatch(registerUser({username, password, email}));
     };
 
@@ -37,7 +49,7 @@ export const RegistrationPage: React.FC = () => {
                 {success ? `Success registration ${responseData?.username}!` : null}
             </Typography>
 
-             <Typography variant="h5" sx={{mb: 2, color: 'red'}}>
+            <Typography variant="h5" sx={{mb: 2, color: 'red'}}>
                 {typeof error === 'string' ? error : null}
             </Typography>
 
@@ -71,19 +83,19 @@ export const RegistrationPage: React.FC = () => {
                 autoComplete="new-password"
             />
 
-            {/*<TextField*/}
-            {/*    type="password"*/}
-            {/*    label="Password confirm"*/}
-            {/*    name="confirm_password"*/}
-            {/*    value={formData.confirm_password}*/}
-            {/*    onChange={handleChange}*/}
-            {/*    required*/}
-            {/*    fullWidth*/}
-            {/*    sx={{mb: 2}}*/}
-            {/*    autoComplete="new-password"*/}
-            {/*    error={!!localError.confirm_password}*/}
-            {/*    helperText={localError.confirm_password}*/}
-            {/*/>*/}
+            <TextField
+                type="password"
+                label="Password confirm"
+                name="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                fullWidth
+                sx={{mb: 2}}
+                autoComplete="new-password"
+                error={!!localError.confirm_password}
+                helperText={localError.confirm_password}
+            />
 
             <TextField
                 type="email"
