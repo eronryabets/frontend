@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {ThemeProvider} from '@mui/material/styles';
-import {MuiTheme} from "./components/MuiTheme";
+import {createTheme, ThemeProvider} from '@mui/material/styles';
+// import {MuiTheme} from "./components/MuiTheme";
 import {CssBaseline} from "@mui/material";
 import {RegistrationPage} from "./components/RegistrationPage";
 import {HelmetProvider} from "react-helmet-async";
@@ -12,9 +12,22 @@ import {NotFoundPage} from "./components/NotFoundPage";
 
 function App() {
 
+    // Default Theme
+    const theme = createTheme({
+        palette: {
+            mode: 'dark', // dark/light
+            primary: {
+                main: '#1976d2',
+            },
+            secondary: {
+                main: '#dc004e',
+            },
+        },
+    });
+
     return (
         <HelmetProvider>
-            <ThemeProvider theme={MuiTheme}>
+            <ThemeProvider theme={theme}>
                 <CssBaseline/>
                  <Router>
                     <Routes>
