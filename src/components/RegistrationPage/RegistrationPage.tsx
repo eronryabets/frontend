@@ -5,6 +5,7 @@ import {registerUser} from "../../redux/slices/registrationSlice";
 
 import {TextField, Button, Box, Typography, Avatar, IconButton} from '@mui/material';
 import {PhotoCamera} from "@mui/icons-material";
+import { v4 as uuidv4 } from 'uuid';
 
 
 export const RegistrationPage: React.FC = () => {
@@ -36,9 +37,15 @@ export const RegistrationPage: React.FC = () => {
 
         if (name === 'avatar' && files && files.length > 0) {
             const file = files[0];
+            //uuid file name
+            //Генерируем уникальное имя файла с UUID префиксом
+            const uniqueFileName = `${uuidv4()}-${file.name}`;
+            //Создаем новый обьект Файл с измененным именем
+            const newFile = new File([file], uniqueFileName, {type: file.type});
+
             setFormData({
                 ...formData,
-                avatar: file,
+                avatar: newFile,  //передаем файл с новым именем
             });
             setAvatarPreview(URL.createObjectURL(file));
         } else {
