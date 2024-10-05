@@ -37,15 +37,12 @@ export const RegistrationPage: React.FC = () => {
 
         if (name === 'avatar' && files && files.length > 0) {
             const file = files[0];
-            //uuid file name
-            //Генерируем уникальное имя файла с UUID префиксом
             const uniqueFileName = `${uuidv4()}-${file.name}`;
-            //Создаем новый обьект Файл с измененным именем
             const newFile = new File([file], uniqueFileName, {type: file.type});
 
             setFormData({
                 ...formData,
-                avatar: newFile,  //передаем файл с новым именем
+                avatar: newFile,
             });
             setAvatarPreview(URL.createObjectURL(file));
         } else {
