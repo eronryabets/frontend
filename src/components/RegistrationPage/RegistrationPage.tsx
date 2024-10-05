@@ -4,47 +4,53 @@ import {AppDispatch, RootState} from "../../redux/store";
 import {registerUser} from "../../redux/slices/registrationSlice";
 
 import {TextField, Button, Box, Typography, Avatar, IconButton} from '@mui/material';
+import {PhotoCamera} from "@mui/icons-material";
 
 
 export const RegistrationPage: React.FC = () => {
-    // диспатч для отправки действий в Стор
+
     const dispatch = useDispatch<AppDispatch>();
-    //Cостояние действия - pending, fulfilled, reject - для отображения на нашей страницы
-    //Что бы отобразить на странице - Loading... \ Success! \ Error:"oops!"
     const {loading, success, error, responseData} = useSelector((state: RootState) => state.registration);
 
-
-    //Создали локальный Стейт - где хранить данные заполеные в Форме
-    // const [username, setUsername] = useState('');
-    // const [password, setPassword] = useState('');
-    // const [email, setEmail] = useState('');
-    // const [confirmPassword, setConfirmPassword] = useState('');
 
     const [formData, setFormData] = useState({
         username: '',
         password: '',
         confirmPassword: '',
         email: '',
+        first_name: '',
+        last_name: '',
+        avatar: null as File | null,
     });
 
-    const {username, password, confirmPassword, email} = formData;
+    const {username, password, confirmPassword, email, first_name, last_name} = formData;
 
     // Локальное состояние для ошибок формы
     const [localError, setLocalError] = useState<{ confirm_password?: string }>({});
 
+    //Локальное состояние для превью аватара
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
+        const {name, value, files} = e.target;
 
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-
-      // Очистить ошибку при изменении поля "confirm_password"
-      if (name === 'confirmPassword') {
-        setLocalError((prev) => ({ ...prev, confirm_password: undefined }));
-      }
-
+        if (name === 'avatar' && files && files.length > 0) {
+            const file = files[0];
+            setFormData({
+                ...formData,
+                avatar: file,
+            });
+            setAvatarPreview(URL.createObjectURL(file));
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value,
+            });
+            // Очистить ошибку при изменении поля "confirm_password"
+            if (name === 'confirm_password') {
+                setLocalError((prev) => ({...prev, confirm_password: undefined}));
+            }
+        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -80,7 +86,6 @@ export const RegistrationPage: React.FC = () => {
                 label="Username"
                 name="username"
                 value={username}
-                // onChange={(e) => setUsername(e.target.value)}
                 onChange={handleChange}
                 required
                 fullWidth
@@ -128,6 +133,46 @@ export const RegistrationPage: React.FC = () => {
                 error={!!error?.email}
                 helperText={error?.email ? error.email.join(' ') : ''}
             />
+
+            <TextField
+                label="First name"
+                name="first_name"
+                value={first_name}
+                onChange={handleChange}
+                fullWidth
+                sx={{mb: 2}}
+            />
+
+            <TextField
+                label="Last name"
+                name="last_name"
+                value={last_name}
+                onChange={handleChange}
+                fullWidth
+                sx={{mb: 2}}
+            />
+
+            {/* Avatar Loading */}
+            <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                <Avatar
+                    alt="Avatar Preview"
+                    src={avatarPreview || undefined}
+                    sx={{width: 56, height: 56, mr: 2}}
+                />
+                <label htmlFor="avatar-upload">
+                    <input
+                        accept="image/*"
+                        id="avatar-upload"
+                        type="file"
+                        name="avatar"
+                        style={{display: 'none'}}
+                        onChange={handleChange}
+                    />
+                    <IconButton color="primary" aria-label="upload picture" component="span">
+                        <PhotoCamera/>
+                    </IconButton>
+                </label>
+            </Box>
 
 
             <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>

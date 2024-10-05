@@ -6,6 +6,9 @@ interface RegistrationData {
     username: string;
     password: string;
     email: string;
+    first_name?: string;
+    last_name?: string;
+    avatar?: File | null;
 }
 
 // Интерфейс состояния регистрации (ТИПИЗАЦИЯ)
@@ -40,20 +43,39 @@ export const registerUser = createAsyncThunk(
     // PayloadCreator //rejectWithValue - сообщение об ошибке в случае ошибки
     async (formData: RegistrationData, {rejectWithValue}) => {
         try {
-            const response = await axios.post('http://auth.localhost/auth/register/', {
+            //Регистрация в 1-м сервисе AUTH
+            const authResponse = await axios.post('http://auth.localhost/auth/register/', {
                 username: formData.username,
                 password: formData.password,
                 email: formData.email,
             }, {
-                withCredentials: true, //позже нужны будут для второго запроса на сервис2
+                withCredentials: true,
             });
-            return response.data; // Успешный результат возвращаем - ответ от сервера
+
+            //Регистрация в User Service :
+            if (authResponse.status === 201) {
+
+                //Установить задержку в 30 сек и проверить куки
+                const {id} = authResponse.data;
+
+                const userData = new FormData();
+                userData.append('id', id);
+                if (formData.first_name) userData.append('first_name', formData.first_name);
+                if (formData.last_name) userData.append('last_name', formData.last_name);
+                if (formData.avatar) userData.append('avatar', formData.avatar);
+
+                await axios.post('http://user.localhost/user/create/', userData, {
+                    withCredentials: true,
+                });
+
+                window.alert('Пользователь успешно зарегистрирован и добавлен в User Service.');
+                return authResponse.data;
+            }
 
         } catch (error: any) {
             if (axios.isAxiosError(error) && error.response) {
-                return rejectWithValue(error.response.data); //"custom user with this username already exists."
+                return rejectWithValue(error.response.data);
             } else {
-                console.log(typeof (error.message)) //string
                 return rejectWithValue(error.message); //Network Error
             }
         }
