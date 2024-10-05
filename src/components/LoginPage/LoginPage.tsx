@@ -9,6 +9,7 @@ export const LoginPage = () => {
 
     const dispatch = useDispatch<AppDispatch>();
     const {loading, success, error,} = useSelector((state: RootState) => state.authorization.status);
+    const userData = useSelector((state: RootState) => state.authorization.userData);
 
     const [formData, setFormData] = useState({
         username: '',
@@ -42,7 +43,7 @@ export const LoginPage = () => {
             </Typography>
 
             <Typography variant="h5" sx={{mb: 2, color: 'green'}}>
-                {success ? 'Login successful' : null}
+                {success ? `${userData.username} - login successful!` : null}
             </Typography>
 
             <TextField

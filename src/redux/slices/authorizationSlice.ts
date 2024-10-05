@@ -96,7 +96,10 @@ const authorizationSlice = createSlice({
                 state.status.loading = false;
                 state.status.success = true;
                 //Тут мне нужно из ответа записать данные в стейт - id, username, email TODO
-                // state.responseData = action.payload; это мне не нужно -_-
+                state.isAuthenticated = true;
+                state.userData.id = action.payload.id;
+                state.userData.username = action.payload.username;
+                state.userData.email = action.payload.email;
             })
             .addCase(authorizationUser.rejected, (state, action: PayloadAction<any>) => {
                 state.status.loading = false;
