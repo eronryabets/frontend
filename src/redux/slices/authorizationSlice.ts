@@ -16,7 +16,7 @@ interface AuthorizationState {
         email: string | null;
         first_name?: string | null;
         last_name?: string | null;
-        avatar?: File | null;
+        avatar?: string | null;
     };
     status: {
         loading: boolean;
@@ -25,13 +25,14 @@ interface AuthorizationState {
     };
 }
 
-//Интерфейс типизации данных ответа от сервера
 interface ResponseData {
     id: string;
     username: string;
     email: string;
-
-    [key: string]: any; // Опционально, для дополнительных полей, которые могут присутствовать
+    first_name?: string;
+    last_name?: string;
+    avatar?: string; // Если аватар — это URL или строка
+    [key: string]: any; // Для дополнительных полей, если они есть
 }
 
 // Изначальное состояние не авторизованного юзера
@@ -52,38 +53,52 @@ const initialState: AuthorizationState = {
     },
 };
 
-//Запрос на авторизацию
+
 export const authorizationUser = createAsyncThunk(
     'authorization/authorizationUser',
-    async (formData: AuthorizationData, {rejectWithValue}) => {
+    async (formData: AuthorizationData, { rejectWithValue }) => {
         try {
-            //Aвторизация в первом auth сервисе
-            const authResponse = await axios.post('http://auth.localhost/auth/login/', formData, {
+            // Aвторизация в первом auth сервисе
+            const authResponse = await axios.post('http://auth.drunar.space/auth/login/', formData, {
                 withCredentials: true,
             });
-            //Получение данных юзера с User Service
-            //... TODO
+            console.log(authResponse.data); // Данные из Auth Service
 
-            console.log(authResponse.data);
-            return authResponse.data;
+            if (authResponse.status === 200) {
+                // Получение данных пользователя из User Service
+                const profileResponse = await axios.get('http://user.drunar.space/user/profile/', {
+                    withCredentials: true,
+                });
+                console.log(profileResponse.data); // Данные из User Service
 
+                // Объединяем данные из двух сервисов
+                const combinedData = {
+                    ...authResponse.data,
+                    ...profileResponse.data,
+                };
+
+                // Возвращаем объединённые данные
+                return combinedData;
+            } else {
+                // Если статус не 200, отклоняем с сообщением об ошибке
+                return rejectWithValue('Authorization failed');
+            }
         } catch (error: any) {
             console.log(error.response.data);
             if (axios.isAxiosError(error) && error.response) {
                 return rejectWithValue(error.response.data);
             } else {
-                return rejectWithValue(error.message); //Network Error
+                return rejectWithValue(error.message); // Network Error
             }
         }
     }
 );
 
-// Создание Слайса по авторизации - ОБРАБОТКА СОСТОЯНИЯ ЗАГРУЗКИ (в экстра редюсере)
 const authorizationSlice = createSlice({
     name: 'authorization',
     initialState,
     reducers: {
-        //экшены которые изменяют состояния
+        // ваши редюсеры
     },
     extraReducers: (builder) => {
         builder
@@ -95,14 +110,20 @@ const authorizationSlice = createSlice({
             .addCase(authorizationUser.fulfilled, (state, action: PayloadAction<ResponseData>) => {
                 state.status.loading = false;
                 state.status.success = true;
-                //Тут мне нужно из ответа записать данные в стейт - id, username, email TODO
                 state.isAuthenticated = true;
-                state.userData.id = action.payload.id;
-                state.userData.username = action.payload.username;
-                state.userData.email = action.payload.email;
+
+                // Записываем данные пользователя из объединённого ответа
+                const userData = action.payload;
+                state.userData.id = userData.id;
+                state.userData.username = userData.username;
+                state.userData.email = userData.email;
+                state.userData.first_name = userData.first_name || null;
+                state.userData.last_name = userData.last_name || null;
+                state.userData.avatar = userData.avatar || null;
             })
             .addCase(authorizationUser.rejected, (state, action: PayloadAction<any>) => {
                 state.status.loading = false;
+                state.isAuthenticated = false;
                 if (action.payload && typeof action.payload === 'object' && 'detail' in action.payload) {
                     state.status.error = action.payload.detail; // Извлекаем строку из поля `detail`
                 } else {

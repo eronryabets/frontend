@@ -44,7 +44,7 @@ export const registerUser = createAsyncThunk(
     async (formData: RegistrationData, {rejectWithValue}) => {
         try {
             //Регистрация в 1-м сервисе AUTH
-            const authResponse = await axios.post('http://auth.localhost/auth/register/', {
+            const authResponse = await axios.post('http://auth.drunar.space/auth/register/', {
                 username: formData.username,
                 password: formData.password,
                 email: formData.email,
@@ -64,7 +64,7 @@ export const registerUser = createAsyncThunk(
                 if (formData.last_name) userData.append('last_name', formData.last_name);
                 if (formData.avatar) userData.append('avatar', formData.avatar);
 
-                await axios.post('http://user.localhost/user/create/', userData, {
+                await axios.post('http://user.drunar.space/user/create/', userData, {
                     withCredentials: true,
                 });
 
