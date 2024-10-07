@@ -1,15 +1,19 @@
 import {TextField, Button, Box, Typography} from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {authorizationUser} from "../../redux/slices/authorizationSlice";
+import {useNavigate} from "react-router-dom";
 
 
 export const LoginPage = () => {
 
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+
     const {loading, success, error,} = useSelector((state: RootState) => state.authorization.status);
     const userData = useSelector((state: RootState) => state.authorization.userData);
+    const isAuthenticated = useSelector((state: RootState) => state.authorization.isAuthenticated);
 
     const [formData, setFormData] = useState({
         username: '',
@@ -28,9 +32,15 @@ export const LoginPage = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
         dispatch(authorizationUser(formData));
     };
+
+     // Редирект после успешного логина
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/profile');
+        }
+    }, [isAuthenticated, navigate]);
 
     return (
         <Box component="form" onSubmit={handleSubmit} sx={{width: '300px', margin: 'auto', mt: 5}}>
