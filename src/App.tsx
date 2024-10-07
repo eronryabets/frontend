@@ -1,4 +1,7 @@
 import React from 'react';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './redux/store';
 
 import {createTheme, ThemeProvider} from '@mui/material/styles';
 // import {MuiTheme} from "./components/MuiTheme";
@@ -26,19 +29,23 @@ function App() {
     });
 
     return (
-        <HelmetProvider>
-            <ThemeProvider theme={theme}>
-                <CssBaseline/>
-                 <Router>
-                    <Routes>
-                        <Route path="/registration" element={<RegistrationPage/>}/>
-                        <Route path="/login" element={<LoginPage/>}/>
-                        <Route path="/profile" element={<ProfilePage/>}/>
-                        <Route path="*" element={<NotFoundPage/>}/> 
-                    </Routes>
-                </Router>
-            </ThemeProvider>
-        </HelmetProvider>
+        <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+                <HelmetProvider>
+                    <ThemeProvider theme={theme}>
+                        <CssBaseline/>
+                        <Router>
+                            <Routes>
+                                <Route path="/registration" element={<RegistrationPage/>}/>
+                                <Route path="/login" element={<LoginPage/>}/>
+                                <Route path="/profile" element={<ProfilePage/>}/>
+                                <Route path="*" element={<NotFoundPage/>}/>
+                            </Routes>
+                        </Router>
+                    </ThemeProvider>
+                </HelmetProvider>
+            </PersistGate>
+        </Provider>
     );
 }
 
