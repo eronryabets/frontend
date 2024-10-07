@@ -35,7 +35,7 @@ export const LoginPage = () => {
     return (
         <Box component="form" onSubmit={handleSubmit} sx={{width: '300px', margin: 'auto', mt: 5}}>
             <Typography variant="h5" sx={{mb: 2}}>
-                Вход
+                Login
             </Typography>
 
             <Typography variant="h5" sx={{mb: 2, color: 'red'}}>
@@ -47,7 +47,7 @@ export const LoginPage = () => {
             </Typography>
 
             <TextField
-                label="Имя пользователя"
+                label="Username"
                 name="username"
                 value={username}
                 onChange={handleChange}
@@ -59,7 +59,7 @@ export const LoginPage = () => {
 
             <TextField
                 type="password"
-                label="Пароль"
+                label="Password"
                 name="password"
                 value={password}
                 onChange={handleChange}
@@ -70,7 +70,7 @@ export const LoginPage = () => {
             />
 
             <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
-                {loading ? 'Загрузка...' : 'Войти'}
+                {loading ? 'Loading...' : 'Login'}
             </Button>
         </Box>
     );

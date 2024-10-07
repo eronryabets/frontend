@@ -6,17 +6,18 @@ import {
 } from '@mui/material';
 import {toggleTheme} from "../../redux/slices/themeSlice";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../redux/store";
+import {RootState, useAppDispatch} from "../../redux/store";
 
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
+import {logout} from "../../redux/slices/authorizationSlice";
 
 interface NavBarProps {
 }
 
 export const NavBar = () => {
 
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -32,6 +33,18 @@ export const NavBar = () => {
 
     const handleThemeToggle = () => {
         dispatch(toggleTheme());
+    };
+
+     // Логаут пользователя
+    const handleLogout = () => {
+        handleMenuClose(); // Сначала закрываем меню
+        dispatch(logout()).then((result) => {
+            if (logout.fulfilled.match(result)) {
+                console.log("Logout successful");
+            } else if (logout.rejected.match(result)) {
+                console.error("Logout failed:", result.error.message);
+            }
+        });
     };
 
     return (
@@ -71,9 +84,7 @@ export const NavBar = () => {
                         <MenuItem onClick={handleMenuClose}>My Profile</MenuItem>
                         <MenuItem onClick={handleMenuClose}>Vocabulary</MenuItem>
                         <MenuItem onClick={handleMenuClose}>Books</MenuItem>
-                        <MenuItem onClick={() => {
-                            handleMenuClose(); /* добавить логику для выхода */
-                        }}>Выйти</MenuItem>
+                        <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
                 </Box>
             </Toolbar>

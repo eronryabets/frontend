@@ -2,6 +2,7 @@ import {configureStore} from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage'; // локальное хранилище браузера
 import {persistReducer, persistStore} from 'redux-persist';
 import rootReducer from './rootReducer';
+import {useDispatch} from "react-redux";
 
 // Конфигурация для Redux Persist
 const persistConfig: { storage: any; whitelist: string[]; key: string } = {
@@ -32,3 +33,5 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
 export default store;
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();

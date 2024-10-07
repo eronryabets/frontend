@@ -13,6 +13,7 @@ import {LoginPage} from "./components/LoginPage";
 import {ProfilePage} from "./components/ProfilePage";
 import {NotFoundPage} from "./components/NotFoundPage";
 import {NavBar} from "./components/NavBar";
+import {ProtectedRoute} from "./components/ProtectedRoute";
 
 function App() {
 
@@ -29,8 +30,11 @@ function App() {
                         <CssBaseline/>
                         <Router>
                             <Routes>
-                                <Route element={<NavBar/>}>
-                                    <Route path="/profile" element={<ProfilePage/>}/>
+                                {/* Защищенные маршруты */}
+                                <Route element={<ProtectedRoute/>}>
+                                    <Route element={<NavBar/>}>
+                                        <Route path="/profile" element={<ProfilePage/>}/>
+                                    </Route>
                                 </Route>
                                 <Route path="/registration" element={<RegistrationPage/>}/>
                                 <Route path="/login" element={<LoginPage/>}/>
