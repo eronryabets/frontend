@@ -7,7 +7,7 @@ import rootReducer from './rootReducer';
 const persistConfig: { storage: any; whitelist: string[]; key: string } = {
     key: 'root', // ключ для хранения
     storage, // используем storage из redux-persist
-    whitelist: ['authorization'], // массив редюсеров, которые нужно сохранять (например, авторизация)
+    whitelist: ['authorization', 'theme'], // массив редюсеров, которые нужно сохранять (например, авторизация)
 };
 
 
