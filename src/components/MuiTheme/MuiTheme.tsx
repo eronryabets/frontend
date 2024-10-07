@@ -5,7 +5,7 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
     palette: {
       mode: themeMode,
       primary: {
-        main: '#1976d2',
+        main: 'rgba(137,193,220,0.75)',
       },
       secondary: {
         main: '#dc004e',

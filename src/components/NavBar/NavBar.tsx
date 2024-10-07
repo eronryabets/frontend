@@ -2,7 +2,7 @@ import styles from './NavBar.module.scss';
 import React from 'react';
 import {
     AppBar, Toolbar, Typography, IconButton, Menu, MenuItem,
-    Avatar, Tooltip, Button, Switch, Box
+    Avatar, Tooltip, Button, Box
 } from '@mui/material';
 import {toggleTheme} from "../../redux/slices/themeSlice";
 import {useDispatch, useSelector} from "react-redux";
@@ -48,7 +48,7 @@ export const NavBar = () => {
     };
 
     return (
-        <AppBar position="static">
+        <AppBar position="fixed">
             <Toolbar>
                 <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
                     Smart Reader
