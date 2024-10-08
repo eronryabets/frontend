@@ -3,15 +3,16 @@ import api from "../../utils/api";
 import axios from "axios";
 
 interface ProfileData {
-    first_name: string;
-    last_name: string;
-    avatar: string;
+    first_name?: string;
+    last_name?: string;
+    avatar?: string | File;
 }
 
 interface Settings {
-    theme: string; // Например, светлая или темная тема
-    language: string; // Настройки языка
-    [key: string]: any; // Другие возможные настройки
+    theme: string;
+    language: string;
+
+    [key: string]: any;
 }
 
 interface UserInfoState {
@@ -22,7 +23,7 @@ interface UserInfoState {
         first_name?: string | null;
         last_name?: string | null;
         avatar?: string | null;
-        settings?: Settings | null; // Настройки как объект
+        settings?: Settings | null;
     };
     status: {
         loading: boolean;
@@ -38,12 +39,10 @@ interface ResponseData {
     first_name?: string;
     last_name?: string;
     avatar?: string;
-    settings?: string; // Добавляем settings в типы ответа
-
-    [key: string]: any;
+    settings?: string;
 }
 
-// Изначальное состояние не авторизованного юзера
+// Изначальное состояние
 const initialState: UserInfoState = {
     userData: {
         id: null,
@@ -52,7 +51,7 @@ const initialState: UserInfoState = {
         first_name: null,
         last_name: null,
         avatar: null,
-        settings: null, // Инициализируем поле settings
+        settings: null,
     },
     status: {
         loading: false,
@@ -66,35 +65,25 @@ export const getUserInfo = createAsyncThunk(
     'userInfo/getUserInfo',
     async (_, {rejectWithValue}) => {
         try {
-            // Получение Юзер Инфо с Сервиса Авторизации
-            const authServiceResponse = await api.get('http://auth.drunar.space/auth/profile/', {});
+            const authServiceResponse = await api.get('http://auth.drunar.space/auth/profile/');
             console.log("getUserInfo aut_api: authServiceResponse.data : "); // Данные из Auth Service
-            console.log(authServiceResponse.data); // Данные из Auth Service
+            console.log(authServiceResponse.data);
 
             if (authServiceResponse.status === 200) {
-                // Получение данных пользователя из User Service
-                const profileResponse = await api.get('http://user.drunar.space/user/profile/', {});
+                const profileResponse = await api.get('http://user.drunar.space/user/profile/');
                 console.log("getUserInfo user_api: profileResponse.data: "); // Данные из User Service
-                console.log(profileResponse.data); // Данные из User Service
+                console.log(profileResponse.data);
 
-                // Объединяем данные из двух сервисов
                 const combinedData = {
                     ...authServiceResponse.data,
                     ...profileResponse.data,
                 };
-
-                // Возвращаем объединённые данные
                 return combinedData;
             } else {
                 return rejectWithValue('Response failed');
             }
         } catch (error: any) {
-            console.log(error.response.data);
-            if (axios.isAxiosError(error) && error.response) {
-                return rejectWithValue(error.response.data);
-            } else {
-                return rejectWithValue(error.message);
-            }
+            return rejectWithValue(error.response?.data || error.message);
         }
     }
 );
@@ -102,20 +91,13 @@ export const getUserInfo = createAsyncThunk(
 // Обновление информации в сервисе авторизации
 export const patchUserAuthInfo = createAsyncThunk(
     'userInfo/patchUserAuthInfo',
-    async (formData: { password: string; email: string }, {rejectWithValue}) => {
+    async (formData: Partial<{ password: string; email: string }>, {rejectWithValue}) => {
         try {
-            const authServiceResponse = await api.patch('http://auth.drunar.space/auth/profile/',
-                formData, {});
+            const authServiceResponse = await api.patch('http://auth.drunar.space/auth/profile/', formData);
             console.log(authServiceResponse.data);
             return authServiceResponse.data;
-
         } catch (error: any) {
-            console.log(error.response.data);
-            if (axios.isAxiosError(error) && error.response) {
-                return rejectWithValue(error.response.data);
-            } else {
-                return rejectWithValue(error.message);
-            }
+            return rejectWithValue(error.response?.data || error.message);
         }
     }
 );
@@ -123,18 +105,13 @@ export const patchUserAuthInfo = createAsyncThunk(
 // Обновление информации в пользовательском сервисе
 export const patchUserProfileInfo = createAsyncThunk(
     'userInfo/patchUserProfileInfo',
-    async (formData: ProfileData, {rejectWithValue}) => {
+    async (formData: Partial<ProfileData>, {rejectWithValue}) => {
         try {
-            const profileResponse = await api.patch('http://user.drunar.space/user/profile/',
-                formData);
+            const profileResponse = await api.patch('http://user.drunar.space/user/profile/', formData);
             console.log(profileResponse.data);
             return profileResponse.data;
         } catch (error: any) {
-            if (axios.isAxiosError(error) && error.response) {
-                return rejectWithValue(error.response.data);
-            } else {
-                return rejectWithValue(error.message);
-            }
+            return rejectWithValue(error.response?.data || error.message);
         }
     }
 );
@@ -144,7 +121,7 @@ const userInfoSlice = createSlice({
     initialState,
     reducers: {
         clearUserInfo: (state) => {
-           state.userData = {
+            state.userData = {
                 id: null,
                 username: null,
                 email: null,
@@ -167,7 +144,6 @@ const userInfoSlice = createSlice({
                 state.status.loading = false;
                 state.status.success = true;
 
-                // Записываем данные пользователя из объединённого ответа
                 const userData = action.payload;
 
                 state.userData = {
@@ -177,32 +153,24 @@ const userInfoSlice = createSlice({
                     first_name: userData.first_name || null,
                     last_name: userData.last_name || null,
                     avatar: userData.avatar || null,
-                    // Если settings получены как JSON-строка, парсим её
-                    settings: null, // Инициализируем settings как null
-                }
-                // Если settings получены как JSON-строка, парсим её
+                    settings: null,
+                };
+
                 if (userData.settings) {
                     if (typeof userData.settings === 'string') {
                         try {
                             state.userData.settings = JSON.parse(userData.settings);
                         } catch (error) {
-                            console.error("Error parsing settings", error);
                             state.userData.settings = null;
                         }
                     } else {
-                        // Если settings уже объект, просто сохраняем их
                         state.userData.settings = userData.settings;
                     }
                 }
-
             })
             .addCase(getUserInfo.rejected, (state, action: PayloadAction<any>) => {
                 state.status.loading = false;
-                if (action.payload && typeof action.payload === 'object' && 'detail' in action.payload) {
-                    state.status.error = action.payload.detail;
-                } else {
-                    state.status.error = action.payload;
-                }
+                state.status.error = action.payload || 'Error fetching user info';
             })
             // patchUserAuthInfo:
             .addCase(patchUserAuthInfo.pending, (state) => {
@@ -216,11 +184,7 @@ const userInfoSlice = createSlice({
             })
             .addCase(patchUserAuthInfo.rejected, (state, action: PayloadAction<any>) => {
                 state.status.loading = false;
-                if (action.payload && typeof action.payload === 'object' && 'detail' in action.payload) {
-                    state.status.error = action.payload.detail;
-                } else {
-                    state.status.error = action.payload;
-                }
+                state.status.error = action.payload || 'Error updating auth info';
             })
             // patchUserProfileInfo:
             .addCase(patchUserProfileInfo.pending, (state) => {
@@ -234,15 +198,11 @@ const userInfoSlice = createSlice({
             })
             .addCase(patchUserProfileInfo.rejected, (state, action: PayloadAction<any>) => {
                 state.status.loading = false;
-                if (action.payload && typeof action.payload === 'object' && 'detail' in action.payload) {
-                    state.status.error = action.payload.detail;
-                } else {
-                    state.status.error = action.payload;
-                }
+                state.status.error = action.payload || 'Error updating profile info';
             });
     },
 });
 
 // Экспортируем действие для очистки данных профиля
-export const { clearUserInfo} = userInfoSlice.actions;
+export const {clearUserInfo} = userInfoSlice.actions;
 export default userInfoSlice.reducer;
