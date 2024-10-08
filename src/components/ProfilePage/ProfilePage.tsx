@@ -10,8 +10,7 @@ import {
 } from '@mui/material';
 
 export const ProfilePage: React.FC = () => {
-    // Достаем данные пользователя из Redux
-    const userData = useSelector((state: RootState) => state.authorization.userData);
+    const userData = useSelector((state: RootState) => state.userInfo.userData);
     // Достаем текущую тему
     const theme = useTheme();
 

@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import React, {useEffect, useState} from "react";
 import {authorizationUser} from "../../redux/slices/authorizationSlice";
+import {getUserInfo} from "../../redux/slices/userInfoSlice";
 import {useNavigate} from "react-router-dom";
 
 
@@ -12,7 +13,7 @@ export const LoginPage = () => {
     const navigate = useNavigate();
 
     const {loading, success, error,} = useSelector((state: RootState) => state.authorization.status);
-    const userData = useSelector((state: RootState) => state.authorization.userData);
+    const userData = useSelector((state: RootState) => state.userInfo.userData);
     const isAuthenticated = useSelector((state: RootState) => state.authorization.isAuthenticated);
 
     const [formData, setFormData] = useState({
@@ -33,6 +34,7 @@ export const LoginPage = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         dispatch(authorizationUser(formData));
+        // dispatch(getUserInfo());
     };
 
      // Редирект после успешного логина

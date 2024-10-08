@@ -21,7 +21,7 @@ export const NavBar = () => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const themeMode = useSelector((state: RootState) => state.theme.mode);
-    const userData = useSelector((state: RootState) => state.authorization.userData);
+    const userData = useSelector((state: RootState) => state.userInfo.userData);
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);

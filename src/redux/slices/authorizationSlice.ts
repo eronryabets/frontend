@@ -1,25 +1,18 @@
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import api from "../../utils/api";
-import {AUTH_SERVICE_URL} from "../../config";
+import { AUTH_SERVICE_URL } from "../../config";
+import {clearUserInfo, getUserInfo} from "./userInfoSlice";
 
-// Интерфейс для данных авторизации (ТИПИЗАЦИЯ) хотя можно и без него.
+// Интерфейс для данных авторизации
 interface AuthorizationData {
     username: string;
     password: string;
 }
 
-// Интерфейс состояния авторизованного юзера (ТИПИЗАЦИЯ)
+// Интерфейс состояния авторизованного пользователя
 interface AuthorizationState {
     isAuthenticated: boolean;
-    userData: {
-        id: string | null;
-        username: string | null;
-        email: string | null;
-        first_name?: string | null;
-        last_name?: string | null;
-        avatar?: string | null;
-    };
     status: {
         loading: boolean;
         success: boolean;
@@ -27,27 +20,9 @@ interface AuthorizationState {
     };
 }
 
-interface ResponseData {
-    id: string;
-    username: string;
-    email: string;
-    first_name?: string;
-    last_name?: string;
-    avatar?: string; // Если аватар — это URL или строка
-    [key: string]: any; // Для дополнительных полей, если они есть
-}
-
-// Изначальное состояние не авторизованного юзера
+// Изначальное состояние авторизации
 const initialState: AuthorizationState = {
     isAuthenticated: false,
-    userData: {
-        id: null,
-        username: null,
-        email: null,
-        first_name: null,
-        last_name: null,
-        avatar: null,
-    },
     status: {
         loading: false,
         success: false,
@@ -55,34 +30,25 @@ const initialState: AuthorizationState = {
     },
 };
 
-
+// Авторизация пользователя
 export const authorizationUser = createAsyncThunk(
     'authorization/authorizationUser',
-    async (formData: AuthorizationData, {rejectWithValue}) => {
+    async (formData: AuthorizationData, { dispatch, rejectWithValue }) => {
         try {
-            // Aвторизация в первом auth сервисе
+            // Aвторизация на сервисе
             const authResponse = await axios.post('http://auth.drunar.space/auth/login/', formData, {
                 withCredentials: true,
             });
-            console.log(authResponse.data); // Данные из Auth Service
+            console.log("authorizationUser auth_api: authResponse.data");
+            console.log(authResponse.data);
 
             if (authResponse.status === 200) {
-                // Получение данных пользователя из User Service
-                const profileResponse = await axios.get('http://user.drunar.space/user/profile/', {
-                    withCredentials: true,
-                });
-                console.log(profileResponse.data); // Данные из User Service
+                // После успешной авторизации делаем запрос на получение данных пользователя
+                console.log(`authorizationUser getUserInfo(): `);
+                dispatch(getUserInfo());  // Получаем данные пользователя
 
-                // Объединяем данные из двух сервисов
-                const combinedData = {
-                    ...authResponse.data,
-                    ...profileResponse.data,
-                };
-
-                // Возвращаем объединённые данные
-                return combinedData;
+                return authResponse.data;  // Возвращаем данные авторизации
             } else {
-                // Если статус не 200, отклоняем с сообщением об ошибке
                 return rejectWithValue('Authorization failed');
             }
         } catch (error: any) {
@@ -96,13 +62,15 @@ export const authorizationUser = createAsyncThunk(
     }
 );
 
-// Асинхронный thunk для логаута
+// Логаут пользователя
 export const logout = createAsyncThunk(
     'authorization/logout',
-    async (_, {rejectWithValue}) => {
+    async (_, { dispatch, rejectWithValue }) => {
         try {
             // Отправляем запрос на логаут (cookies автоматически отправятся)
             await api.post(`${AUTH_SERVICE_URL}logout/`, {}, {});
+            // Вызываем очистку данных профиля после логаута
+            dispatch(clearUserInfo());
         } catch (error: any) {
             return rejectWithValue('Logout failed.');
         }
@@ -112,40 +80,24 @@ export const logout = createAsyncThunk(
 const authorizationSlice = createSlice({
     name: 'authorization',
     initialState,
-    reducers: {
-        // наши редюсеры
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
-            //authorizationUser :
+            // Authorization User Cases
             .addCase(authorizationUser.pending, (state) => {
                 state.status.loading = true;
                 state.status.success = false;
                 state.status.error = null;
             })
-            .addCase(authorizationUser.fulfilled, (state, action: PayloadAction<ResponseData>) => {
+            .addCase(authorizationUser.fulfilled, (state) => {
                 state.status.loading = false;
                 state.status.success = true;
                 state.isAuthenticated = true;
-
-                // Записываем данные пользователя из объединённого ответа
-                const userData = action.payload;
-                state.userData.id = userData.id;
-                state.userData.username = userData.username;
-                state.userData.email = userData.email;
-                state.userData.first_name = userData.first_name || null;
-                state.userData.last_name = userData.last_name || null;
-                state.userData.avatar = userData.avatar || null;
             })
             .addCase(authorizationUser.rejected, (state, action: PayloadAction<any>) => {
                 state.status.loading = false;
                 state.isAuthenticated = false;
-                if (action.payload && typeof action.payload === 'object' && 'detail' in action.payload) {
-                    state.status.error = action.payload.detail; // Извлекаем строку из поля `detail`
-                } else {
-                    // В случае, если это простое сообщение об ошибке (например, `Network Error`)
-                    state.status.error = action.payload;
-                }
+                state.status.error = action.payload ?? 'Authorization failed';
             })
             // Logout Cases
             .addCase(logout.pending, (state) => {
@@ -156,16 +108,6 @@ const authorizationSlice = createSlice({
             .addCase(logout.fulfilled, (state) => {
                 state.status.loading = false;
                 state.isAuthenticated = false;
-
-                // Очищаем все данные пользователя
-                state.userData = {
-                    id: null,
-                    username: null,
-                    email: null,
-                    first_name: null,
-                    last_name: null,
-                    avatar: null,
-                };
             })
             .addCase(logout.rejected, (state, action: PayloadAction<any>) => {
                 state.status.loading = false;
