@@ -209,7 +209,14 @@ const userInfoSlice = createSlice({
             })
             .addCase(patchUserAuthInfo.rejected, (state, action: PayloadAction<any>) => {
                 state.updateStatus.updateLoading = false;
-                state.updateStatus.updateError = action.payload || 'Ошибка при обновлении информации авторизации';
+                // state.updateStatus.updateError = action.payload || 'Ошибка при обновлении информации авторизации';
+                if (typeof action.payload === 'string') {
+                    state.updateStatus.updateError = {detail: action.payload}; // Преобразуем строку в объект с ключом detail
+                } else if (action.payload && typeof action.payload === 'object') {
+                    state.updateStatus.updateError = action.payload; // Оставляем объект, если он есть
+                } else {
+                    state.updateStatus.updateError = {detail: 'Произошла неизвестная ошибка'};
+                }
             })
             // patchUserProfileInfo:
             .addCase(patchUserProfileInfo.pending, (state) => {
@@ -223,7 +230,14 @@ const userInfoSlice = createSlice({
             })
             .addCase(patchUserProfileInfo.rejected, (state, action: PayloadAction<any>) => {
                 state.updateStatus.updateLoading = false;
-                state.updateStatus.updateError = action.payload || 'Ошибка при обновлении информации профиля';
+                // state.updateStatus.updateError = action.payload || 'Ошибка при обновлении информации профиля';
+                if (typeof action.payload === 'string') {
+                    state.updateStatus.updateError = {detail: action.payload}; // Преобразуем строку в объект с ключом detail
+                } else if (action.payload && typeof action.payload === 'object') {
+                    state.updateStatus.updateError = action.payload; // Оставляем объект, если он есть
+                } else {
+                    state.updateStatus.updateError = {detail: 'Произошла неизвестная ошибка'};
+                }
             });
     },
 });

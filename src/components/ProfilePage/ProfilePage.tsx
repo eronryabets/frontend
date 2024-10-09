@@ -30,6 +30,7 @@ export const ProfilePage: React.FC = () => {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(`${USER_API_MEDIA_URL}${userData.avatar}` || null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [showSnackbar, setShowSnackbar] = useState(false); // Для уведомления об успешной операции
+    const [openErrorSnackbar, setOpenErrorSnackbar] = useState(false); //для уведомления ошибок
 
     // Обновляем данные пользователя при загрузке страницы профиля
     useEffect(() => {
@@ -104,6 +105,20 @@ export const ProfilePage: React.FC = () => {
         setShowSnackbar(false);
     };
 
+    // Показ уведомления об ошибке
+    useEffect(() => {
+        if (error || updateError) {
+            setOpenErrorSnackbar(true);
+        }
+    }, [error, updateError]);
+
+     // Закрытие Error Snackbar
+    const handleErrorSnackbarClose = () => {
+        setOpenErrorSnackbar(false);
+        dispatch(resetUpdateState()); // Сбрасываем состояние ошибки после закрытия
+    };
+
+
     return (
         <Box
             component="form"
@@ -144,7 +159,6 @@ export const ProfilePage: React.FC = () => {
                         <Avatar
                             alt="Avatar Preview"
                             src={avatarPreview || undefined}
-                            // src={`http://user.drunar.space/${avatarPreview} ` || undefined}
                             sx={{width: 100, height: 100, mr: 2}}
                         />
                         <label htmlFor="avatar-upload">
@@ -206,7 +220,6 @@ export const ProfilePage: React.FC = () => {
                         </Alert>
                     )}
 
-
                     <Button
                         fullWidth
                         variant="contained"
@@ -226,6 +239,15 @@ export const ProfilePage: React.FC = () => {
                 onClose={handleSnackbarClose}
                 message="Изменения успешно сохранены"
             />
+
+            {/* Snackbar для уведомления об ошибке */}
+            <Snackbar
+                open={openErrorSnackbar}
+                autoHideDuration={10000}
+                onClose={handleErrorSnackbarClose}
+                message={`Ошибка: ${typeof updateError === 'object' ? updateError?.detail : updateError || updateError}`}
+            />
+
         </Box>
     );
 };
