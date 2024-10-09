@@ -1,20 +1,18 @@
-import styles from './NavBar.module.scss';
 import React from 'react';
 import {
     AppBar, Toolbar, Typography, IconButton, Menu, MenuItem,
     Avatar, Tooltip, Button, Box
 } from '@mui/material';
 import {toggleTheme} from "../../redux/slices/themeSlice";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {RootState, useAppDispatch} from "../../redux/store";
 
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import {logout} from "../../redux/slices/authorizationSlice";
 import {Link} from "react-router-dom";
+import {USER_API_MEDIA_URL} from "../../config";
 
-interface NavBarProps {
-}
 
 export const NavBar = () => {
 
@@ -65,7 +63,7 @@ export const NavBar = () => {
                         <IconButton onClick={handleMenuOpen} sx={{p: 0}}>
                             <Avatar
                                 alt="User Avatar"
-                                src={`http://user.drunar.space/${userData.avatar}`}
+                                src={`${USER_API_MEDIA_URL}${userData.avatar}`}
                             />
                         </IconButton>
                     </Tooltip>

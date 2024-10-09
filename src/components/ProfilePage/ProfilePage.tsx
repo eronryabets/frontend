@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {RootState, useAppDispatch} from '../../redux/store';
 import {getUserInfo, patchUserAuthInfo, patchUserProfileInfo, resetUpdateState} from '../../redux/slices/userInfoSlice'; // Обновляем thunk-и
 import {
@@ -13,7 +13,8 @@ import {
     useTheme, Alert, Snackbar, CircularProgress,
 } from '@mui/material';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import {v4 as uuidv4} from 'uuid'; // Используем для уникальных имен файлов
+import {v4 as uuidv4} from 'uuid';
+import {USER_API_MEDIA_URL} from "../../config"; // Используем для уникальных имен файлов
 
 export const ProfilePage: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -26,7 +27,7 @@ export const ProfilePage: React.FC = () => {
     const [password, setPassword] = useState('');
     const [firstName, setFirstName] = useState(userData.first_name || '');
     const [lastName, setLastName] = useState(userData.last_name || '');
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(userData.avatar || null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(`${USER_API_MEDIA_URL}${userData.avatar}` || null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [showSnackbar, setShowSnackbar] = useState(false); // Для уведомления об успешной операции
 
@@ -42,7 +43,8 @@ export const ProfilePage: React.FC = () => {
             dispatch(getUserInfo()); // Обновляем данные профиля
             dispatch(resetUpdateState()); //Сбрасываем состояние успеха
         }
-    }, [success, dispatch]);
+    }, [updateSuccess, dispatch]);
+
 
     // Обработка изменений в текстовых полях
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) =>
@@ -142,6 +144,7 @@ export const ProfilePage: React.FC = () => {
                         <Avatar
                             alt="Avatar Preview"
                             src={avatarPreview || undefined}
+                            // src={`http://user.drunar.space/${avatarPreview} ` || undefined}
                             sx={{width: 100, height: 100, mr: 2}}
                         />
                         <label htmlFor="avatar-upload">

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import api from "../../utils/api";
-import { AUTH_SERVICE_URL } from "../../config";
+import {AUTH_API_URL} from "../../config";
 import {clearUserInfo, getUserInfo} from "./userInfoSlice";
 
 // Интерфейс для данных авторизации
@@ -36,7 +36,7 @@ export const authorizationUser = createAsyncThunk(
     async (formData: AuthorizationData, { dispatch, rejectWithValue }) => {
         try {
             // Aвторизация на сервисе
-            const authResponse = await axios.post('http://auth.drunar.space/auth/login/', formData, {
+            const authResponse = await axios.post(`${AUTH_API_URL}login/`, formData, {
                 withCredentials: true,
             });
             console.log("authorizationUser auth_api: authResponse.data");
@@ -68,7 +68,7 @@ export const logout = createAsyncThunk(
     async (_, { dispatch, rejectWithValue }) => {
         try {
             // Отправляем запрос на логаут (cookies автоматически отправятся)
-            await api.post(`${AUTH_SERVICE_URL}logout/`, {}, {});
+            await api.post(`${AUTH_API_URL}logout/`, {}, {});
             // Вызываем очистку данных профиля после логаута
             dispatch(clearUserInfo());
         } catch (error: any) {

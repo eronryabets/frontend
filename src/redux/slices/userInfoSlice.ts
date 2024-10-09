@@ -1,6 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import api from "../../utils/api";
 import axios from "axios";
+import {AUTH_API_URL, USER_API_URL} from "../../config";
 
 interface ProfileData {
     first_name?: string;
@@ -75,12 +76,12 @@ export const getUserInfo = createAsyncThunk(
     'userInfo/getUserInfo',
     async (_, {rejectWithValue}) => {
         try {
-            const authServiceResponse = await api.get('http://auth.drunar.space/auth/profile/');
+            const authServiceResponse = await api.get(`${AUTH_API_URL}profile/`);
             console.log("getUserInfo aut_api: authServiceResponse.data : "); // Данные из Auth Service
             console.log(authServiceResponse.data);
 
             if (authServiceResponse.status === 200) {
-                const profileResponse = await api.get('http://user.drunar.space/user/profile/');
+                const profileResponse = await api.get(`${USER_API_URL}profile/`);
                 console.log("getUserInfo user_api: profileResponse.data: "); // Данные из User Service
                 console.log(profileResponse.data);
 
@@ -103,7 +104,7 @@ export const patchUserAuthInfo = createAsyncThunk(
     'userInfo/patchUserAuthInfo',
     async (formData: Partial<{ password: string; email: string }>, {rejectWithValue}) => {
         try {
-            const authServiceResponse = await api.patch('http://auth.drunar.space/auth/profile/', formData);
+            const authServiceResponse = await api.patch(`${AUTH_API_URL}profile/`, formData);
             console.log(authServiceResponse.data);
             return authServiceResponse.data;
         } catch (error: any) {
@@ -117,7 +118,7 @@ export const patchUserProfileInfo = createAsyncThunk(
     'userInfo/patchUserProfileInfo',
     async (formData: Partial<ProfileData>, {rejectWithValue}) => {
         try {
-            const profileResponse = await api.patch('http://user.drunar.space/user/profile/', formData);
+            const profileResponse = await api.patch(`${USER_API_URL}profile/`, formData);
             console.log(profileResponse.data);
             return profileResponse.data;
         } catch (error: any) {
