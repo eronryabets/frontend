@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState, useAppDispatch} from '../../redux/store';
-import {getUserInfo, patchUserAuthInfo, patchUserProfileInfo} from '../../redux/slices/userInfoSlice'; // Обновляем thunk-и
+import {getUserInfo, patchUserAuthInfo, patchUserProfileInfo, resetUpdateState} from '../../redux/slices/userInfoSlice'; // Обновляем thunk-и
 import {
     Avatar,
     Box,
@@ -19,6 +19,7 @@ export const ProfilePage: React.FC = () => {
     const dispatch = useAppDispatch();
     const userData = useSelector((state: RootState) => state.userInfo.userData);
     const {loading, success, error} = useSelector((state: RootState) => state.userInfo.status);
+    const { updateSuccess, updateError } = useSelector((state: RootState) => state.userInfo.updateStatus);
     const theme = useTheme();
 
     const [email, setEmail] = useState(userData.email || '');
@@ -36,10 +37,12 @@ export const ProfilePage: React.FC = () => {
 
     // Показ уведомления об успехе
     useEffect(() => {
-        if (success) {
+        if (updateSuccess) {
             setShowSnackbar(true); // Показываем уведомление об успехе
+            dispatch(getUserInfo()); // Обновляем данные профиля
+            dispatch(resetUpdateState()); //Сбрасываем состояние успеха
         }
-    }, [success])
+    }, [success, dispatch]);
 
     // Обработка изменений в текстовых полях
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) =>
@@ -198,7 +201,6 @@ export const ProfilePage: React.FC = () => {
                             Ошибка: {error}
                         </Alert>
                     )}
-
                     <Button
                         fullWidth
                         variant="contained"

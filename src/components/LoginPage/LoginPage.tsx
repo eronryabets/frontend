@@ -40,7 +40,8 @@ export const LoginPage = () => {
      // Редирект после успешного логина
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/profile');
+            // navigate('/profile');
+            navigate('/');
         }
     }, [isAuthenticated, navigate]);
 

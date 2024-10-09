@@ -37,7 +37,7 @@ const AppContent = () => {
                 {/* Открытые маршруты */}
                 <Route path="/registration" element={<RegistrationPage />} />
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="*" element={<NotFoundPage />} />
+                <Route path="/*" element={<NotFoundPage />} />
             </Routes>
         </ThemeProvider>
     );

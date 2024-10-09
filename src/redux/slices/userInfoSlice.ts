@@ -30,6 +30,11 @@ interface UserInfoState {
         success: boolean;
         error: string | null;
     };
+    updateStatus: {
+        updateLoading: boolean;
+        updateSuccess: boolean;
+        updateError: string | null;
+    };
 }
 
 interface ResponseData {
@@ -57,6 +62,11 @@ const initialState: UserInfoState = {
         loading: false,
         success: false,
         error: null,
+    },
+    updateStatus: {
+        updateLoading: false,
+        updateSuccess: false,
+        updateError: null,
     },
 };
 
@@ -130,7 +140,12 @@ const userInfoSlice = createSlice({
                 avatar: null,
                 settings: null,
             };
-        }
+        },
+        resetUpdateState: (state) => {
+            state.updateStatus.updateSuccess = false;
+            state.updateStatus.updateError = null;
+            state.updateStatus.updateLoading = false;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -174,35 +189,35 @@ const userInfoSlice = createSlice({
             })
             // patchUserAuthInfo:
             .addCase(patchUserAuthInfo.pending, (state) => {
-                state.status.loading = true;
-                state.status.success = false;
-                state.status.error = null;
+                state.updateStatus.updateLoading = true;
+                state.updateStatus.updateSuccess = false;
+                state.updateStatus.updateError = null;
             })
             .addCase(patchUserAuthInfo.fulfilled, (state) => {
-                state.status.loading = false;
-                state.status.success = true;
+                state.updateStatus.updateLoading = false;
+                state.updateStatus.updateSuccess = true;
             })
             .addCase(patchUserAuthInfo.rejected, (state, action: PayloadAction<any>) => {
-                state.status.loading = false;
-                state.status.error = action.payload || 'Error updating auth info';
+                state.updateStatus.updateLoading = false;
+                state.updateStatus.updateError = action.payload || 'Ошибка при обновлении информации авторизации';
             })
             // patchUserProfileInfo:
             .addCase(patchUserProfileInfo.pending, (state) => {
-                state.status.loading = true;
-                state.status.success = false;
-                state.status.error = null;
+                state.updateStatus.updateLoading = true;
+                state.updateStatus.updateSuccess = false;
+                state.updateStatus.updateError = null;
             })
             .addCase(patchUserProfileInfo.fulfilled, (state) => {
-                state.status.loading = false;
-                state.status.success = true;
+                state.updateStatus.updateLoading = false;
+                state.updateStatus.updateSuccess = true;
             })
             .addCase(patchUserProfileInfo.rejected, (state, action: PayloadAction<any>) => {
-                state.status.loading = false;
-                state.status.error = action.payload || 'Error updating profile info';
+                state.updateStatus.updateLoading = false;
+                state.updateStatus.updateError = action.payload || 'Ошибка при обновлении информации профиля';
             });
     },
 });
 
 // Экспортируем действие для очистки данных профиля
-export const {clearUserInfo} = userInfoSlice.actions;
+export const {clearUserInfo, resetUpdateState} = userInfoSlice.actions;
 export default userInfoSlice.reducer;

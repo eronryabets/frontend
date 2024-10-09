@@ -11,6 +11,7 @@ import {RootState, useAppDispatch} from "../../redux/store";
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import {logout} from "../../redux/slices/authorizationSlice";
+import {Link} from "react-router-dom";
 
 interface NavBarProps {
 }
@@ -35,7 +36,7 @@ export const NavBar = () => {
         dispatch(toggleTheme());
     };
 
-     // Логаут пользователя
+    // Логаут пользователя
     const handleLogout = () => {
         handleMenuClose(); // Сначала закрываем меню
         dispatch(logout()).then((result) => {
@@ -81,7 +82,9 @@ export const NavBar = () => {
                             horizontal: 'right',
                         }}
                     >
-                        <MenuItem onClick={handleMenuClose}>My Profile</MenuItem>
+                        <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
+                            My Profile
+                        </MenuItem>
                         <MenuItem onClick={handleMenuClose}>Vocabulary</MenuItem>
                         <MenuItem onClick={handleMenuClose}>Books</MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>
