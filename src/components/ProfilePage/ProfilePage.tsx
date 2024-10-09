@@ -20,7 +20,7 @@ export const ProfilePage: React.FC = () => {
     const dispatch = useAppDispatch();
     const userData = useSelector((state: RootState) => state.userInfo.userData);
     const {loading, success, error} = useSelector((state: RootState) => state.userInfo.status);
-    const { updateSuccess, updateError } = useSelector((state: RootState) => state.userInfo.updateStatus);
+    const {updateSuccess, updateError} = useSelector((state: RootState) => state.userInfo.updateStatus);
     const theme = useTheme();
 
     const [email, setEmail] = useState(userData.email || '');
@@ -201,9 +201,12 @@ export const ProfilePage: React.FC = () => {
 
                     {error && (
                         <Alert severity="error" sx={{width: '100%', mb: 2}}>
-                            Ошибка: {error}
+                             {/*Ошибка: {typeof error === 'object' ? error.detail : error}*/}
+                            Ошибка: {typeof error === 'object' && error.detail ? error.detail : error}
                         </Alert>
                     )}
+
+
                     <Button
                         fullWidth
                         variant="contained"

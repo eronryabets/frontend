@@ -1,3 +1,4 @@
+// api.ts
 import {AUTH_API_URL} from "../config";
 import axios from 'axios';
 import store from "../redux/store";
@@ -10,31 +11,35 @@ const api = axios.create({
 // Interceptor для перехвата ошибок 401 (неавторизован)
 api.interceptors.response.use(
     (response) => {
-        console.log('Response received:', response);
+        console.log("Response received:", response);
         return response;
     },
     async (error) => {
-        console.error('Error intercepted:', error);
         const originalRequest = error.config;
+
         if (error.response.status === 401 && !originalRequest._retry) {
-            console.log('401 error detected, attempting token refresh');
+            console.log("401 error detected, attempting token refresh");
+
             originalRequest._retry = true;
 
             // Попытка обновления access-токена через refresh-токен
             try {
-                console.log('Sending request to refresh token');
-                const response = await api.post(`${AUTH_API_URL}token/refresh/`, {}, {
+                console.log("Sending request to refresh token");
+
+                const response = await axios.post(`${AUTH_API_URL}token/refresh/`, null, {
                     withCredentials: true, // Отправляем cookies вместе с запросом
                 });
 
-                console.log('Token refresh successful:', response.data);
-                const { access } = response.data;
+                console.log("Token refresh successful:", response.data);
 
-                // Добавляем новый access-токен в заголовок
-                originalRequest.headers['Authorization'] = `Bearer ${access}`;
-                console.log('Retrying original request with new token');
+                const { access_token } = response.data;
 
-                // Повторяем оригинальный запрос
+                // Добавляем новый access-токен в заголовок оригинального запроса
+                originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
+
+                console.log("Retrying original request with new token");
+
+                // Повторяем оригинальный запрос с новым токеном
                 return api(originalRequest);
             } catch (refreshError) {
                 console.error('Refresh token expired or invalid', refreshError);
@@ -42,7 +47,7 @@ api.interceptors.response.use(
                 return Promise.reject(refreshError);
             }
         }
-        console.error('Request failed:', error);
+
         return Promise.reject(error);
     }
 );

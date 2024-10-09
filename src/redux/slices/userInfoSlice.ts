@@ -29,12 +29,12 @@ interface UserInfoState {
     status: {
         loading: boolean;
         success: boolean;
-        error: string | null;
+        error: Record<string, any> | string | null;
     };
     updateStatus: {
         updateLoading: boolean;
         updateSuccess: boolean;
-        updateError: string | null;
+        updateError: Record<string, any> | string | null;
     };
 }
 
@@ -105,6 +105,7 @@ export const patchUserAuthInfo = createAsyncThunk(
     async (formData: Partial<{ password: string; email: string }>, {rejectWithValue}) => {
         try {
             const authServiceResponse = await api.patch(`${AUTH_API_URL}profile/`, formData);
+            console.log("userInfo/patchUserAuthInfo : ");
             console.log(authServiceResponse.data);
             return authServiceResponse.data;
         } catch (error: any) {
@@ -119,6 +120,7 @@ export const patchUserProfileInfo = createAsyncThunk(
     async (formData: Partial<ProfileData>, {rejectWithValue}) => {
         try {
             const profileResponse = await api.patch(`${USER_API_URL}profile/`, formData);
+            console.log("userInfo/patchUserProfileInfo : ");
             console.log(profileResponse.data);
             return profileResponse.data;
         } catch (error: any) {
@@ -186,7 +188,14 @@ const userInfoSlice = createSlice({
             })
             .addCase(getUserInfo.rejected, (state, action: PayloadAction<any>) => {
                 state.status.loading = false;
-                state.status.error = action.payload || 'Error fetching user info';
+                // state.status.error = action.payload || 'Error fetching user info';
+                if (typeof action.payload === 'string') {
+                    state.status.error = {detail: action.payload}; // Преобразуем строку в объект с ключом detail
+                } else if (action.payload && typeof action.payload === 'object') {
+                    state.status.error = action.payload; // Оставляем объект, если он есть
+                } else {
+                    state.status.error = {detail: 'Произошла неизвестная ошибка'};
+                }
             })
             // patchUserAuthInfo:
             .addCase(patchUserAuthInfo.pending, (state) => {
