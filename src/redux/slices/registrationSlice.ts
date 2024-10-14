@@ -1,6 +1,7 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import axios from 'axios';
 import {AUTH_API_URL, USER_API_URL} from "../../config";
+import api from "../../utils/api";
 
 // Интерфейс для данных регистрации (ТИПИЗАЦИЯ)
 interface RegistrationData {
@@ -65,7 +66,7 @@ export const registerUser = createAsyncThunk(
                 if (formData.last_name) userData.append('last_name', formData.last_name);
                 if (formData.avatar) userData.append('avatar', formData.avatar);
 
-                await axios.post(`${USER_API_URL}create/`, userData, {
+                await api.post(`${USER_API_URL}create/`, userData, {
                     withCredentials: true,
                 });
 

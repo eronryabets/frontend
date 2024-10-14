@@ -178,6 +178,7 @@ export const ProfilePage: React.FC = () => {
 
                     <TextField
                         fullWidth
+                        type="email"
                         label="Email"
                         value={email}
                         onChange={handleInputChange(setEmail)}
