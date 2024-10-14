@@ -14,6 +14,7 @@ import {ProfilePage} from "./components/ProfilePage";
 import {NotFoundPage} from "./components/NotFoundPage";
 import {NavBar} from "./components/NavBar";
 import {ProtectedRoute} from "./components/ProtectedRoute";
+import {BookPage} from "./components/BookPage";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -32,6 +33,7 @@ const AppContent = () => {
                 {/* Защищенные маршруты */}
                 <Route element={<ProtectedRoute />}>
                     <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/book" element={<BookPage />} />
                 </Route>
 
                 {/* Открытые маршруты */}
