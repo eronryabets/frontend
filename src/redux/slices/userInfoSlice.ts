@@ -1,52 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import api from "../../utils/api";
-import axios from "axios";
 import {AUTH_API_URL, USER_API_URL} from "../../config";
-
-interface ProfileData {
-    first_name?: string;
-    last_name?: string;
-    avatar?: string | File;
-}
-
-interface Settings {
-    theme: string;
-    language: string;
-
-    [key: string]: any;
-}
-
-interface UserInfoState {
-    userData: {
-        id: string | null;
-        username: string | null;
-        email: string | null;
-        first_name?: string | null;
-        last_name?: string | null;
-        avatar?: string | null;
-        settings?: Settings | null;
-    };
-    status: {
-        loading: boolean;
-        success: boolean;
-        error: Record<string, any> | string | null;
-    };
-    updateStatus: {
-        updateLoading: boolean;
-        updateSuccess: boolean;
-        updateError: Record<string, any> | string | null;
-    };
-}
-
-interface ResponseData {
-    id: string;
-    username: string;
-    email: string;
-    first_name?: string;
-    last_name?: string;
-    avatar?: string;
-    settings?: string;
-}
+import {ProfileData, ResponseData, UserInfoState} from "../../types/userInfo";
 
 // Изначальное состояние
 const initialState: UserInfoState = {

@@ -2,33 +2,9 @@ import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import axios from 'axios';
 import {AUTH_API_URL, USER_API_URL} from "../../config";
 import api from "../../utils/api";
+import {RegistrationData, RegistrationState, ResponseData} from "../../types/registration";
 
-// Интерфейс для данных регистрации (ТИПИЗАЦИЯ)
-interface RegistrationData {
-    username: string;
-    password: string;
-    email: string;
-    first_name?: string;
-    last_name?: string;
-    avatar?: File | null;
-}
 
-// Интерфейс состояния регистрации (ТИПИЗАЦИЯ)
-interface RegistrationState {
-    loading: boolean;
-    success: boolean;
-    error: Record<string, string[]> | null;
-    responseData: ResponseData | null; // Используем интерфейс для строгой типизации JSON данных
-}
-
-//Интерфейс типизации данных ответа от сервера
-interface ResponseData {
-    id: string;
-    username: string;
-    email: string;
-
-    [key: string]: any; // Опционально, для дополнительных полей, которые могут присутствовать
-}
 
 // Изначальное состояние для слайса (для его кейса состояния)
 const initialState: RegistrationState = {
@@ -41,7 +17,7 @@ const initialState: RegistrationState = {
 // Асинхронный thunk для регистрации пользователя с использованием axios
 //(1,2) 1 - название действия, 2 - полезная нагрузка (успех или ошибка)
 export const registerUser = createAsyncThunk(
-    'registration/registerUser', // name/action
+    'registration.ts/registerUser', // name/action
     // PayloadCreator //rejectWithValue - сообщение об ошибке в случае ошибки
     async (formData: RegistrationData, {rejectWithValue}) => {
         try {

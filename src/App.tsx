@@ -22,7 +22,7 @@ const AppContent = () => {
     const location = useLocation();
 
     // Определяем, нужно ли показывать NavBar в зависимости от текущего маршрута
-    const hideNavBarRoutes = ['/login', '/registration', '/notfound'];
+    const hideNavBarRoutes = ['/login', '/registration.ts', '/notfound'];
     const shouldHideNavBar = hideNavBarRoutes.includes(location.pathname.toLowerCase());
 
     return (
