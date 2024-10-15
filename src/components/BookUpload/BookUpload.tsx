@@ -28,12 +28,12 @@ export const BookUpload: React.FC = () => {
     const [formData, setFormData] = useState<BookFormState>({
         user_id: userData?.id || '',  // Проверка на null
         title: '',
-        genre: '',
+        genres: '',
         file: null,
         cover_image: null,
     });
 
-    const { title, genre, file } = formData;
+    const { title, genres, file } = formData;
 
     // Локальное состояние для превью обложки книги
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
@@ -78,7 +78,7 @@ export const BookUpload: React.FC = () => {
         const bookData: BookData = {
             user_id: formData.user_id,
             title: formData.title,
-            genre: formData.genre,
+            genres: formData.genres,
             file: formData.file,
             cover_image: formData.cover_image,
         };
@@ -161,9 +161,9 @@ export const BookUpload: React.FC = () => {
 
                     <TextField
                         fullWidth
-                        label="Genre"
-                        name="genre"
-                        value={genre}
+                        label="Genres"
+                        name="genres"
+                        value={genres}
                         onChange={handleChange}
                         variant="outlined"
                         sx={{ mb: 2 }}

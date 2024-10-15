@@ -5,6 +5,7 @@ import api from "../../utils/api";
 // Интерфейс для данных необходимых для выгрузки книги (ТИПИЗАЦИЯ)
 import { BookData, UploadBookState, ResponseData } from '../../types/book';
 import axios from "axios";
+import normalizeAndLimitErrors from "../../utils/normalizeAndLimitErrors";
 
 // Изначальное состояние для слайса
 const initialState: UploadBookState = {
@@ -12,23 +13,6 @@ const initialState: UploadBookState = {
     success: false,
     error: null,
     responseMessage: null,
-};
-
-// Функция для нормализации ошибок
-const normalizeErrors = (data: any): Record<string, string[]> => {
-    const normalizedErrors: Record<string, string[]> = {};
-
-    for (const key in data) {
-        if (Array.isArray(data[key])) {
-            normalizedErrors[key] = data[key];
-        } else if (typeof data[key] === 'string') {
-            normalizedErrors[key] = [data[key]];
-        } else {
-            normalizedErrors[key] = ['Unknown error'];
-        }
-    }
-
-    return normalizedErrors;
 };
 
 // Асинхронный thunk для загрузки книги
@@ -44,7 +28,7 @@ export const uploadBook = createAsyncThunk<
             const formData = new FormData();
             formData.append("user_id", bookData.user_id);
             formData.append("title", bookData.title);
-            formData.append("genre", bookData.genre);
+            formData.append("genre", bookData.genres);
             if (bookData.file) {
                 formData.append("file", bookData.file);
             }
@@ -63,11 +47,15 @@ export const uploadBook = createAsyncThunk<
             return response.data as ResponseData;
         } catch (error: any) {
             if (axios.isAxiosError(error) && error.response) {
-                // Нормализация ошибок
-                const normalizedErrors = normalizeErrors(error.response.data);
+                // Нормализация и ограничение длины ошибок
+                const normalizedErrors = normalizeAndLimitErrors(error.response.data);
                 return rejectWithValue(normalizedErrors);
             } else {
-                return rejectWithValue(error.message);
+                // Ограничение длины строки ошибки
+                const errorMessage = typeof error.message === 'string' ?
+                    (error.message.length > 500 ? error.message.slice(0, 500) + '...' : error.message) :
+                    'Unknown error occurred.';
+                return rejectWithValue(errorMessage);
             }
         }
     }
