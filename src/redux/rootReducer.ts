@@ -4,6 +4,7 @@ import authorizationReducer from './slices/authorizationSlice';
 import userInfoReducer from './slices/userInfoSlice';
 import themeReducer from './slices/themeSlice';
 import uploadBookReducer from "./slices/uploadBookSlice";
+import genresReducer from "./slices/genresSlice";
 
 // Объединяем все редьюсеры в один root reducer
 const rootReducer = combineReducers({
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
   userInfo: userInfoReducer,
   theme: themeReducer,
   uploadBook: uploadBookReducer,
+  genres: genresReducer,
 });
 
 export default rootReducer;
