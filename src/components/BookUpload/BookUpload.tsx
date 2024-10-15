@@ -1,6 +1,7 @@
-import React, {useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../redux/store";
+// BookUpload.tsx
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
 import {
     Alert,
     Avatar,
@@ -14,31 +15,32 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import {PhotoCamera} from "@mui/icons-material";
-import {uploadBook} from "../../redux/slices/uploadBookSlice"; // Импортируем экшен для загрузки книги
+import { PhotoCamera } from "@mui/icons-material";
+import { uploadBook } from "../../redux/slices/uploadBookSlice"; // Импортируем экшен для загрузки книги
+import { BookFormState, BookData } from '../../types/book'; // Импортируем типы
 
 export const BookUpload: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const userData = useSelector((state: RootState) => state.userInfo.userData);
-    const {loading, success, error} = useSelector((state: RootState) => state.uploadBook);
+    const { loading, success, error } = useSelector((state: RootState) => state.uploadBook);
     const theme = useTheme();
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<BookFormState>({
         user_id: userData?.id || '',  // Проверка на null
         title: '',
         genre: '',
-        file: null as File | null,
-        cover_image: null as File | null,
+        file: null,
+        cover_image: null,
     });
 
-    const {title, genre, file} = formData;
+    const { title, genre, file } = formData;
 
     // Локальное состояние для превью обложки книги
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
 
     // Обработка изменения в полях
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value, files} = e.target;
+        const { name, value, files } = e.target;
 
         if (name === "cover_image" && files && files.length > 0) {
             const file = files[0];
@@ -65,25 +67,24 @@ export const BookUpload: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const bookFormData = new FormData();
-
-        // Добавляем данные в formData, проверяя на наличие значений
-        if (formData.user_id) {
-            bookFormData.append("user_id", formData.user_id);
-        }
-        bookFormData.append("title", formData.title);
-        bookFormData.append("genre", formData.genre);
-
-        if (formData.file) {
-            bookFormData.append("file", formData.file);
+        // Проверка обязательных полей
+        if (!formData.file) {
+            // Можно добавить обработку ошибки, если файл не выбран
+            alert("Пожалуйста, выберите файл для загрузки.");
+            return;
         }
 
-        if (formData.cover_image) {
-            bookFormData.append("cover_image", formData.cover_image);
-        }
+        // Создаём объект BookData
+        const bookData: BookData = {
+            user_id: formData.user_id,
+            title: formData.title,
+            genre: formData.genre,
+            file: formData.file,
+            cover_image: formData.cover_image,
+        };
 
         // Отправляем данные через Redux action
-        dispatch(uploadBook(bookFormData));
+        dispatch(uploadBook(bookData));
     };
 
     return (
@@ -95,14 +96,14 @@ export const BookUpload: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '100vh',
+                minHeight: '100vh',
                 padding: 2,
                 margin: 6,
                 backgroundColor: theme.palette.background.default,
             }}
         >
             {loading ? (
-                <CircularProgress/>
+                <CircularProgress />
             ) : (
                 <Paper
                     elevation={3}
@@ -117,11 +118,11 @@ export const BookUpload: React.FC = () => {
                         color: theme.palette.text.primary,
                     }}
                 >
-                    <Typography variant="h5" component="div" sx={{mb: 2, alignSelf: 'center'}}>
+                    <Typography variant="h5" component="div" sx={{ mb: 2, alignSelf: 'center' }}>
                         Upload Book
                     </Typography>
 
-                    <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <Avatar
                             alt="Cover Image Preview"
                             src={coverImagePreview || undefined}
@@ -138,11 +139,11 @@ export const BookUpload: React.FC = () => {
                                 id="cover-image-upload"
                                 type="file"
                                 name="cover_image"
-                                style={{display: 'none'}}
+                                style={{ display: 'none' }}
                                 onChange={handleChange}
                             />
                             <IconButton color="primary" aria-label="upload cover image" component="span">
-                                <PhotoCamera/>
+                                <PhotoCamera />
                             </IconButton>
                         </label>
                     </Box>
@@ -154,7 +155,8 @@ export const BookUpload: React.FC = () => {
                         value={title}
                         onChange={handleChange}
                         variant="outlined"
-                        sx={{mb: 2}}
+                        sx={{ mb: 2 }}
+                        required
                     />
 
                     <TextField
@@ -164,10 +166,11 @@ export const BookUpload: React.FC = () => {
                         value={genre}
                         onChange={handleChange}
                         variant="outlined"
-                        sx={{mb: 2}}
+                        sx={{ mb: 2 }}
+                        required
                     />
 
-                    <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <Button variant="contained" component="label">
                             Upload Book File
                             <input
@@ -179,15 +182,21 @@ export const BookUpload: React.FC = () => {
                             />
                         </Button>
                         {file && (
-                            <Typography variant="body2" sx={{ml: 2}}>
+                            <Typography variant="body2" sx={{ ml: 2 }}>
                                 {file.name}
                             </Typography>
                         )}
                     </Box>
 
                     {error && (
-                        <Alert severity="error" sx={{width: '100%', mb: 2}}>
-                            {/*Ошибка: {error}*/}
+                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                            {error.general
+                                ? error.general.join(' ')
+                                : Object.entries(error).map(([key, messages]) => (
+                                      <div key={key}>
+                                          {key}: {Array.isArray(messages) ? messages.join(' ') : messages}
+                                      </div>
+                                  ))}
                         </Alert>
                     )}
 
@@ -196,7 +205,7 @@ export const BookUpload: React.FC = () => {
                         variant="contained"
                         color="primary"
                         type="submit"
-                        sx={{mt: 2}}
+                        sx={{ mt: 2 }}
                     >
                         Upload Book
                     </Button>
