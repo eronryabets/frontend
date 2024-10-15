@@ -2,22 +2,23 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import {FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Chip} from "@mui/material";
 import { Genre } from "../../types/genres";
 
 interface GenreSelectProps {
-    value: number | null;
-    onChange: (value: null | number) => void;
+    values: number[]; // Массив выбранных жанров
+    onChange: (values: number[]) => void;
     label?: string;
     required?: boolean;
 }
 
-const GenreSelect: React.FC<GenreSelectProps> = ({ value, onChange, label = "Genre", required = false }) => {
+const GenreSelect: React.FC<GenreSelectProps> = ({ values, onChange, label = "Genres", required = false }) => {
     const { genres, loading, error } = useSelector((state: RootState) => state.genres);
 
-    const handleChange = (event: SelectChangeEvent<string>) => {
-        const selectedId = event.target.value === "" ? null : Number(event.target.value);
-        onChange(selectedId);
+    const handleChange = (event: SelectChangeEvent<string[]>) => {
+        // Явно указываем TypeScript, что event.target.value - это string[]
+        const selectedIds = (event.target.value as string[]).map((val: string) => Number(val));
+        onChange(selectedIds);
     };
 
     return (
@@ -27,13 +28,22 @@ const GenreSelect: React.FC<GenreSelectProps> = ({ value, onChange, label = "Gen
                      disabled={loading || !!error}
                      sx={{mb: 2}}
         >
-            <InputLabel id="genre-label">{label}</InputLabel>
+            <InputLabel id="genres-label">{label}</InputLabel>
             <Select
-                 labelId="genre-label"
-                id="genre-select"
-                value={value !== null ? value.toString() : ''}
+                labelId="genres-label"
+                id="genres-select"
+                multiple
+                value={values.map(id => id.toString())} // Преобразуем числа в строки
                 onChange={handleChange}
                 label={label}
+                renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => {
+                            const genre = genres.find((g) => g.id === Number(value));
+                            return <Chip key={value} label={genre ? genre.name : value} />;
+                        })}
+                    </Box>
+                )}
             >
                 {genres.map((genre: Genre) => (
                     <MenuItem key={genre.id} value={genre.id.toString()}>

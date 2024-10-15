@@ -15,6 +15,7 @@ const initialState: UploadBookState = {
     responseMessage: null,
 };
 
+
 // Асинхронный thunk для загрузки книги
 export const uploadBook = createAsyncThunk<
     ResponseData, // Тип возвращаемых данных при успехе
@@ -22,13 +23,16 @@ export const uploadBook = createAsyncThunk<
     { rejectValue: Record<string, string[]> | string } // Тип rejectWithValue
 >(
     'books/uploadBook',
-    async (bookData: BookData, {rejectWithValue}) => {
+    async (bookData: BookData, { rejectWithValue }) => {
         try {
             // Создание FormData из BookData
             const formData = new FormData();
             formData.append("user_id", bookData.user_id);
             formData.append("title", bookData.title);
-            formData.append("genres", bookData.genre.toString()); // Преобразуем число в строку
+            // Добавление нескольких жанров
+            bookData.genres.forEach((genreId) => {
+                formData.append("genres", genreId.toString());
+            });
             if (bookData.file) {
                 formData.append("file", bookData.file);
             }
@@ -87,24 +91,23 @@ const uploadBookSlice = createSlice({
             .addCase(uploadBook.fulfilled, (state, action: PayloadAction<ResponseData>) => {
                 state.loading = false;
                 state.success = true;
-                state.responseMessage = {general: ["Book uploaded successfully."]};
+                state.responseMessage = { general: ["Book uploaded successfully."] };
             })
             .addCase(uploadBook.rejected, (state, action) => {
                 state.loading = false;
                 if (action.payload) { // Проверяем, что payload существует
                     if (typeof action.payload === 'string') {
-                        state.error = {general: [action.payload]};
+                        state.error = { general: [action.payload] };
                     } else {
                         state.error = action.payload;
                     }
                 } else {
                     // Если payload отсутствует, устанавливаем общую ошибку
-                    state.error = {general: ['Unknown error occurred.']};
+                    state.error = { general: ['Unknown error occurred.'] };
                 }
             });
     },
 });
 
-
-export const {resetState} = uploadBookSlice.actions;
+export const { resetState } = uploadBookSlice.actions;
 export default uploadBookSlice.reducer;

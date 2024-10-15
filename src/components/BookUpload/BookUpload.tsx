@@ -24,26 +24,26 @@ import GenreSelect from '../GenreSelect/GenreSelect';
 export const BookUpload: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const userData = useSelector((state: RootState) => state.userInfo.userData);
-    const {loading, success, error} = useSelector((state: RootState) => state.uploadBook);
-    const {genres, loading: genresLoading, error: genresError} = useSelector((state: RootState) => state.genres);
+    const { loading, success, error } = useSelector((state: RootState) => state.uploadBook);
+    const { genres, loading: genresLoading, error: genresError } = useSelector((state: RootState) => state.genres);
     const theme = useTheme();
 
     const [formData, setFormData] = useState<BookFormState>({
         user_id: userData?.id || '',
         title: '',
-        genre: null, // Инициализируем как null
+        genres: [], // Инициализируем как пустой массив
         file: null,
         cover_image: null,
     });
 
-    const {title, genre, file} = formData;
+    const { title, genres: selectedGenres, file } = formData;
 
     // Локальное состояние для превью обложки книги
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
 
     // Обработка изменений для полей ввода, кроме жанра
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value, files} = e.target;
+        const { name, value, files } = e.target;
 
         if (name === "cover_image" && files && files.length > 0) {
             const file = files[0];
@@ -66,11 +66,11 @@ export const BookUpload: React.FC = () => {
         }
     };
 
-    // Обработка выбора жанра
-    const handleGenreChange = (selectedId: number | null) => {
+    // Обработка выбора жанров
+    const handleGenresChange = (selectedIds: number[]) => {
         setFormData({
             ...formData,
-            genre: selectedId,
+            genres: selectedIds,
         });
     };
 
@@ -84,15 +84,15 @@ export const BookUpload: React.FC = () => {
             return;
         }
 
-        if (formData.genre === null) {
-            alert("Please select a genre.");
+        if (formData.genres.length === 0) {
+            alert("Please select at least one genre.");
             return;
         }
 
         const bookData: BookData = {
             user_id: formData.user_id,
             title: formData.title,
-            genre: formData.genre,
+            genres: formData.genres,
             file: formData.file,
             cover_image: formData.cover_image,
         };
@@ -105,21 +105,21 @@ export const BookUpload: React.FC = () => {
         dispatch(fetchGenres());
     }, [dispatch]);
 
-    // Установка жанра по умолчанию на "Unknown Genre" (id: 41) после загрузки жанров
+    // Установка жанра по умолчанию на "Other" (id: 41) после загрузки жанров
     useEffect(() => {
-        if (genres.length > 0 && formData.genre === null) {
-            const unknownGenreId = 41; // ID "Unknown Genre"
-            const unknownGenre = genres.find((g) => g.id === unknownGenreId);
+        if (genres.length > 0 && formData.genres.length === 0) {
+            const otherGenreId = 41; // ID "Other" genre
+            const otherGenre = genres.find((g) => g.id === otherGenreId);
 
-            if (unknownGenre) {
-                setFormData((prev) => ({...prev, genre: unknownGenre.id}));
+            if (otherGenre) {
+                setFormData((prev) => ({ ...prev, genres: [otherGenre.id] }));
             } else {
-                // Если "Unknown Genre" не найден, можно выбрать первый жанр или обработать иначе
-                setFormData((prev) => ({...prev, genre: genres[0].id}));
-                console.warn(`Genre with id ${unknownGenreId} not found. Defaulting to the first genre.`);
+                // Если "Other" не найден, выбрать первый жанр из списка
+                setFormData((prev) => ({ ...prev, genres: [genres[0].id] }));
+                console.warn(`Genre with id ${otherGenreId} not found. Defaulting to the first genre.`);
             }
         }
-    }, [genres, formData.genre]);
+    }, [genres, formData.genres.length]);
 
     return (
         <Box
@@ -137,7 +137,7 @@ export const BookUpload: React.FC = () => {
             }}
         >
             {(loading || genresLoading) ? (
-                <CircularProgress/>
+                <CircularProgress />
             ) : (
                 <Paper
                     elevation={3}
@@ -152,12 +152,12 @@ export const BookUpload: React.FC = () => {
                         color: theme.palette.text.primary,
                     }}
                 >
-                    <Typography variant="h5" component="div" sx={{mb: 2, alignSelf: 'center'}}>
+                    <Typography variant="h5" component="div" sx={{ mb: 2, alignSelf: 'center' }}>
                         Upload Book
                     </Typography>
 
                     {/* Превью обложки */}
-                    <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <Avatar
                             alt="Cover Image Preview"
                             src={coverImagePreview || undefined}
@@ -174,20 +174,20 @@ export const BookUpload: React.FC = () => {
                                 id="cover-image-upload"
                                 type="file"
                                 name="cover_image"
-                                style={{display: 'none'}}
+                                style={{ display: 'none' }}
                                 onChange={handleInputChange}
                             />
                             <IconButton color="primary" aria-label="upload cover image" component="span">
-                                <PhotoCamera/>
+                                <PhotoCamera />
                             </IconButton>
                         </label>
                     </Box>
 
-                    {/* Поле выбора жанра */}
+                    {/* Поле выбора жанров */}
                     <GenreSelect
-                        value={genre}
-                        onChange={handleGenreChange}
-                        label="Genre"
+                        values={selectedGenres}
+                        onChange={handleGenresChange}
+                        label="Genres"
                         required
                     />
 
@@ -199,12 +199,12 @@ export const BookUpload: React.FC = () => {
                         value={title}
                         onChange={handleInputChange}
                         variant="outlined"
-                        sx={{mb: 2}}
+                        sx={{ mb: 2 }}
                         required
                     />
 
                     {/* Поле для загрузки файла книги */}
-                    <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <Button variant="contained" component="label">
                             Upload Book File
                             <input
@@ -216,7 +216,7 @@ export const BookUpload: React.FC = () => {
                             />
                         </Button>
                         {file && (
-                            <Typography variant="body2" sx={{ml: 2}}>
+                            <Typography variant="body2" sx={{ ml: 2 }}>
                                 {file.name}
                             </Typography>
                         )}
@@ -224,20 +224,20 @@ export const BookUpload: React.FC = () => {
 
                     {/* Отображение ошибок при загрузке книги */}
                     {error && (
-                        <Alert severity="error" sx={{width: '100%', mb: 2}}>
+                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
                             {error.general
                                 ? error.general.join(' ')
                                 : Object.entries(error).map(([key, messages]) => (
-                                    <div key={key}>
-                                        {key}: {Array.isArray(messages) ? messages.join(' ') : messages}
-                                    </div>
-                                ))}
+                                      <div key={key}>
+                                          {key}: {Array.isArray(messages) ? messages.join(' ') : messages}
+                                      </div>
+                                  ))}
                         </Alert>
                     )}
 
                     {/* Отображение ошибок при загрузке жанров */}
                     {genresError && (
-                        <Alert severity="error" sx={{width: '100%', mb: 2}}>
+                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
                             {genresError}
                         </Alert>
                     )}
@@ -248,7 +248,7 @@ export const BookUpload: React.FC = () => {
                         variant="contained"
                         color="primary"
                         type="submit"
-                        sx={{mt: 2}}
+                        sx={{ mt: 2 }}
                         disabled={loading || genresLoading}
                     >
                         Upload Book
