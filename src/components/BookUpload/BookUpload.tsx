@@ -105,18 +105,18 @@ export const BookUpload: React.FC = () => {
         dispatch(fetchGenres());
     }, [dispatch]);
 
-    // Установка жанра по умолчанию на "Other" (id: 41) после загрузки жанров
+    // Установка жанра по умолчанию на "Another" (id: 1) после загрузки жанров
     useEffect(() => {
         if (genres.length > 0 && formData.genres.length === 0) {
-            const otherGenreId = 41; // ID "Other" genre
-            const otherGenre = genres.find((g) => g.id === otherGenreId);
+            const anotherGenreId = 1; // ID "Another" genre
+            const anotherGenre = genres.find((g) => g.id === anotherGenreId);
 
-            if (otherGenre) {
-                setFormData((prev) => ({ ...prev, genres: [otherGenre.id] }));
+            if (anotherGenre) {
+                setFormData((prev) => ({ ...prev, genres: [anotherGenre.id] }));
             } else {
                 // Если "Other" не найден, выбрать первый жанр из списка
                 setFormData((prev) => ({ ...prev, genres: [genres[0].id] }));
-                console.warn(`Genre with id ${otherGenreId} not found. Defaulting to the first genre.`);
+                console.warn(`Genre with id ${anotherGenreId} not found. Defaulting to the first genre.`);
             }
         }
     }, [genres, formData.genres.length]);
