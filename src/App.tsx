@@ -5,7 +5,7 @@ import {store, persistor, RootState} from './redux/store';
 
 import {ThemeProvider} from '@mui/material/styles';
 import {MuiTheme} from "./components/MuiTheme";
-import {CssBaseline} from "@mui/material";
+import {CssBaseline, Toolbar} from "@mui/material";
 import {RegistrationPage} from "./components/RegistrationPage";
 import {HelmetProvider} from "react-helmet-async";
 import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
@@ -15,6 +15,7 @@ import {NotFoundPage} from "./components/NotFoundPage";
 import {NavBar} from "./components/NavBar";
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import {BookUpload} from "./components/BookUpload";
+import BooksList from "./components/BookList/BooksList";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -27,19 +28,21 @@ const AppContent = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <CssBaseline />
-            {!shouldHideNavBar && <NavBar />} {/* Отображаем NavBar только если текущий маршрут не в списке */}
+            <CssBaseline/>
+            {!shouldHideNavBar && <NavBar/>} {/* Отображаем NavBar только если текущий маршрут не в списке */}
+            {!shouldHideNavBar && <Toolbar/>} {/* Добавляем Toolbar как спейсер */}
             <Routes>
                 {/* Защищенные маршруты */}
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/book" element={<BookUpload />} />
+                <Route element={<ProtectedRoute/>}>
+                    <Route path="/profile" element={<ProfilePage/>}/>
+                    <Route path="/book" element={<BookUpload/>}/>
+                    <Route path="/booklist" element={<BooksList/>}/>
                 </Route>
 
                 {/* Открытые маршруты */}
-                <Route path="/registration" element={<RegistrationPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/*" element={<NotFoundPage />} />
+                <Route path="/registration" element={<RegistrationPage/>}/>
+                <Route path="/login" element={<LoginPage/>}/>
+                <Route path="/*" element={<NotFoundPage/>}/>
             </Routes>
         </ThemeProvider>
     );
@@ -51,7 +54,7 @@ function App() {
             <PersistGate loading={null} persistor={persistor}>
                 <HelmetProvider>
                     <Router>
-                        <AppContent />
+                        <AppContent/>
                     </Router>
                 </HelmetProvider>
             </PersistGate>

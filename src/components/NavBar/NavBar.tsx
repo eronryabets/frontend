@@ -55,7 +55,8 @@ export const NavBar = () => {
                 <Box sx={{display: 'flex', alignItems: 'center'}}>
                     <Button color="inherit">Test</Button>
                     <Button color="inherit">Vocabulary</Button>
-                    <Button color="inherit" component={Link} to="/book" >Books</Button>
+                    <Button color="inherit" component={Link} to="/book" >upl.Book</Button>
+                    <Button color="inherit" component={Link} to="/booklist" >Books</Button>
                     <IconButton onClick={handleThemeToggle} color="inherit">
                         {themeMode === 'dark' ? <Brightness7Icon/> : <Brightness4Icon/>}
                     </IconButton>

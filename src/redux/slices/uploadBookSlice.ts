@@ -2,8 +2,7 @@ import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import {BOOK_API_URL} from "../../config";
 import api from "../../utils/api";
 
-// Интерфейс для данных необходимых для выгрузки книги (ТИПИЗАЦИЯ)
-import {BookData, UploadBookState, ResponseData} from '../../types/book';
+import {BookData, UploadBookState, ResponseData} from '../../types/uploadBook';
 import axios from "axios";
 import normalizeAndLimitErrors from "../../utils/normalizeAndLimitErrors";
 
