@@ -32,6 +32,7 @@ declare module '@mui/material/styles' {
 }
 
 export const MuiTheme = (themeMode: 'light' | 'dark') => {
+    const isLight = themeMode === 'light';
 
     const theme = createTheme({
         transitions: {
@@ -63,6 +64,7 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
                 primary: themeMode === 'light' ? '#000000' : '#ffffff',
                 secondary: themeMode === 'light' ? '#555555' : '#bbbbbb',
             },
+
         },
         typography: {
             fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
@@ -73,9 +75,9 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
             MuiAppBar: {
                 styleOverrides: {
                     root: {
-                        backgroundColor: '#808080', // Серый цвет
-                        // Или значение из темы:
-                        // backgroundColor: isLight ? '#f5f5f5' : '#424242',
+                        //значение из темы:
+                        backgroundColor: isLight ? '#b0b0b4' : '#424242',
+                        color: isLight ? '#000000' : '#ffffff',
                     },
                 },
             },
