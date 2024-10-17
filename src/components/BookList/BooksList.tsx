@@ -48,7 +48,10 @@ export const BooksList: React.FC = () => {
     }
 
     return (
-        <Container sx={{mt: 4, mb: 4}}>
+        <Container sx={{
+            mt: 8,
+            mb: 4
+        }}>
             <Box
                 display="grid"
                 gap={4}
@@ -97,9 +100,9 @@ export const BooksList: React.FC = () => {
                                         animation: 'pulse 2.5s infinite',
                                     },
                                     '@keyframes pulse': {
-                                        '0%': { transform: 'scale(1)' },
-                                        '50%': { transform: 'scale(1.05)' },
-                                        '100%': { transform: 'scale(1)' },
+                                        '0%': {transform: 'scale(1)'},
+                                        '50%': {transform: 'scale(1.05)'},
+                                        '100%': {transform: 'scale(1)'},
                                     },
                                 }}
                             >
@@ -164,7 +167,7 @@ export const BooksList: React.FC = () => {
                 ))}
             </Box>
             {/* Пагинация */}
-            <Box display="flex" justifyContent="center" mt={4}>
+            <Box display="flex" justifyContent="center" mt={14}>
                 <Pagination
                     count={totalPages}
                     page={currentPage}

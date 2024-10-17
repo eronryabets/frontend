@@ -132,8 +132,10 @@ export const BookUpload: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                minHeight: '100vh', // Покрывает всю высоту окна просмотра
+                height: '90vh', // Покрывает всю высоту окна просмотра
                 padding: 2,
+                overflow: 'hidden', // Предотвращаем переполнение
+                backgroundColor: theme.customBackground.gradient,
             }}
         >
             {(loading || genresLoading) ? (
@@ -150,7 +152,7 @@ export const BookUpload: React.FC = () => {
                         maxWidth: 500,
                         background: theme.customBackground.paperGradient, // градиент из темы
                         borderRadius: 2,
-                        boxShadow: 4, // 'none' - Убираем тень, чтобы не было двойного эффекта
+                        boxShadow: 4,
                     }}
                 >
                     <Typography variant="h5" component="div" sx={{ mb: 2, alignSelf: 'center', color: theme.palette.text.primary }}>

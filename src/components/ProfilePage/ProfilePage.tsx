@@ -128,11 +128,12 @@ export const ProfilePage: React.FC = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '100vh',
+                height: '80vh',
                 padding: 2,
                 margin: 6,
+                overflow: 'hidden', // Предотвращаем переполнение
                 backgroundColor: theme.customBackground.gradient,
-                minHeight: '100vh', // Покрывает всю высоту окна просмотра
+                // minHeight: '100vh', // Покрывает всю высоту окна просмотра
             }}
         >
             {loading ? (
