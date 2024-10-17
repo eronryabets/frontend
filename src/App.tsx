@@ -16,6 +16,7 @@ import {NavBar} from "./components/NavBar";
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import {BookUpload} from "./components/BookUpload";
 import {BooksList} from "./components/BookList";
+import BookDetail from "./components/BookDetail/BookDetail";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -50,6 +51,7 @@ const AppContent = () => {
                     <Route path="/profile" element={<ProfilePage/>}/>
                     <Route path="/book" element={<BookUpload/>}/>
                     <Route path="/booklist" element={<BooksList/>}/>
+                    <Route path="/book/:id" element={<BookDetail />} />
                 </Route>
 
                 {/* Открытые маршруты */}

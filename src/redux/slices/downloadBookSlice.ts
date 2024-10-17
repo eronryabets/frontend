@@ -10,7 +10,7 @@ const initialState: DownloadBooksState = {
     error: null,
     currentPage: 1,
     totalPages: 1,
-    itemsPerPage: 10, // Предположим, что на каждой странице по 10 книг
+    itemsPerPage: 6, // Предположим, что на каждой странице по 6 книг
 };
 
 // Асинхронный thunk для получения книг с пагинацией
