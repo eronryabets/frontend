@@ -28,6 +28,7 @@ export const uploadBook = createAsyncThunk<
             const formData = new FormData();
             formData.append("user_id", bookData.user_id);
             formData.append("title", bookData.title);
+            formData.append("description", bookData.description || "");
             // Добавление нескольких жанров
             bookData.genres.forEach((genreId) => {
                 formData.append("genres", genreId.toString());

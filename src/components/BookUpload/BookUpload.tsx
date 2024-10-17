@@ -1,8 +1,8 @@
 // src/components/BookUpload.tsx
 
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
+import React, {useState, useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../redux/store";
 import {
     Alert,
     Avatar,
@@ -16,17 +16,17 @@ import {
     Typography,
     useTheme,
 } from "@mui/material";
-import { PhotoCamera } from "@mui/icons-material";
-import { uploadBook } from "../../redux/slices/uploadBookSlice";
-import { fetchGenres } from "../../redux/slices/genresSlice";
-import { BookFormState, BookData } from '../../types';
-import { GenreSelect } from '../GenreSelect';
+import {PhotoCamera} from "@mui/icons-material";
+import {resetState, uploadBook} from "../../redux/slices/uploadBookSlice";
+import {fetchGenres} from "../../redux/slices/genresSlice";
+import {BookFormState, BookData} from '../../types';
+import {GenreSelect} from '../GenreSelect';
 
 export const BookUpload: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const userData = useSelector((state: RootState) => state.userInfo.userData);
-    const { loading, success, error } = useSelector((state: RootState) => state.uploadBook);
-    const { genres, loading: genresLoading, error: genresError } = useSelector((state: RootState) => state.genres);
+    const {loading, success, error} = useSelector((state: RootState) => state.uploadBook);
+    const {genres, loading: genresLoading, error: genresError} = useSelector((state: RootState) => state.genres);
     const theme = useTheme();
 
     const [formData, setFormData] = useState<BookFormState>({
@@ -35,16 +35,17 @@ export const BookUpload: React.FC = () => {
         genres: [],
         file: null,
         cover_image: null,
+        description: '',
     });
 
-    const { title, genres: selectedGenres, file } = formData;
+    const {title, genres: selectedGenres, file, description} = formData;
 
     // Локальное состояние для превью обложки книги
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
 
     // Обработка изменений для полей ввода, кроме жанра
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, files } = e.target;
+        const {name, value, files} = e.target;
 
         if (name === "cover_image" && files && files.length > 0) {
             const file = files[0];
@@ -65,6 +66,15 @@ export const BookUpload: React.FC = () => {
                 [name]: value,
             });
         }
+    };
+
+    // Обработка изменения поля описания
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const {value} = e.target;
+        setFormData({
+            ...formData,
+            description: value,
+        });
     };
 
     // Обработка выбора жанров
@@ -96,6 +106,7 @@ export const BookUpload: React.FC = () => {
             genres: formData.genres,
             file: formData.file,
             cover_image: formData.cover_image,
+            description: formData.description,
         };
 
         dispatch(uploadBook(bookData));
@@ -113,14 +124,24 @@ export const BookUpload: React.FC = () => {
             const anotherGenre = genres.find((g) => g.id === anotherGenreId);
 
             if (anotherGenre) {
-                setFormData((prev) => ({ ...prev, genres: [anotherGenre.id] }));
+                setFormData((prev) => ({...prev, genres: [anotherGenre.id]}));
             } else {
                 // Если "Another" не найден, выбрать первый жанр из списка
-                setFormData((prev) => ({ ...prev, genres: [genres[0].id] }));
+                setFormData((prev) => ({...prev, genres: [genres[0].id]}));
                 console.warn(`Genre with id ${anotherGenreId} not found. Defaulting to the first genre.`);
             }
         }
     }, [genres, formData.genres.length]);
+
+    useEffect(() => {
+        if (success || error) {
+            const timer = setTimeout(() => {
+                dispatch(resetState());
+            }, 6000); // Закрытие Snackbar через 6 секунд
+
+            return () => clearTimeout(timer);
+        }
+    }, [success, error, dispatch]);
 
     return (
         <Box
@@ -139,7 +160,7 @@ export const BookUpload: React.FC = () => {
             }}
         >
             {(loading || genresLoading) ? (
-                <CircularProgress />
+                <CircularProgress/>
             ) : (
                 <Paper
                     elevation={3}
@@ -149,18 +170,19 @@ export const BookUpload: React.FC = () => {
                         flexDirection: 'column',
                         alignItems: 'flex-start',
                         width: '100%',
-                        maxWidth: 500,
+                        maxWidth: 600,
                         background: 'background.paper', // градиент из темы -> theme.customBackground.paperGradient
                         borderRadius: 2,
                         boxShadow: 4,
                     }}
                 >
-                    <Typography variant="h5" component="div" sx={{ mb: 2, alignSelf: 'center', color: theme.palette.text.primary }}>
+                    <Typography variant="h5" component="div"
+                                sx={{mb: 2, alignSelf: 'center', color: theme.palette.text.primary}}>
                         Upload Book
                     </Typography>
 
                     {/* Превью обложки */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
                         <Avatar
                             alt="Cover Image Preview"
                             src={coverImagePreview || undefined}
@@ -177,14 +199,31 @@ export const BookUpload: React.FC = () => {
                                 id="cover-image-upload"
                                 type="file"
                                 name="cover_image"
-                                style={{ display: 'none' }}
+                                style={{display: 'none'}}
                                 onChange={handleInputChange}
                             />
                             <IconButton color="primary" aria-label="upload cover image" component="span">
-                                <PhotoCamera />
+                                <PhotoCamera/>
                             </IconButton>
                         </label>
                     </Box>
+
+                    {/* Поле ввода описания */}
+                    <TextField
+                        fullWidth
+                        label="Description"
+                        name="description"
+                        value={description}
+                        onChange={handleDescriptionChange}
+                        variant="outlined"
+                        multiline
+                        rows={4}
+                        sx={{mb: 2}}
+                        placeholder="Enter a short description of the book"
+                        inputProps={{maxLength: 500}}
+                        helperText={`${description.length}/500`}
+                        required
+                    />
 
                     {/* Поле выбора жанров */}
                     <GenreSelect
@@ -202,12 +241,12 @@ export const BookUpload: React.FC = () => {
                         value={title}
                         onChange={handleInputChange}
                         variant="outlined"
-                        sx={{ mb: 2 }}
+                        sx={{mb: 2}}
                         required
                     />
 
                     {/* Поле для загрузки файла книги */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
                         <Button variant="contained" component="label">
                             Upload Book File
                             <input
@@ -219,7 +258,7 @@ export const BookUpload: React.FC = () => {
                             />
                         </Button>
                         {file && (
-                            <Typography variant="body2" sx={{ ml: 2, color: theme.palette.text.primary }}>
+                            <Typography variant="body2" sx={{ml: 2, color: theme.palette.text.primary}}>
                                 {file.name}
                             </Typography>
                         )}
@@ -227,7 +266,7 @@ export const BookUpload: React.FC = () => {
 
                     {/* Отображение ошибок при загрузке книги */}
                     {error && (
-                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                        <Alert severity="error" sx={{width: '100%', mb: 2}}>
                             {error.general
                                 ? error.general.join(' ')
                                 : Object.entries(error).map(([key, messages]) => (
@@ -240,7 +279,7 @@ export const BookUpload: React.FC = () => {
 
                     {/* Отображение ошибок при загрузке жанров */}
                     {genresError && (
-                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                        <Alert severity="error" sx={{width: '100%', mb: 2}}>
                             {genresError}
                         </Alert>
                     )}
@@ -251,7 +290,7 @@ export const BookUpload: React.FC = () => {
                         variant="contained"
                         color="primary"
                         type="submit"
-                        sx={{ mt: 2 }}
+                        sx={{mt: 2}}
                         disabled={loading || genresLoading}
                     >
                         Upload Book
@@ -259,8 +298,10 @@ export const BookUpload: React.FC = () => {
 
                     {/* Уведомление об успешной загрузке */}
                     {success && (
-                        <Snackbar open={success} autoHideDuration={6000}>
-                            <Alert severity="success">Book uploaded and processed successfully!</Alert>
+                        <Snackbar open={success} autoHideDuration={6000} onClose={() => dispatch(resetState())}>
+                            <Alert onClose={() => dispatch(resetState())} severity="success" sx={{width: '100%'}}>
+                                Book uploaded and processed successfully!
+                            </Alert>
                         </Snackbar>
                     )}
                 </Paper>
