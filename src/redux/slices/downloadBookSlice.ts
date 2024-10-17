@@ -33,6 +33,26 @@ export const fetchBooks = createAsyncThunk<
     }
 );
 
+// Асинхронный thunk для удаления книги
+export const deleteBook = createAsyncThunk<
+    string, // Возвращает ID удалённой книги
+    string, // Принимает ID книги для удаления
+    { rejectValue: string }
+>(
+    'books/deleteBook',
+    async (bookId: string, { rejectWithValue }) => {
+        try {
+            await api.delete(`${GET_BOOK_API_URL}${bookId}/`);
+            return bookId;
+        } catch (error: any) {
+            if (axios.isAxiosError(error) && error.response) {
+                return rejectWithValue(error.response.data.message || 'Не удалось удалить книгу.');
+            }
+            return rejectWithValue('Не удалось удалить книгу.');
+        }
+    }
+);
+
 const downloadBookSlice = createSlice({
     name: 'books',
     initialState,
@@ -43,6 +63,7 @@ const downloadBookSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // Обработка fetchBooks
             .addCase(fetchBooks.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -55,6 +76,20 @@ const downloadBookSlice = createSlice({
             .addCase(fetchBooks.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || 'Не удалось загрузить книги.';
+            })
+            // Обработка deleteBook
+            .addCase(deleteBook.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteBook.fulfilled, (state, action: PayloadAction<string>) => {
+                state.loading = false;
+                const deletedBookId = action.payload;
+                state.books = state.books.filter((book) => book.id !== deletedBookId);
+            })
+            .addCase(deleteBook.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || 'Не удалось удалить книгу.';
             });
     },
 });
