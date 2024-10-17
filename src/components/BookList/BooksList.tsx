@@ -7,7 +7,7 @@ import {
     CardContent,
     Typography,
     CircularProgress,
-    Alert, Container, Box, Pagination, Chip, CardActionArea,
+    Alert, Container, Box, Pagination, Chip, CardActionArea, useTheme,
 } from '@mui/material';
 import defaultCover from '../../assets/default_cover.png';
 import {fetchBooks, setCurrentPage} from "../../redux/slices/downloadBookSlice";
@@ -17,6 +17,7 @@ import {Link} from "react-router-dom";
 export const BooksList: React.FC = () => {
     const dispatch = useAppDispatch();
     const {books, loading, error, currentPage, totalPages} = useSelector((state: RootState) => state.books);
+    const theme = useTheme();
 
     useEffect(() => {
         dispatch(fetchBooks(currentPage));
@@ -83,6 +84,7 @@ export const BooksList: React.FC = () => {
                                 '&:focus': {
                                     outline: '2px solid rgba(0, 0, 255, 0.5)', // Обводка при фокусе
                                 },
+                                background: theme.customBackground.paperGradient, // градиент из темы -> theme.customBackground.paperGradient / 'background.paper'
                                 // transition: 'background-color 0.3s, box-shadow 0.3s, transform 0.3s',
                             }}
                         >

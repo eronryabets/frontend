@@ -95,6 +95,7 @@ export const RegistrationPage: React.FC = () => {
                      padding: 2,
                      borderRadius: 2,
                      boxShadow: 4,
+                     backgroundColor: 'background.paper', //дефолтный
                  }}>
 
                 <Typography variant="h5" sx={{mb: 2, color: 'green'}}>

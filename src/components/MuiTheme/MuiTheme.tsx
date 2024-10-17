@@ -70,6 +70,15 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
         },
         //Настройка Компонентов
         components: {
+            MuiAppBar: {
+                styleOverrides: {
+                    root: {
+                        backgroundColor: '#808080', // Серый цвет
+                        // Или значение из темы:
+                        // backgroundColor: isLight ? '#f5f5f5' : '#424242',
+                    },
+                },
+            },
             MuiButton: {
                 styleOverrides: {
                     root: {
@@ -105,12 +114,12 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
         //Настройка заднего градиента (фона)
          customBackground: {
             gradient: getGradient(
-                themeMode === 'light' ? '#ffffff' : '#2e2e2e',
+                themeMode === 'light' ? '#eadfdf' : '#2e2e2e',
                 themeMode === 'light' ? '#f0f0f0' : '#1c1c1c',
                 'to bottom'
             ),
             paperGradient: getGradient(
-                themeMode === 'light' ? 'rgba(255,255,255,0.8)' : 'rgba(30,30,30,0.8)',
+                themeMode === 'light' ? 'rgb(176,176,180)' : 'rgba(30,30,30,0.8)',
                 themeMode === 'light' ? 'rgba(240,240,240,0.8)' : 'rgba(66,66,66,0.8)',
                 'to bottom right'
             ),

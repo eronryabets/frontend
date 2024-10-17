@@ -19,7 +19,7 @@ import {
 import { PhotoCamera } from "@mui/icons-material";
 import { uploadBook } from "../../redux/slices/uploadBookSlice";
 import { fetchGenres } from "../../redux/slices/genresSlice";
-import { BookFormState, BookData } from '../../types/bookTypes';
+import { BookFormState, BookData } from '../../types';
 import { GenreSelect } from '../GenreSelect';
 
 export const BookUpload: React.FC = () => {
@@ -150,7 +150,7 @@ export const BookUpload: React.FC = () => {
                         alignItems: 'flex-start',
                         width: '100%',
                         maxWidth: 500,
-                        background: theme.customBackground.paperGradient, // градиент из темы
+                        background: 'background.paper', // градиент из темы -> theme.customBackground.paperGradient
                         borderRadius: 2,
                         boxShadow: 4,
                     }}
