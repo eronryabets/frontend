@@ -131,6 +131,16 @@ const BookDetail: React.FC = () => {
                             Добавлено: {new Date(book.created_at).toLocaleDateString()}
                         </Typography>
 
+                        {/* Описание Книги */}
+                        {book.description && (
+                            <Box sx={{ mb: 2 }}>
+                                <Typography variant="h6">Описание : </Typography>
+                                <Typography variant="body1" color="text.primary">
+                                    {book.description}
+                                </Typography>
+                            </Box>
+                        )}
+
                         {/* Жанры */}
                         <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
                             <Typography variant="subtitle1" color="text.secondary" gutterBottom>

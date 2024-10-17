@@ -7,6 +7,7 @@ export interface BookFormState {
     genres: number[];
     file: File | null;
     cover_image: File | null;
+     description?: string;
 }
 
 export interface BookData {
@@ -15,6 +16,7 @@ export interface BookData {
     genres: number[];
     file: File;
     cover_image?: File | null;
+    description?: string;
 }
 
 export interface UploadBookState {
@@ -28,6 +30,7 @@ export interface BookResponseData {
     id: string;
     title: string;
     genres: Genre[];
+    description?: string | null;
 }
 
 export interface GenreDetail {
@@ -44,6 +47,7 @@ export interface Book {
     cover_image: string | null;
     genre_details: GenreDetail[];
     chapters: string[];
+    description?: string | null;
 }
 
 export interface FetchBooksResponse {
