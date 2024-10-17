@@ -9,6 +9,6 @@ export interface AuthorizationState {
     status: {
         loading: boolean;
         success: boolean;
-        error: string | null;
+        error: Record<string, string[]> | null;
     };
 }

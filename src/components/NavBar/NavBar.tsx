@@ -1,42 +1,62 @@
+// src/components/NavBar/NavBar.tsx
+
 import React from 'react';
 import {
-    AppBar, Toolbar, Typography, IconButton, Menu, MenuItem,
-    Avatar, Tooltip, Button, Box
+    AppBar,
+    Toolbar,
+    Typography,
+    IconButton,
+    Menu,
+    MenuItem,
+    Avatar,
+    Tooltip,
+    Button,
+    Box,
+    Fade
 } from '@mui/material';
-import {toggleTheme} from "../../redux/slices/themeSlice";
-import {useSelector} from "react-redux";
-import {RootState, useAppDispatch} from "../../redux/store";
+import { toggleTheme } from "../../redux/slices/themeSlice";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "../../redux/store";
 
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
-import {logout} from "../../redux/slices/authorizationSlice";
-import {Link} from "react-router-dom";
-import {USER_API_MEDIA_URL} from "../../config";
-
+import { logout } from "../../redux/slices/authorizationSlice";
+import { Link } from "react-router-dom";
+import { USER_API_MEDIA_URL } from "../../config";
 
 export const NavBar = () => {
-
     const dispatch = useAppDispatch();
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [booksMenuAnchorEl, setBooksMenuAnchorEl] = React.useState<null | HTMLElement>(null);
 
     const themeMode = useSelector((state: RootState) => state.theme.mode);
     const userData = useSelector((state: RootState) => state.userInfo.userData);
 
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
+    // Handlers for User Menu
+    const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setUserMenuAnchorEl(event.currentTarget);
     };
 
-    const handleMenuClose = () => {
-        setAnchorEl(null);
+    const handleUserMenuClose = () => {
+        setUserMenuAnchorEl(null);
+    };
+
+    // Handlers for Books Menu
+    const handleBooksMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setBooksMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleBooksMenuClose = () => {
+        setBooksMenuAnchorEl(null);
     };
 
     const handleThemeToggle = () => {
         dispatch(toggleTheme());
     };
 
-    // Логаут пользователя
+    // Logout Handler
     const handleLogout = () => {
-        handleMenuClose(); // Сначала закрываем меню
+        handleUserMenuClose(); // Сначала закрываем меню
         dispatch(logout()).then((result) => {
             if (logout.fulfilled.match(result)) {
                 console.log("Logout successful");
@@ -46,44 +66,104 @@ export const NavBar = () => {
         });
     };
 
+    // Проверка открытости меню
+    const isUserMenuOpen = Boolean(userMenuAnchorEl);
+    const isBooksMenuOpen = Boolean(booksMenuAnchorEl);
+
     return (
         <AppBar position="fixed">
             <Toolbar>
-                <Typography variant="h6" component="div" sx={{flexGrow: 1}}>
+                {/* Название приложения */}
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                     Smart Reader
                 </Typography>
-                <Box sx={{display: 'flex', alignItems: 'center'}}>
-                    <Button color="inherit">Test</Button>
+
+                {/* Основные кнопки навигации */}
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Button color="inherit">Vocabulary</Button>
-                    <Button color="inherit" component={Link} to="/book" >upl.Book</Button>
-                    <Button color="inherit" component={Link} to="/booklist" >Books</Button>
+
+                    {/* Кнопка "Books" с выпадающим меню */}
+                    <Box
+                        sx={{ position: 'relative' }}
+                        onMouseEnter={handleBooksMenuOpen}
+                        onMouseLeave={handleBooksMenuClose}
+                    >
+                        <Button
+                            color="inherit"
+                            aria-controls={isBooksMenuOpen ? 'books-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={isBooksMenuOpen ? 'true' : undefined}
+                        >
+                            Books
+                        </Button>
+                        <Menu
+                            id="books-menu"
+                            anchorEl={booksMenuAnchorEl}
+                            open={isBooksMenuOpen}
+                            onClose={handleBooksMenuClose}
+                            MenuListProps={{
+                                onMouseEnter: () => setBooksMenuAnchorEl(booksMenuAnchorEl),
+                                onMouseLeave: handleBooksMenuClose,
+                            }}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                            TransitionComponent={Fade}
+                        >
+                            <MenuItem component={Link} to="/book" onClick={handleBooksMenuClose}>
+                                Book Upload
+                            </MenuItem>
+                            <MenuItem component={Link} to="/booklist" onClick={handleBooksMenuClose}>
+                                Book List
+                            </MenuItem>
+                        </Menu>
+                    </Box>
+
+                    {/* Кнопка переключения темы */}
                     <IconButton onClick={handleThemeToggle} color="inherit">
-                        {themeMode === 'dark' ? <Brightness7Icon/> : <Brightness4Icon/>}
+                        {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>
+
+                    {/* Аватар пользователя с меню */}
                     <Tooltip title="Открыть меню">
-                        <IconButton onClick={handleMenuOpen} sx={{p: 0}}>
+                        <IconButton onClick={handleUserMenuOpen} sx={{ p: 0 }}>
                             <Avatar
                                 alt="User Avatar"
                                 src={`${USER_API_MEDIA_URL}${userData.avatar}`}
                             />
                         </IconButton>
                     </Tooltip>
+
+                    {/* Меню пользователя */}
                     <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
+                        id="user-menu"
+                        anchorEl={userMenuAnchorEl}
+                        open={isUserMenuOpen}
+                        onClose={handleUserMenuClose}
                         anchorOrigin={{
-                            vertical: 'top',
+                            vertical: 'bottom',
                             horizontal: 'right',
                         }}
                         transformOrigin={{
                             vertical: 'top',
                             horizontal: 'right',
                         }}
+                        TransitionComponent={Fade}
                     >
-                        <MenuItem onClick={handleMenuClose} component={Link} to="/profile">My Profile</MenuItem>
-                        <MenuItem onClick={handleMenuClose}>Vocabulary</MenuItem>
-                        <MenuItem onClick={handleMenuClose} component={Link} to="/book">Books</MenuItem>
+                        <MenuItem component={Link} to="/profile" onClick={handleUserMenuClose}>
+                            My Profile
+                        </MenuItem>
+                        <MenuItem component={Link} to="/vocabulary" onClick={handleUserMenuClose}>
+                            Vocabulary
+                        </MenuItem>
+                        <MenuItem component={Link} to="/book" onClick={handleUserMenuClose}>
+                            Books
+                        </MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>
                     </Menu>
                 </Box>

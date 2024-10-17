@@ -15,7 +15,7 @@ import {NotFoundPage} from "./components/NotFoundPage";
 import {NavBar} from "./components/NavBar";
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import {BookUpload} from "./components/BookUpload";
-import BooksList from "./components/BookList/BooksList";
+import {BooksList} from "./components/BookList";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -23,7 +23,7 @@ const AppContent = () => {
     const location = useLocation();
 
     // Определяем, нужно ли показывать NavBar в зависимости от текущего маршрута
-    const hideNavBarRoutes = ['/login', '/registration.ts', '/notfound'];
+    const hideNavBarRoutes = ['/login', '/registration', '/notfound'];
     const shouldHideNavBar = hideNavBarRoutes.includes(location.pathname.toLowerCase());
 
     return (

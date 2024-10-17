@@ -1,9 +1,8 @@
-import {TextField, Button, Box, Typography} from '@mui/material';
+import {TextField, Button, Box, Typography, Alert} from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import React, {useEffect, useState} from "react";
-import {authorizationUser} from "../../redux/slices/authorizationSlice";
-import {getUserInfo} from "../../redux/slices/userInfoSlice";
+import {authorizationUser, resetState} from "../../redux/slices/authorizationSlice";
 import {useNavigate} from "react-router-dom";
 
 
@@ -29,7 +28,16 @@ export const LoginPage = () => {
             ...formData,
             [name]: value,
         });
+        //сбрасываем ошибку при вводе
+        if (name === 'username') {
+            dispatch(resetState());
+        }
     };
+
+    //сбрасываем ошибку при обновлении страницы
+    useEffect(() => {
+        dispatch(resetState());
+    }, [dispatch]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,7 +45,7 @@ export const LoginPage = () => {
         // dispatch(getUserInfo());
     };
 
-     // Редирект после успешного логина
+    // Редирект после успешного логина
     useEffect(() => {
         if (isAuthenticated) {
             // navigate('/profile');
@@ -46,45 +54,76 @@ export const LoginPage = () => {
     }, [isAuthenticated, navigate]);
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{width: '300px', margin: 'auto', mt: 5}}>
-            <Typography variant="h5" sx={{mb: 2}}>
-                Login
-            </Typography>
+        <Box
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh',
+                backgroundColor: 'background.default',
+                padding: 2,
+            }}
+        >
+            <Box component="form" onSubmit={handleSubmit}
+                 sx={{
+                     width: '100%',
+                    maxWidth: 400,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 3,
+                    padding: 4,
+                    backgroundColor: 'background.paper',
+                    boxShadow: 3,
+                    borderRadius: 2,
+                 }}>
+                <Typography variant="h5" sx={{mb: 2}}>
+                    Login
+                </Typography>
 
-            <Typography variant="h5" sx={{mb: 2, color: 'red'}}>
-                {error ? error : null}
-            </Typography>
+                {error && (
+                    <Alert severity="error" sx={{width: '100%', mb: 2}}>
+                        {error.general
+                            ? error.general.join(' ')
+                            : Object.entries(error).map(([key, messages]) => (
+                                <div key={key}>
+                                    {key}: {Array.isArray(messages) ? messages.join(' ') : messages}
+                                </div>
+                            ))}
+                    </Alert>
+                )}
 
-            <Typography variant="h5" sx={{mb: 2, color: 'green'}}>
-                {success ? `${userData.username} - login successful!` : null}
-            </Typography>
+                <Typography variant="h5" sx={{mb: 2, color: 'green'}}>
+                    {success ? `${userData.username} - login successful!` : null}
+                </Typography>
 
-            <TextField
-                label="Username"
-                name="username"
-                value={username}
-                onChange={handleChange}
-                required
-                fullWidth
-                sx={{mb: 2}}
-                autoComplete="username"
-            />
+                <TextField
+                    label="Username"
+                    name="username"
+                    value={username}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    sx={{mb: 2}}
+                    autoComplete="username"
+                />
 
-            <TextField
-                type="password"
-                label="Password"
-                name="password"
-                value={password}
-                onChange={handleChange}
-                required
-                fullWidth
-                sx={{mb: 2}}
-                autoComplete="current-password"
-            />
+                <TextField
+                    type="password"
+                    label="Password"
+                    name="password"
+                    value={password}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    sx={{mb: 2}}
+                    autoComplete="current-password"
+                />
 
-            <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
-                {loading ? 'Loading...' : 'Login'}
-            </Button>
+                <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
+                    {loading ? 'Loading...' : 'Login'}
+                </Button>
+            </Box>
         </Box>
     );
 

@@ -65,7 +65,13 @@ export const logout = createAsyncThunk(
 const authorizationSlice = createSlice({
     name: 'authorization',
     initialState,
-    reducers: {},
+    reducers: {
+        resetState: (state) => {
+            state.status.loading = false;
+            state.status.success = false;
+            state.status.error = null;
+        },
+    },
     extraReducers: (builder) => {
         builder
             // Authorization User Cases
@@ -82,7 +88,17 @@ const authorizationSlice = createSlice({
             .addCase(authorizationUser.rejected, (state, action: PayloadAction<any>) => {
                 state.status.loading = false;
                 state.isAuthenticated = false;
-                state.status.error = action.payload ?? 'Authorization failed';
+                // state.status.error = action.payload ?? 'Authorization failed';
+                if (action.payload) { // Проверяем, что payload существует
+                    if (typeof action.payload === 'string') {
+                        state.status.error = { general: [action.payload] };
+                    } else {
+                        state.status.error = action.payload;
+                    }
+                } else {
+                    // Если payload отсутствует, устанавливаем общую ошибку
+                    state.status.error = { general: ['Unknown error occurred.'] };
+                }
             })
             // Logout Cases
             .addCase(logout.pending, (state) => {
@@ -100,5 +116,5 @@ const authorizationSlice = createSlice({
             });
     },
 });
-
+export const { resetState } = authorizationSlice.actions;
 export default authorizationSlice.reducer;

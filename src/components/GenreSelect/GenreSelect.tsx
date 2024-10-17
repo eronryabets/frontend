@@ -12,7 +12,7 @@ interface GenreSelectProps {
     required?: boolean;
 }
 
-const GenreSelect: React.FC<GenreSelectProps> = ({ values, onChange, label = "Genres", required = false }) => {
+export const GenreSelect: React.FC<GenreSelectProps> = ({ values, onChange, label = "Genres", required = false }) => {
     const { genres, loading, error } = useSelector((state: RootState) => state.genres);
 
     const handleChange = (event: SelectChangeEvent<string[]>) => {
@@ -54,5 +54,3 @@ const GenreSelect: React.FC<GenreSelectProps> = ({ values, onChange, label = "Ge
         </FormControl>
     );
 };
-
-export default GenreSelect;

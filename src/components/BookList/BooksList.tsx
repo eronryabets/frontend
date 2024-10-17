@@ -7,14 +7,14 @@ import {
     CardContent,
     Typography,
     CircularProgress,
-    Alert, Container, Box, Button, Pagination, Chip, CardActionArea,
+    Alert, Container, Box, Pagination, Chip, CardActionArea,
 } from '@mui/material';
 import defaultCover from '../../assets/default_cover.png';
 import {fetchBooks, setCurrentPage} from "../../redux/slices/downloadBookSlice";
 import {RootState, useAppDispatch} from "../../redux/store";
 import {Link} from "react-router-dom";
 
-const BooksList: React.FC = () => {
+export const BooksList: React.FC = () => {
     const dispatch = useAppDispatch();
     const {books, loading, error, currentPage, totalPages} = useSelector((state: RootState) => state.books);
 
@@ -93,7 +93,7 @@ const BooksList: React.FC = () => {
                                     '&:hover img': {
                                         boxShadow: '0 0 20px rgba(0, 0, 255, 0.5)', // Свечение вокруг изображения
                                         // transform: 'rotateY(20deg) scale(1.05)', // Поворот вокруг оси Y и масштабирование
-                                        filter: 'brightness(1.2) contrast(1.1)', // Увеличение яркости и контраста
+                                        filter: 'brightness(1.1) contrast(1.1)', // Увеличение яркости и контраста
                                         animation: 'pulse 2.5s infinite',
                                     },
                                     '@keyframes pulse': {
@@ -175,5 +175,3 @@ const BooksList: React.FC = () => {
         </Container>
     );
 };
-
-export default BooksList;
