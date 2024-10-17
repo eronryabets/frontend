@@ -3,16 +3,16 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import {registerUser} from "../../redux/slices/registrationSlice";
 
-import {TextField, Button, Box, Typography, Avatar, IconButton} from '@mui/material';
+import {TextField, Button, Box, Typography, Avatar, IconButton, useTheme} from '@mui/material';
 import {PhotoCamera} from "@mui/icons-material";
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 
 
 export const RegistrationPage: React.FC = () => {
 
     const dispatch = useDispatch<AppDispatch>();
     const {loading, success, error, responseData} = useSelector((state: RootState) => state.registration);
-
+    const theme = useTheme();
 
     const [formData, setFormData] = useState({
         username: '',
@@ -70,118 +70,143 @@ export const RegistrationPage: React.FC = () => {
 
 
     return (
-        <Box component="form" onSubmit={handleSubmit}
-             sx={{width: '300px', margin: 'auto', mt: 5}}>
 
-            <Typography variant="h5" sx={{mb: 2, color: 'green'}}>
-                {success ? `Success registration ${responseData?.username}!` : null}
-            </Typography>
+        <Box
+            component="form"
+            onSubmit={handleSubmit}
+            gap={4}
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '90vh', // Покрывает всю высоту окна просмотра
+                padding: 2,
+                overflow: 'hidden', // Предотвращаем переполнение
+                backgroundColor: theme.customBackground.gradient,
+            }}
+        >
 
-            <Typography variant="h5" sx={{mb: 2, color: 'red'}}>
-                {typeof error === 'string' ? error : null}
-            </Typography>
+            <Box component="form" onSubmit={handleSubmit}
+                 sx={{
+                     width: '300px',
+                     margin: 'auto',
+                     mt: 15,
+                     padding: 2,
+                     borderRadius: 2,
+                     boxShadow: 4,
+                 }}>
+
+                <Typography variant="h5" sx={{mb: 2, color: 'green'}}>
+                    {success ? `Success registration ${responseData?.username}!` : null}
+                </Typography>
+
+                <Typography variant="h5" sx={{mb: 2, color: 'red'}}>
+                    {typeof error === 'string' ? error : null}
+                </Typography>
 
 
-            <Typography variant="h5" sx={{mb: 2}}>
-                Registration
-            </Typography>
+                <Typography variant="h5" sx={{mb: 2}}>
+                    Registration
+                </Typography>
 
-            <TextField
-                label="Username"
-                name="username"
-                value={username}
-                onChange={handleChange}
-                required
-                fullWidth
-                sx={{mb: 2}}
-                autoComplete="username"
-                error={!!error?.username}
-                helperText={error?.username ? error.username.join(' ') : ''}
-            />
-
-            <TextField
-                type="password"
-                label="Password"
-                name="password"
-                value={password}
-                onChange={handleChange}
-                required
-                fullWidth
-                sx={{mb: 2}}
-                autoComplete="new-password"
-            />
-
-            <TextField
-                type="password"
-                label="Password confirm"
-                name="confirmPassword"
-                value={confirmPassword}
-                onChange={handleChange}
-                required
-                fullWidth
-                sx={{mb: 2}}
-                autoComplete="new-password"
-                error={!!localError.confirm_password}
-                helperText={localError.confirm_password}
-            />
-
-            <TextField
-                type="email"
-                label="Email"
-                name="email"
-                value={email}
-                onChange={handleChange}
-                required
-                fullWidth
-                sx={{mb: 2}}
-                error={!!error?.email}
-                helperText={error?.email ? error.email.join(' ') : ''}
-            />
-
-            <TextField
-                label="First name"
-                name="first_name"
-                value={first_name}
-                onChange={handleChange}
-                fullWidth
-                sx={{mb: 2}}
-            />
-
-            <TextField
-                label="Last name"
-                name="last_name"
-                value={last_name}
-                onChange={handleChange}
-                fullWidth
-                sx={{mb: 2}}
-            />
-
-            {/* Avatar Loading */}
-            <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
-                <Avatar
-                    alt="Avatar Preview"
-                    src={avatarPreview || undefined}
-                    sx={{width: 56, height: 56, mr: 2}}
+                <TextField
+                    label="Username"
+                    name="username"
+                    value={username}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    sx={{mb: 2}}
+                    autoComplete="username"
+                    error={!!error?.username}
+                    helperText={error?.username ? error.username.join(' ') : ''}
                 />
-                <label htmlFor="avatar-upload">
-                    <input
-                        accept="image/*"
-                        id="avatar-upload"
-                        type="file"
-                        name="avatar"
-                        style={{display: 'none'}}
-                        onChange={handleChange}
+
+                <TextField
+                    type="password"
+                    label="Password"
+                    name="password"
+                    value={password}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    sx={{mb: 2}}
+                    autoComplete="new-password"
+                />
+
+                <TextField
+                    type="password"
+                    label="Password confirm"
+                    name="confirmPassword"
+                    value={confirmPassword}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    sx={{mb: 2}}
+                    autoComplete="new-password"
+                    error={!!localError.confirm_password}
+                    helperText={localError.confirm_password}
+                />
+
+                <TextField
+                    type="email"
+                    label="Email"
+                    name="email"
+                    value={email}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    sx={{mb: 2}}
+                    error={!!error?.email}
+                    helperText={error?.email ? error.email.join(' ') : ''}
+                />
+
+                <TextField
+                    label="First name"
+                    name="first_name"
+                    value={first_name}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{mb: 2}}
+                />
+
+                <TextField
+                    label="Last name"
+                    name="last_name"
+                    value={last_name}
+                    onChange={handleChange}
+                    fullWidth
+                    sx={{mb: 2}}
+                />
+
+                {/* Avatar Loading */}
+                <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                    <Avatar
+                        alt="Avatar Preview"
+                        src={avatarPreview || undefined}
+                        sx={{width: 56, height: 56, mr: 2}}
                     />
-                    <IconButton color="primary" aria-label="upload picture" component="span">
-                        <PhotoCamera/>
-                    </IconButton>
-                </label>
+                    <label htmlFor="avatar-upload">
+                        <input
+                            accept="image/*"
+                            id="avatar-upload"
+                            type="file"
+                            name="avatar"
+                            style={{display: 'none'}}
+                            onChange={handleChange}
+                        />
+                        <IconButton color="primary" aria-label="upload picture" component="span">
+                            <PhotoCamera/>
+                        </IconButton>
+                    </label>
+                </Box>
+
+
+                <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
+                    {loading ? 'Loading...' : 'Registration'}
+                </Button>
             </Box>
-
-
-            <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading}>
-                {loading ? 'Loading...' : 'Registration'}
-            </Button>
         </Box>
     );
 

@@ -1,4 +1,4 @@
-import {TextField, Button, Box, Typography, Alert} from '@mui/material';
+import {TextField, Button, Box, Typography, Alert, useTheme} from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import React, {useEffect, useState} from "react";
@@ -10,6 +10,7 @@ export const LoginPage = () => {
 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    const theme = useTheme();
 
     const {loading, success, error,} = useSelector((state: RootState) => state.authorization.status);
     const userData = useSelector((state: RootState) => state.userInfo.userData);
@@ -60,7 +61,8 @@ export const LoginPage = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 minHeight: '100vh',
-                backgroundColor: 'background.default',
+                // backgroundColor: 'background.default',
+                backgroundColor: theme.customBackground.gradient,
                 padding: 2,
             }}
         >

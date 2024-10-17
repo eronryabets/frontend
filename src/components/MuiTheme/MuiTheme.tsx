@@ -1,5 +1,6 @@
 import {createTheme} from '@mui/material/styles';
-import {blue, grey, red} from '@mui/material/colors';
+import {blue, red} from '@mui/material/colors';
+import {getGradient} from "../../utils/getGradient";
 
 
 declare module '@mui/material/styles' {
@@ -8,6 +9,12 @@ declare module '@mui/material/styles' {
             gradient: string;
             paperGradient: string;
         };
+        customColors: {
+            gradientStart: string;
+            gradientEnd: string;
+            paperGradientStart: string;
+            paperGradientEnd: string;
+        };
     }
 
     interface ThemeOptions {
@@ -15,10 +22,17 @@ declare module '@mui/material/styles' {
             gradient?: string;
             paperGradient?: string;
         };
+        customColors?: {
+            gradientStart?: string;
+            gradientEnd?: string;
+            paperGradientStart?: string;
+            paperGradientEnd?: string;
+        }
     }
 }
 
 export const MuiTheme = (themeMode: 'light' | 'dark') => {
+
     const theme = createTheme({
         transitions: {
             create: (props, options) => {
@@ -40,7 +54,7 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
             secondary: {
                 main: red[500],
             },
-            //Настройка Фонов и Текста
+            //Настройка Фонов (элементов) и Текста
             background: {
                 default: themeMode === 'light' ? '#fafafa' : '#303030',
                 paper: themeMode === 'light' ? '#ffffff' : '#424242',
@@ -89,16 +103,17 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
             },
         },
         //Настройка заднего градиента (фона)
-        customBackground: {
-            gradient:
-                themeMode === 'light'
-                    ? 'linear-gradient(to bottom, #ffffff, #f0f0f0)'
-                    : 'linear-gradient(to bottom, #2e2e2e, #1c1c1c)',
-            paperGradient:
-                themeMode === 'light'
-                    ? 'linear-gradient(to bottom right, rgba(255,255,255,0.8), rgba(240,240,240,0.8))'
-                    : 'linear-gradient(to bottom right, rgba(30,30,30,0.8), rgba(66,66,66,0.8))',
-
+         customBackground: {
+            gradient: getGradient(
+                themeMode === 'light' ? '#ffffff' : '#2e2e2e',
+                themeMode === 'light' ? '#f0f0f0' : '#1c1c1c',
+                'to bottom'
+            ),
+            paperGradient: getGradient(
+                themeMode === 'light' ? 'rgba(255,255,255,0.8)' : 'rgba(30,30,30,0.8)',
+                themeMode === 'light' ? 'rgba(240,240,240,0.8)' : 'rgba(66,66,66,0.8)',
+                'to bottom right'
+            ),
         },
     });
 
