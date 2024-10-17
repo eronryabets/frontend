@@ -1,7 +1,7 @@
-// src/redux/slices/genres/genresSlice.ts
+
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { Genre, GenresState } from '../../types/genres';
+import { Genre, GenresState } from '../../types';
 import { BOOK_GENRES_API_URL } from '../../config';
 import api from "../../utils/api"; // Убедитесь, что у вас есть соответствующая конфигурация
 

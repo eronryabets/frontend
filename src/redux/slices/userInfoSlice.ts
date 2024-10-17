@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import api from "../../utils/api";
 import {AUTH_API_URL, USER_API_URL} from "../../config";
-import {ProfileData, ResponseData, UserInfoState} from "../../types/userInfo";
+import {ProfileData, UserInfoResponseData, UserInfoState} from "../../types";
 
 // Изначальное состояние
 const initialState: UserInfoState = {
@@ -113,7 +113,7 @@ const userInfoSlice = createSlice({
                 state.status.success = false;
                 state.status.error = null;
             })
-            .addCase(getUserInfo.fulfilled, (state, action: PayloadAction<ResponseData>) => {
+            .addCase(getUserInfo.fulfilled, (state, action: PayloadAction<UserInfoResponseData>) => {
                 state.status.loading = false;
                 state.status.success = true;
 

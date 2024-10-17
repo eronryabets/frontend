@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import {BOOK_API_URL} from "../../config";
 import api from "../../utils/api";
 
-import {BookData, UploadBookState, ResponseData} from '../../types/uploadBook';
+import {BookData, UploadBookState, BookResponseData} from '../../types';
 import axios from "axios";
 import normalizeAndLimitErrors from "../../utils/normalizeAndLimitErrors";
 
@@ -17,7 +17,7 @@ const initialState: UploadBookState = {
 
 // Асинхронный thunk для загрузки книги
 export const uploadBook = createAsyncThunk<
-    ResponseData, // Тип возвращаемых данных при успехе
+    BookResponseData, // Тип возвращаемых данных при успехе
     BookData,     // Тип аргумента
     { rejectValue: Record<string, string[]> | string } // Тип rejectWithValue
 >(
@@ -47,7 +47,7 @@ export const uploadBook = createAsyncThunk<
             });
 
             // Предполагаем, что сервер возвращает данные типа ResponseData
-            return response.data as ResponseData;
+            return response.data as BookResponseData;
         } catch (error: any) {
             if (axios.isAxiosError(error) && error.response) {
                 // Нормализация и ограничение длины ошибок
@@ -87,7 +87,7 @@ const uploadBookSlice = createSlice({
                 state.success = false;
                 state.error = null;
             })
-            .addCase(uploadBook.fulfilled, (state, action: PayloadAction<ResponseData>) => {
+            .addCase(uploadBook.fulfilled, (state, action: PayloadAction<BookResponseData>) => {
                 state.loading = false;
                 state.success = true;
                 state.responseMessage = { general: ["Book uploaded successfully."] };

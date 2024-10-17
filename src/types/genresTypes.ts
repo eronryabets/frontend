@@ -1,5 +1,5 @@
 
-export interface Genre {
+interface Genre {
     id: number;
     name: string;
 }

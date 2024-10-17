@@ -3,7 +3,7 @@ import axios from 'axios';
 import api from "../../utils/api";
 import {AUTH_API_URL} from "../../config";
 import {clearUserInfo, getUserInfo} from "./userInfoSlice";
-import {AuthorizationData, AuthorizationState} from "../../types/authorization";
+import {AuthorizationData, AuthorizationState} from "../../types";
 
 // Изначальное состояние авторизации
 const initialState: AuthorizationState = {
@@ -17,7 +17,7 @@ const initialState: AuthorizationState = {
 
 // Авторизация пользователя
 export const authorizationUser = createAsyncThunk(
-    'authorization.ts/authorizationUser',
+    'authorization/authorizationUser',
     async (formData: AuthorizationData, { dispatch, rejectWithValue }) => {
         try {
             // Aвторизация на сервисе
@@ -49,7 +49,7 @@ export const authorizationUser = createAsyncThunk(
 
 // Логаут пользователя
 export const logout = createAsyncThunk(
-    'authorization.ts/logout',
+    'authorization/logout',
     async (_, { dispatch, rejectWithValue }) => {
         try {
             // Отправляем запрос на логаут (cookies автоматически отправятся)

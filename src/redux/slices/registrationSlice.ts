@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import axios from 'axios';
 import {AUTH_API_URL, USER_API_URL} from "../../config";
 import api from "../../utils/api";
-import {RegistrationData, RegistrationState, ResponseData} from "../../types/registration";
+import {RegistrationData, RegistrationState, RegistrationResponseData} from "../../types";
 
 
 
@@ -17,7 +17,7 @@ const initialState: RegistrationState = {
 // Асинхронный thunk для регистрации пользователя с использованием axios
 //(1,2) 1 - название действия, 2 - полезная нагрузка (успех или ошибка)
 export const registerUser = createAsyncThunk(
-    'registration.ts/registerUser', // name/action
+    'registration/registerUser', // name/action
     // PayloadCreator //rejectWithValue - сообщение об ошибке в случае ошибки
     async (formData: RegistrationData, {rejectWithValue}) => {
         try {
@@ -74,7 +74,7 @@ const registrationSlice = createSlice({
                 state.success = false;
                 state.error = null;
             })
-            .addCase(registerUser.fulfilled, (state, action: PayloadAction<ResponseData>) => {
+            .addCase(registerUser.fulfilled, (state, action: PayloadAction<RegistrationResponseData>) => {
                 state.loading = false;
                 state.success = true;
                 state.responseData = action.payload;

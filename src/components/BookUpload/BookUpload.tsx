@@ -18,7 +18,7 @@ import {
 import {PhotoCamera} from "@mui/icons-material";
 import {uploadBook} from "../../redux/slices/uploadBookSlice";
 import {fetchGenres} from "../../redux/slices/genresSlice";
-import {BookFormState, BookData} from '../../types/uploadBook';
+import {BookFormState, BookData} from '../../types/bookTypes';
 import {GenreSelect} from '../GenreSelect';
 
 export const BookUpload: React.FC = () => {

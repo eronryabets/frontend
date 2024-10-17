@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import {DownloadBooksState, FetchBooksResponse} from "../../types/downloadBook";
+import {DownloadBooksState, FetchBooksResponse} from "../../types";
 import {GET_BOOK_API_URL} from "../../config";
 import api from "../../utils/api";
 

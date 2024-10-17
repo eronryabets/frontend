@@ -3,7 +3,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import {FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Chip} from "@mui/material";
-import { Genre } from "../../types/genres";
+import { Genre } from "../../types/genresTypes";
 
 interface GenreSelectProps {
     values: number[]; // Массив выбранных жанров
