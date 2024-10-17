@@ -1,5 +1,3 @@
-// src/components/BookUpload.tsx
-
 import React, {useState, useEffect} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
@@ -8,8 +6,7 @@ import {
     Avatar,
     Box,
     Button,
-    CircularProgress,
-    IconButton,
+    IconButton, LinearProgress,
     Paper,
     Snackbar,
     TextField,
@@ -25,8 +22,8 @@ import {GenreSelect} from '../GenreSelect';
 export const BookUpload: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const userData = useSelector((state: RootState) => state.userInfo.userData);
-    const {loading, success, error} = useSelector((state: RootState) => state.uploadBook);
-    const {genres, loading: genresLoading, error: genresError} = useSelector((state: RootState) => state.genres);
+    const { loading, success, error } = useSelector((state: RootState) => state.uploadBook);
+    const { genres, loading: genresLoading, error: genresError } = useSelector((state: RootState) => state.genres);
     const theme = useTheme();
 
     const [formData, setFormData] = useState<BookFormState>({
@@ -38,14 +35,17 @@ export const BookUpload: React.FC = () => {
         description: '',
     });
 
-    const {title, genres: selectedGenres, file, description} = formData;
+    const { title, genres: selectedGenres, file, description } = formData;
 
     // Локальное состояние для превью обложки книги
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
 
+    // Состояние для прогресса загрузки
+    const [uploadProgress, setUploadProgress] = useState(0);
+
     // Обработка изменений для полей ввода, кроме жанра
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value, files} = e.target;
+        const { name, value, files } = e.target;
 
         if (name === "cover_image" && files && files.length > 0) {
             const file = files[0];
@@ -70,7 +70,7 @@ export const BookUpload: React.FC = () => {
 
     // Обработка изменения поля описания
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {value} = e.target;
+        const { value } = e.target;
         setFormData({
             ...formData,
             description: value,
@@ -91,12 +91,12 @@ export const BookUpload: React.FC = () => {
 
         // Проверка обязательных полей
         if (!formData.file) {
-            alert("Please select a file to upload.");
+            alert("Пожалуйста, выберите файл для загрузки.");
             return;
         }
 
         if (formData.genres.length === 0) {
-            alert("Please select at least one genre.");
+            alert("Пожалуйста, выберите хотя бы один жанр.");
             return;
         }
 
@@ -120,15 +120,15 @@ export const BookUpload: React.FC = () => {
     // Установка жанра по умолчанию на "Another" (id: 1) после загрузки жанров
     useEffect(() => {
         if (genres.length > 0 && formData.genres.length === 0) {
-            const anotherGenreId = 1; // ID "Another" genre
+            const anotherGenreId = 1; // ID жанра "Another"
             const anotherGenre = genres.find((g) => g.id === anotherGenreId);
 
             if (anotherGenre) {
-                setFormData((prev) => ({...prev, genres: [anotherGenre.id]}));
+                setFormData((prev) => ({ ...prev, genres: [anotherGenre.id] }));
             } else {
                 // Если "Another" не найден, выбрать первый жанр из списка
-                setFormData((prev) => ({...prev, genres: [genres[0].id]}));
-                console.warn(`Genre with id ${anotherGenreId} not found. Defaulting to the first genre.`);
+                setFormData((prev) => ({ ...prev, genres: [genres[0].id] }));
+                console.warn(`Жанр с id ${anotherGenreId} не найден. Выбран первый жанр по умолчанию.`);
             }
         }
     }, [genres, formData.genres.length]);
@@ -142,6 +142,38 @@ export const BookUpload: React.FC = () => {
             return () => clearTimeout(timer);
         }
     }, [success, error, dispatch]);
+
+    // Обновление прогресса загрузки
+    useEffect(() => {
+        let interval: number | null = null;
+
+        if (loading) {
+            setUploadProgress(0); // Сброс прогресса
+
+            interval = window.setInterval(() => {
+                setUploadProgress((prevProgress) => {
+                    if (prevProgress >= 100) {
+                        if (interval !== null) {
+                            clearInterval(interval);
+                        }
+                        return 100;
+                    }
+                    return prevProgress + (100 / 60); // Увеличиваем на ~1.6667% каждую секунду
+                });
+            }, 1000);
+        } else {
+            if (interval !== null) {
+                clearInterval(interval);
+            }
+            setUploadProgress(0);
+        }
+
+        return () => {
+            if (interval !== null) {
+                clearInterval(interval);
+            }
+        };
+    }, [loading]);
 
     return (
         <Box
@@ -160,7 +192,22 @@ export const BookUpload: React.FC = () => {
             }}
         >
             {(loading || genresLoading) ? (
-                <CircularProgress/>
+                <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    height="100%"
+                    width="100%"
+                    sx={{ mt: 4 }}
+                >
+                    <Typography variant="h6" gutterBottom>
+                        Идет обработка книги на сервере
+                    </Typography>
+                    <Box sx={{ width: '100%', maxWidth: 400, mt: 2 }}>
+                        <LinearProgress variant="determinate" value={uploadProgress} />
+                    </Box>
+                </Box>
             ) : (
                 <Paper
                     elevation={3}
@@ -171,18 +218,18 @@ export const BookUpload: React.FC = () => {
                         alignItems: 'flex-start',
                         width: '100%',
                         maxWidth: 600,
-                        background: 'background.paper', // градиент из темы -> theme.customBackground.paperGradient
+                        background: theme.customBackground.paperGradient,
                         borderRadius: 2,
                         boxShadow: 4,
                     }}
                 >
                     <Typography variant="h5" component="div"
-                                sx={{mb: 2, alignSelf: 'center', color: theme.palette.text.primary}}>
-                        Upload Book
+                                sx={{ mb: 2, alignSelf: 'center', color: theme.palette.text.primary }}>
+                        Загрузить книгу
                     </Typography>
 
                     {/* Превью обложки */}
-                    <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <Avatar
                             alt="Cover Image Preview"
                             src={coverImagePreview || undefined}
@@ -199,11 +246,11 @@ export const BookUpload: React.FC = () => {
                                 id="cover-image-upload"
                                 type="file"
                                 name="cover_image"
-                                style={{display: 'none'}}
+                                style={{ display: 'none' }}
                                 onChange={handleInputChange}
                             />
                             <IconButton color="primary" aria-label="upload cover image" component="span">
-                                <PhotoCamera/>
+                                <PhotoCamera />
                             </IconButton>
                         </label>
                     </Box>
@@ -211,16 +258,16 @@ export const BookUpload: React.FC = () => {
                     {/* Поле ввода описания */}
                     <TextField
                         fullWidth
-                        label="Description"
+                        label="Описание"
                         name="description"
                         value={description}
                         onChange={handleDescriptionChange}
                         variant="outlined"
                         multiline
                         rows={4}
-                        sx={{mb: 2}}
-                        placeholder="Enter a short description of the book"
-                        inputProps={{maxLength: 500}}
+                        sx={{ mb: 2 }}
+                        placeholder="Введите краткое описание книги"
+                        inputProps={{ maxLength: 500 }}
                         helperText={`${description.length}/500`}
                         required
                     />
@@ -229,26 +276,26 @@ export const BookUpload: React.FC = () => {
                     <GenreSelect
                         values={selectedGenres}
                         onChange={handleGenresChange}
-                        label="Genres"
+                        label="Жанры"
                         required
                     />
 
                     {/* Поле ввода заголовка */}
                     <TextField
                         fullWidth
-                        label="Title"
+                        label="Название"
                         name="title"
                         value={title}
                         onChange={handleInputChange}
                         variant="outlined"
-                        sx={{mb: 2}}
+                        sx={{ mb: 2 }}
                         required
                     />
 
                     {/* Поле для загрузки файла книги */}
-                    <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                         <Button variant="contained" component="label">
-                            Upload Book File
+                            Загрузить файл книги
                             <input
                                 hidden
                                 accept=".pdf, .doc, .docx"
@@ -258,7 +305,7 @@ export const BookUpload: React.FC = () => {
                             />
                         </Button>
                         {file && (
-                            <Typography variant="body2" sx={{ml: 2, color: theme.palette.text.primary}}>
+                            <Typography variant="body2" sx={{ ml: 2, color: theme.palette.text.primary }}>
                                 {file.name}
                             </Typography>
                         )}
@@ -266,7 +313,7 @@ export const BookUpload: React.FC = () => {
 
                     {/* Отображение ошибок при загрузке книги */}
                     {error && (
-                        <Alert severity="error" sx={{width: '100%', mb: 2}}>
+                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
                             {error.general
                                 ? error.general.join(' ')
                                 : Object.entries(error).map(([key, messages]) => (
@@ -279,7 +326,7 @@ export const BookUpload: React.FC = () => {
 
                     {/* Отображение ошибок при загрузке жанров */}
                     {genresError && (
-                        <Alert severity="error" sx={{width: '100%', mb: 2}}>
+                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
                             {genresError}
                         </Alert>
                     )}
@@ -290,17 +337,17 @@ export const BookUpload: React.FC = () => {
                         variant="contained"
                         color="primary"
                         type="submit"
-                        sx={{mt: 2}}
+                        sx={{ mt: 2 }}
                         disabled={loading || genresLoading}
                     >
-                        Upload Book
+                        Загрузить книгу
                     </Button>
 
                     {/* Уведомление об успешной загрузке */}
                     {success && (
                         <Snackbar open={success} autoHideDuration={6000} onClose={() => dispatch(resetState())}>
-                            <Alert onClose={() => dispatch(resetState())} severity="success" sx={{width: '100%'}}>
-                                Book uploaded and processed successfully!
+                            <Alert onClose={() => dispatch(resetState())} severity="success" sx={{ width: '100%' }}>
+                                Книга успешно загружена и обработана!
                             </Alert>
                         </Snackbar>
                     )}
