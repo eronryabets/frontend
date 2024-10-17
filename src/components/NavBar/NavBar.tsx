@@ -1,5 +1,3 @@
-// src/components/NavBar/NavBar.tsx
-
 import React from 'react';
 import {
     AppBar,
@@ -125,7 +123,10 @@ export const NavBar = () => {
                     </Box>
 
                     {/* Кнопка переключения темы */}
-                    <IconButton onClick={handleThemeToggle} color="inherit">
+                    <IconButton onClick={handleThemeToggle}
+                                color="inherit"
+                                sx={{mr: 1}}
+                    >
                         {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>
 

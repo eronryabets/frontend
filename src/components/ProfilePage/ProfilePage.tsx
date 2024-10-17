@@ -131,7 +131,8 @@ export const ProfilePage: React.FC = () => {
                 height: '100vh',
                 padding: 2,
                 margin: 6,
-                backgroundColor: theme.palette.background.default,
+                backgroundColor: theme.customBackground.gradient,
+                minHeight: '100vh', // Покрывает всю высоту окна просмотра
             }}
         >
             {loading ? (
@@ -146,7 +147,10 @@ export const ProfilePage: React.FC = () => {
                         alignItems: 'flex-start',
                         width: '100%',
                         maxWidth: 400,
-                        backgroundColor: theme.palette.background.paper,
+                        // backgroundColor: theme.palette.background.paper,
+                        backgroundColor: theme.customBackground.paperGradient,
+                        borderRadius: 2,
+                        boxShadow: 4,
                         color: theme.palette.text.primary,
                     }}
                 >

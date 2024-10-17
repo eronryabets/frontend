@@ -5,7 +5,7 @@ import {store, persistor, RootState} from './redux/store';
 
 import {ThemeProvider} from '@mui/material/styles';
 import {MuiTheme} from "./components/MuiTheme";
-import {CssBaseline, Toolbar} from "@mui/material";
+import {CssBaseline, GlobalStyles, Toolbar} from "@mui/material";
 import {RegistrationPage} from "./components/RegistrationPage";
 import {HelmetProvider} from "react-helmet-async";
 import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
@@ -29,6 +29,19 @@ const AppContent = () => {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline/>
+            <GlobalStyles
+                styles={{
+                    body: {
+                        margin: 0,
+                        padding: 0,
+                        background: theme.customBackground.gradient,
+                        minHeight: '100vh',
+                        transition: theme.transitions.create(['background'], {
+                            duration: theme.transitions.duration.standard,
+                        }),
+                    },
+                }}
+            />
             {!shouldHideNavBar && <NavBar/>} {/* Отображаем NavBar только если текущий маршрут не в списке */}
             {!shouldHideNavBar && <Toolbar/>} {/* Добавляем Toolbar как спейсер */}
             <Routes>
