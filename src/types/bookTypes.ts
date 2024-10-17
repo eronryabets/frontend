@@ -1,8 +1,5 @@
 
-export interface Genre {
-    id: number;
-    name: string;
-}
+import {Genre} from "./genresTypes";
 
 export interface BookFormState {
     user_id: string;
