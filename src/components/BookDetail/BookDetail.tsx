@@ -203,10 +203,10 @@ const BookDetail: React.FC = () => {
             <Typography variant="h6" gutterBottom>
                 Список Глав
             </Typography>
-            <List>
+            <List sx={{maxHeight: 300, overflow: 'auto'}}>
                 {book.chapters.map((chapter, index) => (
                     <ListItem key={index} disableGutters>
-                        <ListItemText primary={chapter}/>
+                        <ListItemText primary={`${index + 1}. ${chapter}`}/>
                     </ListItem>
                 ))}
             </List>
