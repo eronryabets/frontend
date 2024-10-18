@@ -24,7 +24,7 @@ import {Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
 import {useAppDispatch} from '../../redux/store';
 import {deleteBook} from '../../redux/slices/downloadBookSlice';
 
-const BookDetail: React.FC = () => {
+export const BookDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const {books, loading, error} = useSelector((state: RootState) => state.books);
     const theme = useTheme();
@@ -252,6 +252,5 @@ const BookDetail: React.FC = () => {
     );
 };
 
-export default BookDetail;
 
 
