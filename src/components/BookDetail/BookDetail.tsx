@@ -23,6 +23,7 @@ import defaultCover from '../../assets/default_cover.png';
 import {Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
 import {useAppDispatch} from '../../redux/store';
 import {deleteBook} from '../../redux/slices/downloadBookSlice';
+import {EditBookModal} from "../EditBookModal";
 
 export const BookDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -33,6 +34,7 @@ export const BookDetail: React.FC = () => {
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
+    const [openEditDialog, setOpenEditDialog] = useState(false); // Состояние для модалки редактирования
 
     // Проверяем, что id определён
     if (!id) {
@@ -99,6 +101,11 @@ export const BookDetail: React.FC = () => {
         }
     };
 
+    // Функция открытия модального окна редактирования
+    const handleEdit = () => {
+        setOpenEditDialog(true);
+    };
+
     return (
         <Container sx={{mt: 10, mb: 4}}>
             {/* Карточка с информацией о книге */}
@@ -134,7 +141,7 @@ export const BookDetail: React.FC = () => {
                         {/* Описание Книги */}
                         {book.description && (
                             <Box sx={{mb: 2}}>
-                                <Typography variant="h6">Описание : </Typography>
+                                <Typography variant="h6">Описание:</Typography>
                                 <Typography variant="body1" color="text.primary">
                                     {book.description}
                                 </Typography>
@@ -144,11 +151,18 @@ export const BookDetail: React.FC = () => {
                         {/* Жанры */}
                         <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
                             <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                                Жанры :
+                                Жанры:
                             </Typography>
-                            {book.genre_details.map((genre) => (
+                            {book.genre_details.slice(0, 4).map((genre) => (
                                 <Chip key={genre.id} label={genre.name} variant="outlined" color="primary"/>
                             ))}
+                            {book.genre_details.length > 4 && (
+                                <Chip
+                                    label={`+${book.genre_details.length - 4}`}
+                                    variant="outlined"
+                                    color="primary"
+                                />
+                            )}
                         </Box>
                     </CardContent>
 
@@ -159,7 +173,7 @@ export const BookDetail: React.FC = () => {
                             color="primary"
                             startIcon={<EditIcon/>}
                             sx={{mr: 2}}
-                            // onClick={handleEdit} // Добавьте обработчик при реализации
+                            onClick={handleEdit} // Открытие модалки редактирования
                         >
                             Редактировать
                         </Button>
@@ -210,17 +224,19 @@ export const BookDetail: React.FC = () => {
             )}
 
             {/* Список глав */}
-            <Box sx={{
-                mt: 4,
-                p: 2,
-                background: theme.customBackground.paperGradient,
-                boxShadow: 3,
-                borderRadius: 2,
-            }}>
+            <Box
+                sx={{
+                    mt: 4,
+                    p: 2,
+                    background: theme.customBackground.paperGradient,
+                    boxShadow: 3,
+                    borderRadius: 2,
+                }}
+            >
                 <Typography variant="h6" gutterBottom>
-                    Список Глав :
+                    Список Глав:
                 </Typography>
-                <List sx={{maxHeight: 300, overflow: 'auto'}}>
+                <List sx={{ maxHeight: 300, overflow: 'auto'}}>
                     {book.chapters.map((chapter, index) => (
                         <ListItem key={index} disableGutters>
                             <ListItemText primary={`${index + 1}. ${chapter}`}/>
@@ -228,6 +244,7 @@ export const BookDetail: React.FC = () => {
                     ))}
                 </List>
             </Box>
+
             {/* Кнопка Назад */}
             <Button component={Link} to="/booklist" variant="outlined" color="primary" sx={{mt: 4}}>
                 Назад к списку книг
@@ -248,9 +265,13 @@ export const BookDetail: React.FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Модальное окно редактирования книги */}
+            <EditBookModal
+                open={openEditDialog}
+                onClose={() => setOpenEditDialog(false)}
+                book={book}
+            />
         </Container>
     );
 };
-
-
-
