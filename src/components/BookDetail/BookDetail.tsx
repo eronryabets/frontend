@@ -133,7 +133,7 @@ const BookDetail: React.FC = () => {
 
                         {/* Описание Книги */}
                         {book.description && (
-                            <Box sx={{ mb: 2 }}>
+                            <Box sx={{mb: 2}}>
                                 <Typography variant="h6">Описание : </Typography>
                                 <Typography variant="body1" color="text.primary">
                                     {book.description}
@@ -210,17 +210,24 @@ const BookDetail: React.FC = () => {
             )}
 
             {/* Список глав */}
-            <Typography variant="h6" gutterBottom>
-                Список Глав
-            </Typography>
-            <List sx={{maxHeight: 300, overflow: 'auto'}}>
-                {book.chapters.map((chapter, index) => (
-                    <ListItem key={index} disableGutters>
-                        <ListItemText primary={`${index + 1}. ${chapter}`}/>
-                    </ListItem>
-                ))}
-            </List>
-
+            <Box sx={{
+                mt: 4,
+                p: 2,
+                background: theme.customBackground.paperGradient,
+                boxShadow: 3,
+                borderRadius: 2,
+            }}>
+                <Typography variant="h6" gutterBottom>
+                    Список Глав :
+                </Typography>
+                <List sx={{maxHeight: 300, overflow: 'auto'}}>
+                    {book.chapters.map((chapter, index) => (
+                        <ListItem key={index} disableGutters>
+                            <ListItemText primary={`${index + 1}. ${chapter}`}/>
+                        </ListItem>
+                    ))}
+                </List>
+            </Box>
             {/* Кнопка Назад */}
             <Button component={Link} to="/booklist" variant="outlined" color="primary" sx={{mt: 4}}>
                 Назад к списку книг
