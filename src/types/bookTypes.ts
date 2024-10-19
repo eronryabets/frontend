@@ -1,5 +1,6 @@
 
 import {Genre} from "./genresTypes";
+import {Chapter} from "./chapterTypes";
 
 export interface BookFormState {
     user_id: string;
@@ -50,12 +51,6 @@ export interface Book {
     description: string | null;
 }
 
-interface Chapter {
-    id: string;
-    chapter_title: string;
-
-}
-
 export interface FetchBooksResponse {
     results: Book[];
     count: number;
@@ -71,5 +66,6 @@ export interface DownloadBooksState {
     totalPages: number;
     itemsPerPage: number;
 }
+
 
 

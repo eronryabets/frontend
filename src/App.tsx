@@ -18,6 +18,7 @@ import {BookUpload} from "./components/BookUpload";
 import {BooksList} from "./components/BookList";
 import {BookDetail} from "./components/BookDetail";
 import {GlobalStyles} from './styles';
+import ChapterDetail from "./components/ChapterDetail/ChapterDetail";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -41,6 +42,7 @@ const AppContent = () => {
                     <Route path="/book" element={<BookUpload/>}/>
                     <Route path="/booklist" element={<BooksList/>}/>
                     <Route path="/book/:id" element={<BookDetail />} />
+                    <Route path="/chapters/get_chapter" element={<ChapterDetail />} />
                 </Route>
 
                 {/* Открытые маршруты */}

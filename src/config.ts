@@ -7,3 +7,4 @@ export const BOOK_API_URL = 'http://book.drunar.space/';
 
 export const GET_BOOK_API_URL = 'http://book.drunar.space/books/';
 export const BOOK_GENRES_API_URL = 'http://book.drunar.space/genres/';
+export const BOOK_CHAPTER_API_URL = 'http://book.drunar.space/chapters/';
