@@ -298,7 +298,7 @@ export const BookUpload: React.FC = () => {
                             Загрузить файл книги
                             <input
                                 hidden
-                                accept=".pdf, .doc, .docx"
+                                accept=".pdf, .fb2, .epub, .rtf, .txt"
                                 type="file"
                                 name="file"
                                 onChange={handleInputChange}
