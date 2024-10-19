@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {useSelector} from 'react-redux';
-import {RootState, useAppDispatch} from '../../redux/store';
-import {getUserInfo, patchUserAuthInfo, patchUserProfileInfo, resetUpdateState} from '../../redux/slices/userInfoSlice'; // Обновляем thunk-и
+import {RootState} from '../../redux/store';
+import { useAppDispatch } from '../../redux/hooks';
+import {getUserInfo, patchUserAuthInfo, patchUserProfileInfo, resetUpdateState} from '../../redux/slices/userInfoSlice';
 import {
     Avatar,
     Box,
@@ -14,7 +15,7 @@ import {
 } from '@mui/material';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import {v4 as uuidv4} from 'uuid';
-import {USER_API_MEDIA_URL} from "../../config"; // Используем для уникальных имен файлов
+import {USER_API_MEDIA_URL} from "../../config";
 
 export const ProfilePage: React.FC = () => {
     const dispatch = useAppDispatch();

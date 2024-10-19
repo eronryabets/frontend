@@ -14,7 +14,8 @@ import {
 } from '@mui/material';
 import { toggleTheme } from "../../redux/slices/themeSlice";
 import { useSelector } from "react-redux";
-import { RootState, useAppDispatch } from "../../redux/store";
+import { RootState } from "../../redux/store";
+import { useAppDispatch } from '../../redux/hooks';
 
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';

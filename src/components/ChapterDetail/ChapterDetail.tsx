@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Container, Typography, CircularProgress, Alert, Box } from '@mui/material';
-import {clearChapter, fetchChapter} from "../../redux/slices/chapterSlice";
-import {useAppDispatch} from "../../redux/store";
-import {useAppSelector} from "../../redux/hooks";
+import { clearChapter, fetchChapter } from "../../redux/slices/chapterSlice";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 
 
 const ChapterDetail: React.FC = () => {

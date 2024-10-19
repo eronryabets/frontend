@@ -21,7 +21,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {RootState} from '../../redux/store';
 import defaultCover from '../../assets/default_cover.png';
 import {Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
-import {useAppDispatch} from '../../redux/store';
+import {useAppDispatch} from '../../redux/hooks';
 import {deleteBook} from '../../redux/slices/downloadBookSlice';
 import {EditBookModal} from "../EditBookModal";
 import {Link as RouterLink} from 'react-router-dom';
