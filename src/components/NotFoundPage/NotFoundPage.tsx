@@ -1,8 +1,8 @@
 import styles from './NotFoundPage.module.scss';
 
-interface NotFoundPageProps { }
 
-export const NotFoundPage = ({ }: NotFoundPageProps) => (
+
+export const NotFoundPage = () => (
   <div className={styles.notFoundPage}>
     NotFoundPage Component
   </div>

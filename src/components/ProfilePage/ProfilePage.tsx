@@ -19,7 +19,7 @@ import {USER_API_MEDIA_URL} from "../../config"; // Используем для 
 export const ProfilePage: React.FC = () => {
     const dispatch = useAppDispatch();
     const userData = useSelector((state: RootState) => state.userInfo.userData);
-    const {loading, success, error} = useSelector((state: RootState) => state.userInfo.status);
+    const {loading, error} = useSelector((state: RootState) => state.userInfo.status);
     const {updateSuccess, updateError} = useSelector((state: RootState) => state.userInfo.updateStatus);
     const theme = useTheme();
 

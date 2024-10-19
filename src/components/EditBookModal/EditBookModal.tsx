@@ -9,7 +9,7 @@ import {
     Box,
     Avatar,
     IconButton,
-    Alert, Typography, LinearProgress, CircularProgress,
+    Alert, CircularProgress,
 } from '@mui/material';
 import {PhotoCamera} from '@mui/icons-material';
 import {useSelector, useDispatch} from 'react-redux';
@@ -29,7 +29,7 @@ interface EditBookModalProps {
 export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book}) => {
     const dispatch = useDispatch<AppDispatch>();
     const {genres, loading: genresLoading, error: genresError} = useSelector((state: RootState) => state.genres);
-    const {loading, error} = useSelector((state: RootState) => state.books);
+    const {loading} = useSelector((state: RootState) => state.books);
 
     const [formData, setFormData] = useState({
         title: book.title,
@@ -39,7 +39,6 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
     });
 
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(book.cover_image);
-    const [uploadProgress, setUploadProgress] = useState(0);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
     const {title, description, genres: selectedGenres} = formData;
@@ -119,7 +118,6 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
             });
             setCoverImagePreview(book.cover_image);
             setSubmitError(null);
-            setUploadProgress(0);
         }
     }, [open, book]);
 

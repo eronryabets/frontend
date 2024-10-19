@@ -10,7 +10,7 @@ import {
     Tooltip,
     Button,
     Box,
-    Fade, useTheme
+    Fade
 } from '@mui/material';
 import { toggleTheme } from "../../redux/slices/themeSlice";
 import { useSelector } from "react-redux";
@@ -26,7 +26,7 @@ export const NavBar = () => {
     const dispatch = useAppDispatch();
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState<null | HTMLElement>(null);
     const [booksMenuAnchorEl, setBooksMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-     const theme = useTheme();
+
 
     const themeMode = useSelector((state: RootState) => state.theme.mode);
     const userData = useSelector((state: RootState) => state.userInfo.userData);

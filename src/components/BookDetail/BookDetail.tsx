@@ -203,8 +203,10 @@ export const BookDetail: React.FC = () => {
                         image={book.cover_image || defaultCover}
                         alt={book.title}
                         sx={{
-                            width: {xs: '100%', md: 300},
-                            height: 'auto',
+                            // width: {xs: '100%', md: 300},
+                            // height: 'auto',
+                            width: 240, // Фиксированная ширина
+                            height: 320, // Фиксированная высота
                             objectFit: 'cover',
                             borderRadius: '16px',
                             boxShadow: 3,
@@ -236,7 +238,7 @@ export const BookDetail: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                     Список Глав:
                 </Typography>
-                <List sx={{ maxHeight: 300, overflow: 'auto'}}>
+                <List sx={{maxHeight: 300, overflow: 'auto'}}>
                     {book.chapters.map((chapter, index) => (
                         <ListItem key={index} disableGutters>
                             <ListItemText primary={`${index + 1}. ${chapter}`}/>
