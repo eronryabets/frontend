@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {useParams, Link, useNavigate} from 'react-router-dom';
+import React, {useState, useMemo} from 'react';
+import {useParams, useNavigate} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import {
     Card,
@@ -14,7 +14,7 @@ import {
     List,
     ListItem,
     ListItemText,
-    Button, useTheme,
+    Button, useTheme, ListItemButton,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -24,6 +24,7 @@ import {Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
 import {useAppDispatch} from '../../redux/store';
 import {deleteBook} from '../../redux/slices/downloadBookSlice';
 import {EditBookModal} from "../EditBookModal";
+import {Link as RouterLink} from 'react-router-dom';
 
 export const BookDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -36,20 +37,44 @@ export const BookDetail: React.FC = () => {
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const [openEditDialog, setOpenEditDialog] = useState(false); // Состояние для модалки редактирования
 
+    // Найти книгу по id
+    const book = useMemo(() => {
+        if (!id) return null;
+        return books.find((b) => b.id === id);
+    }, [books, id]);
+
+    // Мемоизируем список глав
+    const memoizedChapters = useMemo(() => {
+        if (!book) return null;
+        return book.chapters.map((chapter, index) => (
+            <ListItem key={chapter.id} disableGutters>
+                <ListItemButton
+                    component={RouterLink}
+                    to={`/chapters/get_chapter/?book_id=${book.id}&chapter_id=${chapter.id}`}
+                    sx={{
+                        '&:hover': {
+                            backgroundColor: theme.palette.action.hover,
+                            cursor: 'pointer',
+                        },
+                    }}
+                >
+                    <ListItemText primary={`${index + 1}. ${chapter.chapter_title}`}/>
+                </ListItemButton>
+            </ListItem>
+        ));
+    }, [book, theme.palette.action.hover]);
+
     // Проверяем, что id определён
     if (!id) {
         return (
             <Container sx={{mt: 4}}>
                 <Alert severity="warning">Некорректный идентификатор книги.</Alert>
-                <Button component={Link} to="/booklist" variant="contained" color="primary" sx={{mt: 2}}>
+                <Button component={RouterLink} to="/booklist" variant="contained" color="primary" sx={{mt: 2}}>
                     Вернуться к списку книг
                 </Button>
             </Container>
         );
     }
-
-    // Находим книгу по id
-    const book = books.find((b) => b.id === id);
 
     // Обработка состояния загрузки
     if (loading) {
@@ -79,7 +104,7 @@ export const BookDetail: React.FC = () => {
         return (
             <Container sx={{mt: 4}}>
                 <Alert severity="warning">Книга не найдена.</Alert>
-                <Button component={Link} to="/booklist" variant="contained" color="primary" sx={{mt: 2}}>
+                <Button component={RouterLink} to="/booklist" variant="contained" color="primary" sx={{mt: 2}}>
                     Вернуться к списку книг
                 </Button>
             </Container>
@@ -203,8 +228,6 @@ export const BookDetail: React.FC = () => {
                         image={book.cover_image || defaultCover}
                         alt={book.title}
                         sx={{
-                            // width: {xs: '100%', md: 300},
-                            // height: 'auto',
                             width: 240, // Фиксированная ширина
                             height: 320, // Фиксированная высота
                             objectFit: 'cover',
@@ -239,16 +262,18 @@ export const BookDetail: React.FC = () => {
                     Список Глав:
                 </Typography>
                 <List sx={{maxHeight: 300, overflow: 'auto'}}>
-                    {book.chapters.map((chapter, index) => (
-                        <ListItem key={index} disableGutters>
-                            <ListItemText primary={`${index + 1}. ${chapter}`}/>
+                    {memoizedChapters ? (
+                        memoizedChapters
+                    ) : (
+                        <ListItem>
+                            <ListItemText primary="Главы отсутствуют."/>
                         </ListItem>
-                    ))}
+                    )}
                 </List>
             </Box>
 
             {/* Кнопка Назад */}
-            <Button component={Link} to="/booklist" variant="outlined" color="primary" sx={{mt: 4}}>
+            <Button component={RouterLink} to="/booklist" variant="outlined" color="primary" sx={{mt: 4}}>
                 Назад к списку книг
             </Button>
 

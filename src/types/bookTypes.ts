@@ -46,8 +46,14 @@ export interface Book {
     updated_at: string;
     cover_image: string | null;
     genre_details: GenreDetail[];
-    chapters: string[];
+    chapters: Chapter[];
     description: string | null;
+}
+
+interface Chapter {
+    id: string;
+    chapter_title: string;
+
 }
 
 export interface FetchBooksResponse {
@@ -65,3 +71,5 @@ export interface DownloadBooksState {
     totalPages: number;
     itemsPerPage: number;
 }
+
+
