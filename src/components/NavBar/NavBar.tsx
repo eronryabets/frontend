@@ -23,6 +23,7 @@ import { logout } from "../../redux/slices/authorizationSlice";
 import { Link } from "react-router-dom";
 import { USER_API_MEDIA_URL } from "../../config";
 
+
 export const NavBar = () => {
     const dispatch = useAppDispatch();
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -74,7 +75,18 @@ export const NavBar = () => {
         <AppBar position="fixed">
             <Toolbar>
                 {/* Название приложения */}
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                 {/* Кликабельная надпись "Smart Reader" */}
+                <Typography
+                    variant="h6"
+                    component={Link}
+                    to="/booklist"
+                    sx={{
+                        flexGrow: 1,
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        cursor: 'pointer',
+                    }}
+                >
                     Smart Reader
                 </Typography>
 

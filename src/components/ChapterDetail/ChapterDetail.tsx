@@ -1,9 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Container, Typography, CircularProgress, Alert, Box } from '@mui/material';
-import { clearChapter, fetchChapter } from "../../redux/slices/chapterSlice";
-import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import React, {useEffect, useMemo} from 'react';
+import {useSearchParams} from 'react-router-dom';
+import {Container, Typography, CircularProgress, Alert, Box} from '@mui/material';
+import {clearChapter, fetchChapter} from "../../redux/slices/chapterSlice";
+import {useAppSelector, useAppDispatch} from "../../redux/hooks";
+import {Link as RouterLink} from 'react-router-dom';
+import {Button, Stack} from '@mui/material';
+import {Chapter} from "../../types";
 
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const ChapterDetail: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -14,21 +19,33 @@ const ChapterDetail: React.FC = () => {
 
     // Получение состояния из Redux
     const { data: chapter, loading, error } = useAppSelector((state) => state.chapter);
+    const books = useAppSelector((state) => state.books.books); // Предполагаем, что книги хранятся здесь
 
+    // Найти книгу по bookId
+    const book = useMemo(() => {
+        if (!bookId) return null;
+        return books.find((b) => b.id === bookId);
+    }, [books, bookId]);
+
+    // Мемоизируем список глав
+    const memoizedChapters = useMemo(() => {
+        if (!book) return [];
+        return book.chapters;
+    }, [book]);
+
+    // useEffect для загрузки главы
     useEffect(() => {
         if (bookId && chapterId) {
             dispatch(fetchChapter({ bookId, chapterId }));
-        } else {
-            // Если параметры отсутствуют, можно установить ошибку
-            // Однако в нашем слайсе это уже обрабатывается
         }
 
-        // Очистка данных при размонтировании компонента
+        // Очистка состояния при размонтировании компонента
         return () => {
             dispatch(clearChapter());
         };
     }, [dispatch, bookId, chapterId]);
 
+    // Обработка состояния загрузки
     if (loading) {
         return (
             <Box
@@ -42,10 +59,23 @@ const ChapterDetail: React.FC = () => {
         );
     }
 
+    // Обработка ошибок
     if (error) {
         return (
             <Container sx={{ mt: 4 }}>
                 <Alert severity="error">{error}</Alert>
+            </Container>
+        );
+    }
+
+    // Обработка случая, когда книга не найдена
+    if (!book) {
+        return (
+            <Container sx={{ mt: 4 }}>
+                <Alert severity="warning">Книга не найдена.</Alert>
+                <Button component={RouterLink} to="/booklist" variant="contained" color="primary" sx={{ mt: 2 }}>
+                    Вернуться к списку книг
+                </Button>
             </Container>
         );
     }
@@ -58,6 +88,13 @@ const ChapterDetail: React.FC = () => {
         );
     }
 
+    // Определение индекса текущей главы
+    const currentIndex = memoizedChapters.findIndex((c: Chapter) => c.id === chapterId);
+
+    // Определение предыдущей и следующей главы
+    const prevChapter = currentIndex > 0 ? memoizedChapters[currentIndex - 1] : null;
+    const nextChapter = currentIndex < memoizedChapters.length - 1 ? memoizedChapters[currentIndex + 1] : null;
+
     return (
         <Container sx={{ mt: 10, mb: 4 }}>
             <Typography variant="h4" gutterBottom>
@@ -66,6 +103,41 @@ const ChapterDetail: React.FC = () => {
             <Typography variant="body1" component="div" sx={{ whiteSpace: 'pre-wrap' }}>
                 {chapter.chapter_text}
             </Typography>
+
+            {/* Кнопки навигации */}
+            <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ mt: 4 }}>
+                {prevChapter ? (
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        startIcon={<ArrowBackIcon />}
+                        component={RouterLink}
+                        to={`/chapters/get_chapter/?book_id=${book.id}&chapter_id=${prevChapter.id}`}
+                    >
+                        {prevChapter.chapter_title}
+                    </Button>
+                ) : (
+                    <Button variant="outlined" color="primary" startIcon={<ArrowBackIcon />} disabled>
+
+                    </Button>
+                )}
+
+                {nextChapter ? (
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        endIcon={<ArrowForwardIcon />}
+                        component={RouterLink}
+                        to={`/chapters/get_chapter/?book_id=${book.id}&chapter_id=${nextChapter.id}`}
+                    >
+                        {nextChapter.chapter_title}
+                    </Button>
+                ) : (
+                    <Button variant="outlined" color="primary" endIcon={<ArrowForwardIcon />} disabled>
+
+                    </Button>
+                )}
+            </Stack>
         </Container>
     );
 };

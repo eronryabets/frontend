@@ -50,7 +50,7 @@ export const LoginPage = () => {
     useEffect(() => {
         if (isAuthenticated) {
             // navigate('/profile');
-            navigate('/');
+            navigate('/booklist');
         }
     }, [isAuthenticated, navigate]);
 
