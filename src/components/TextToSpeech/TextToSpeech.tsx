@@ -5,14 +5,16 @@ import {
     Box,
     Button,
     FormControl,
-    Grid,
     InputLabel,
     MenuItem,
     Select,
     Slider,
     Typography,
+    IconButton,
+    Drawer,
     Stack
 } from '@mui/material';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 interface TextToSpeechProps {
     text: string;
@@ -48,35 +50,44 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
     // Состояние для доступных голосов
     const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
+    // Состояние для выбранного голоса
+    const [selectedVoiceName, setSelectedVoiceName] = useState<string>('');
+
     // Реф для хранения текущего Utterance
     const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+    // Состояние для управления выдвижной панелью
+    const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
     // Получение доступных голосов при монтировании
     useEffect(() => {
         const populateVoices = () => {
             const availableVoices = window.speechSynthesis.getVoices();
             setVoices(availableVoices);
+
+            // Устанавливаем голос по умолчанию для выбранного языка
+            const defaultVoice = availableVoices.find(voice => voice.lang === language);
+            if (defaultVoice) {
+                setSelectedVoiceName(defaultVoice.name);
+            }
         };
 
         populateVoices();
         window.speechSynthesis.onvoiceschanged = populateVoices;
-    }, []);
+    }, [language]);
 
-    // Функция для воспроизведения текста
+    // Функции управления озвучиванием
     const handlePlay = () => {
         if ('speechSynthesis' in window) {
-            // Остановить любую текущую озвучку
             window.speechSynthesis.cancel();
 
-            // Создать новое Utterance
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = language; // Установить выбранный язык
-            utterance.pitch = pitch;    // Высота тона
-            utterance.rate = rate;      // Скорость речи
-            utterance.volume = volume;  // Громкость
+            utterance.lang = language;
+            utterance.pitch = pitch;
+            utterance.rate = rate;
+            utterance.volume = volume;
 
-            // Выбор голоса, соответствующего выбранному языку
-            const selectedVoice = voices.find(voice => voice.lang === language);
+            const selectedVoice = voices.find(voice => voice.name === selectedVoiceName && voice.lang === language);
             if (selectedVoice) {
                 utterance.voice = selectedVoice;
             } else {
@@ -84,7 +95,6 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
                 return;
             }
 
-            // Обработчики событий
             utterance.onstart = () => {
                 setIsSpeaking(true);
                 setIsPaused(false);
@@ -100,17 +110,14 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
                 setIsPaused(false);
             };
 
-            // Сохранить Utterance в ref
             utteranceRef.current = utterance;
 
-            // Начать озвучивание
             window.speechSynthesis.speak(utterance);
         } else {
             alert('Ваш браузер не поддерживает Web Speech API.');
         }
     };
 
-    // Функция для паузы озвучивания
     const handlePause = () => {
         if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
             window.speechSynthesis.pause();
@@ -118,7 +125,6 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
         }
     };
 
-    // Функция для продолжения озвучивания
     const handleResume = () => {
         if (window.speechSynthesis.paused) {
             window.speechSynthesis.resume();
@@ -126,7 +132,6 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
         }
     };
 
-    // Функция для остановки озвучивания
     const handleStop = () => {
         window.speechSynthesis.cancel();
         setIsSpeaking(false);
@@ -134,60 +139,67 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
     };
 
     return (
-        <Box>
-            {/* Контролы для настройки озвучивания */}
-            <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                    Настройки озвучивания
-                </Typography>
-                <Grid container spacing={2}>
+        <>
+            {/* Кнопка для открытия выдвижной панели */}
+            <IconButton
+                color="primary"
+                onClick={() => setIsDrawerOpen(true)}
+                sx={{ position: 'fixed', top: 80, left: 10, zIndex: 1000 }}
+            >
+                <VolumeUpIcon fontSize="large" />
+            </IconButton>
+
+            {/* Выдвижная панель */}
+            <Drawer
+                anchor="left"
+                open={isDrawerOpen}
+                onClose={() => setIsDrawerOpen(false)}
+            >
+                <Box sx={{ width: 300, p: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                        Настройки озвучивания
+                    </Typography>
+
                     {/* Выбор языка */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <FormControl fullWidth>
-                            <InputLabel id="tts-language-select-label">Язык</InputLabel>
-                            <Select
-                                labelId="tts-language-select-label"
-                                value={language}
-                                label="Язык"
-                                onChange={(e) => setLanguage(e.target.value)}
-                            >
-                                {availableLanguages.map((lang) => (
-                                    <MenuItem key={lang.code} value={lang.code}>
-                                        {lang.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel id="tts-language-select-label">Язык</InputLabel>
+                        <Select
+                            labelId="tts-language-select-label"
+                            value={language}
+                            label="Язык"
+                            onChange={(e) => setLanguage(e.target.value)}
+                        >
+                            {availableLanguages.map((lang) => (
+                                <MenuItem key={lang.code} value={lang.code}>
+                                    {lang.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
                     {/* Выбор голоса */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <FormControl fullWidth disabled={!voices.find(voice => voice.lang === language)}>
-                            <InputLabel id="tts-voice-select-label">Голос</InputLabel>
-                            <Select
-                                labelId="tts-voice-select-label"
-                                value={utteranceRef.current?.voice?.name || ''}
-                                label="Голос"
-                                onChange={(e) => {
-                                    const selectedVoice = voices.find(voice => voice.name === e.target.value);
-                                    if (selectedVoice && utteranceRef.current) {
-                                        utteranceRef.current.voice = selectedVoice;
-                                    }
-                                }}
-                            >
-                                {voices
-                                    .filter(voice => voice.lang === language)
-                                    .map((voice) => (
-                                        <MenuItem key={voice.name} value={voice.name}>
-                                            {voice.name}
-                                        </MenuItem>
-                                    ))}
-                            </Select>
-                        </FormControl>
-                    </Grid>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel id="tts-voice-select-label">Голос</InputLabel>
+                        <Select
+                            labelId="tts-voice-select-label"
+                            value={selectedVoiceName}
+                            label="Голос"
+                            onChange={(e) => {
+                                setSelectedVoiceName(e.target.value);
+                            }}
+                        >
+                            {voices
+                                .filter(voice => voice.lang === language)
+                                .map((voice) => (
+                                    <MenuItem key={voice.name} value={voice.name}>
+                                        {voice.name}
+                                    </MenuItem>
+                                ))}
+                        </Select>
+                    </FormControl>
 
-                    {/* Настройка высоты тона */}
-                    <Grid item xs={12} sm={6} md={3}>
+                    {/* Настройки озвучивания */}
+                    <Box sx={{ mb: 2 }}>
                         <Typography gutterBottom>Высота тона: {pitch.toFixed(1)}</Typography>
                         <Slider
                             value={pitch}
@@ -197,10 +209,9 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
                             onChange={(e, newValue) => setPitch(newValue as number)}
                             aria-labelledby="tts-pitch-slider"
                         />
-                    </Grid>
+                    </Box>
 
-                    {/* Настройка скорости речи */}
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Box sx={{ mb: 2 }}>
                         <Typography gutterBottom>Скорость речи: {rate.toFixed(1)}</Typography>
                         <Slider
                             value={rate}
@@ -210,10 +221,9 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
                             onChange={(e, newValue) => setRate(newValue as number)}
                             aria-labelledby="tts-rate-slider"
                         />
-                    </Grid>
+                    </Box>
 
-                    {/* Настройка громкости */}
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Box sx={{ mb: 2 }}>
                         <Typography gutterBottom>Громкость: {volume.toFixed(1)}</Typography>
                         <Slider
                             value={volume}
@@ -223,50 +233,50 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
                             onChange={(e, newValue) => setVolume(newValue as number)}
                             aria-labelledby="tts-volume-slider"
                         />
-                    </Grid>
-                </Grid>
-            </Box>
+                    </Box>
 
-            {/* Кнопки управления озвучкой */}
-            <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 2 }}>
-                {!isSpeaking && (
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handlePlay}
-                    >
-                        Воспроизвести
-                    </Button>
-                )}
-                {isSpeaking && !isPaused && (
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={handlePause}
-                    >
-                        Пауза
-                    </Button>
-                )}
-                {isSpeaking && isPaused && (
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleResume}
-                    >
-                        Продолжить
-                    </Button>
-                )}
-                {isSpeaking && (
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={handleStop}
-                    >
-                        Остановить
-                    </Button>
-                )}
-            </Stack>
-        </Box>
+                    {/* Кнопки управления озвучкой */}
+                    <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 2 }}>
+                        {!isSpeaking && (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handlePlay}
+                            >
+                                Воспроизвести
+                            </Button>
+                        )}
+                        {isSpeaking && !isPaused && (
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={handlePause}
+                            >
+                                Пауза
+                            </Button>
+                        )}
+                        {isSpeaking && isPaused && (
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleResume}
+                            >
+                                Продолжить
+                            </Button>
+                        )}
+                        {isSpeaking && (
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={handleStop}
+                            >
+                                Остановить
+                            </Button>
+                        )}
+                    </Stack>
+                </Box>
+            </Drawer>
+        </>
     );
 };
 
