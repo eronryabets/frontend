@@ -1,5 +1,5 @@
 // api.ts
-import {AUTH_API_URL} from "../config";
+import {AUTH_API_URL} from "../config/urls";
 import axios from 'axios';
 import store from "../redux/store";
 

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import api from "../../utils/api";
-import {AUTH_API_URL} from "../../config";
+import {AUTH_API_URL} from "../../config/urls";
 import {clearUserInfo, getUserInfo} from "./userInfoSlice";
 import {AuthorizationData, AuthorizationState} from "../../types";
 

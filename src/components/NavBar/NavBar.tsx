@@ -21,7 +21,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import { logout } from "../../redux/slices/authorizationSlice";
 import { Link } from "react-router-dom";
-import { USER_API_MEDIA_URL } from "../../config";
+import { USER_API_MEDIA_URL } from "../../config/urls";
 
 
 export const NavBar = () => {

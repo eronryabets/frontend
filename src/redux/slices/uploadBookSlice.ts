@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
-import {BOOK_API_URL} from "../../config";
+import {BOOK_API_URL} from "../../config/urls";
 import api from "../../utils/api";
 
 import {BookData, UploadBookState, BookResponseData} from '../../types';

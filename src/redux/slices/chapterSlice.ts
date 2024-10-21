@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { ChapterData, ChapterState } from "../../types";
 import api from "../../utils/api";
-import {BOOK_CHAPTER_API_URL} from "../../config";
+import {BOOK_CHAPTER_API_URL} from "../../config/urls";
 
 
 const initialState: ChapterState = {

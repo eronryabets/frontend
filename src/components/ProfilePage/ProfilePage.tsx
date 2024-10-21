@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import {v4 as uuidv4} from 'uuid';
-import {USER_API_MEDIA_URL} from "../../config";
+import {USER_API_MEDIA_URL} from "../../config/urls";
 
 export const ProfilePage: React.FC = () => {
     const dispatch = useAppDispatch();

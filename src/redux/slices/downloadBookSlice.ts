@@ -1,7 +1,7 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import axios from 'axios';
 import {Book, DownloadBooksState, FetchBooksResponse} from "../../types";
-import {GET_BOOK_API_URL} from "../../config";
+import {GET_BOOK_API_URL} from "../../config/urls";
 import api from "../../utils/api";
 
 const initialState: DownloadBooksState = {

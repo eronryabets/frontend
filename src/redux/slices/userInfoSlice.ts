@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import api from "../../utils/api";
-import {AUTH_API_URL, USER_API_URL} from "../../config";
+import {AUTH_API_URL, USER_API_URL} from "../../config/urls";
 import {ProfileData, UserInfoResponseData, UserInfoState} from "../../types";
 
 // Изначальное состояние
