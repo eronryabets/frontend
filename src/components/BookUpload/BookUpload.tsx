@@ -1,23 +1,30 @@
-import React, {useState, useEffect} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../redux/store";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
 import {
     Alert,
     Avatar,
     Box,
     Button,
-    IconButton, LinearProgress,
+    IconButton,
+    LinearProgress,
     Paper,
     Snackbar,
     TextField,
     Typography,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
     useTheme,
 } from "@mui/material";
-import {PhotoCamera} from "@mui/icons-material";
-import {resetState, uploadBook} from "../../redux/slices/uploadBookSlice";
-import {fetchGenres} from "../../redux/slices/genresSlice";
-import {BookFormState, BookData} from '../../types';
-import {GenreSelect} from '../GenreSelect';
+import { PhotoCamera } from "@mui/icons-material";
+import { resetState, uploadBook } from "../../redux/slices/uploadBookSlice";
+import { fetchGenres } from "../../redux/slices/genresSlice";
+import { BookFormState, BookData } from '../../types';
+import { GenreSelect } from '../GenreSelect';
+import { SelectChangeEvent } from '@mui/material/Select';
+import { languageOptions } from '../../config/languageOptions'; // Импорт списка языков
 
 export const BookUpload: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -33,9 +40,10 @@ export const BookUpload: React.FC = () => {
         file: null,
         cover_image: null,
         description: '',
+        language: '',
     });
 
-    const { title, genres: selectedGenres, file, description } = formData;
+    const { title, genres: selectedGenres, file, description, language } = formData;
 
     // Локальное состояние для превью обложки книги
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
@@ -85,6 +93,14 @@ export const BookUpload: React.FC = () => {
         });
     };
 
+    // Обработка изменения языка
+    const handleLanguageChange = (e: SelectChangeEvent<string>) => {
+        setFormData({
+            ...formData,
+            language: e.target.value,
+        });
+    };
+
     // Отправка формы
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -100,6 +116,11 @@ export const BookUpload: React.FC = () => {
             return;
         }
 
+        if (!formData.language) {
+            alert("Пожалуйста, выберите язык книги.");
+            return;
+        }
+
         const bookData: BookData = {
             user_id: formData.user_id,
             title: formData.title,
@@ -107,6 +128,7 @@ export const BookUpload: React.FC = () => {
             file: formData.file,
             cover_image: formData.cover_image,
             description: formData.description,
+            language: formData.language,
         };
 
         dispatch(uploadBook(bookData));
@@ -254,6 +276,25 @@ export const BookUpload: React.FC = () => {
                             </IconButton>
                         </label>
                     </Box>
+
+                    {/* Поле выбора языка */}
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel id="book-language-select-label">Язык книги</InputLabel>
+                        <Select
+                            labelId="book-language-select-label"
+                            value={language}
+                            label="Язык книги"
+                            name="language"
+                            onChange={handleLanguageChange}
+                            required
+                        >
+                            {languageOptions.map((lang) => (
+                                <MenuItem key={lang.code} value={lang.code}>
+                                    {lang.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
                     {/* Поле ввода описания */}
                     <TextField

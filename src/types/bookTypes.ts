@@ -1,6 +1,5 @@
-
-import {Genre} from "./genresTypes";
-import {Chapter} from "./chapterTypes";
+import { Genre } from "./genresTypes";
+import { Chapter } from "./chapterTypes";
 
 export interface BookFormState {
     user_id: string;
@@ -9,6 +8,7 @@ export interface BookFormState {
     file: File | null;
     cover_image: File | null;
     description: string;
+    language: string;
 }
 
 export interface BookData {
@@ -18,6 +18,7 @@ export interface BookData {
     file: File;
     cover_image?: File | null;
     description: string;
+    language: string;
 }
 
 export interface UploadBookState {
@@ -32,6 +33,9 @@ export interface BookResponseData {
     title: string;
     genres: Genre[];
     description: string | null;
+    language: string;
+    total_chapters: number;
+    total_pages: number;
 }
 
 export interface GenreDetail {
@@ -49,6 +53,9 @@ export interface Book {
     genre_details: GenreDetail[];
     chapters: Chapter[];
     description: string | null;
+    language: string;
+    total_chapters: number;
+    total_pages: number;
 }
 
 export interface FetchBooksResponse {
@@ -66,6 +73,3 @@ export interface DownloadBooksState {
     totalPages: number;
     itemsPerPage: number;
 }
-
-
-

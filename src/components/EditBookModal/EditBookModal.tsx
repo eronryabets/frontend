@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -9,16 +9,22 @@ import {
     Box,
     Avatar,
     IconButton,
-    Alert, CircularProgress,
+    Alert,
+    CircularProgress,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
 } from '@mui/material';
-import {PhotoCamera} from '@mui/icons-material';
-import {useSelector, useDispatch} from 'react-redux';
-import {RootState, AppDispatch} from '../../redux/store';
-import {Book} from "../../types";
-import {fetchGenres} from "../../redux/slices/genresSlice";
-import {updateBook} from "../../redux/slices/downloadBookSlice";
-import {GenreSelect} from "../GenreSelect";
-
+import { PhotoCamera } from '@mui/icons-material';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../../redux/store';
+import { Book } from "../../types";
+import { fetchGenres } from "../../redux/slices/genresSlice";
+import { updateBook } from "../../redux/slices/downloadBookSlice";
+import { GenreSelect } from "../GenreSelect";
+import { SelectChangeEvent } from '@mui/material/Select'; // Импортируем SelectChangeEvent
+import { languageOptions } from '../../config/languageOptions'; // Импортируем список языков
 
 interface EditBookModalProps {
     open: boolean;
@@ -26,22 +32,23 @@ interface EditBookModalProps {
     book: Book;
 }
 
-export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book}) => {
+export const EditBookModal: React.FC<EditBookModalProps> = ({ open, onClose, book }) => {
     const dispatch = useDispatch<AppDispatch>();
-    const {genres, loading: genresLoading, error: genresError} = useSelector((state: RootState) => state.genres);
-    const {loading} = useSelector((state: RootState) => state.books);
+    const { genres, loading: genresLoading, error: genresError } = useSelector((state: RootState) => state.genres);
+    const { loading } = useSelector((state: RootState) => state.books);
 
     const [formData, setFormData] = useState({
         title: book.title,
         description: book.description || '',
         genres: book.genre_details.map((genre) => genre.id),
         cover_image: null as File | null,
+        language: book.language || '', // Добавили язык
     });
 
     const [coverImagePreview, setCoverImagePreview] = useState<string | null>(book.cover_image);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const {title, description, genres: selectedGenres} = formData;
+    const { title, description, genres: selectedGenres, language } = formData;
 
     // Загрузка жанров при монтировании компонента
     useEffect(() => {
@@ -52,7 +59,7 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
 
     // Обработка изменений в форме
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value, files} = e.target;
+        const { name, value, files } = e.target;
 
         if (name === 'cover_image' && files && files.length > 0) {
             const file = files[0];
@@ -70,7 +77,7 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
     };
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const {value} = e.target;
+        const { value } = e.target;
         setFormData((prev) => ({
             ...prev,
             description: value,
@@ -84,19 +91,27 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
         }));
     };
 
+    const handleLanguageChange = (e: SelectChangeEvent<string>) => {
+        setFormData((prev) => ({
+            ...prev,
+            language: e.target.value,
+        }));
+    };
+
     // Обработка отправки формы
     const handleSubmit = async () => {
         setSubmitError(null);
         const updatedData = new FormData();
         updatedData.append('title', formData.title);
         updatedData.append('description', formData.description);
+        updatedData.append('language', formData.language); // Добавили язык
         formData.genres.forEach((genreId) => updatedData.append('genres', genreId.toString()));
         if (formData.cover_image) {
             updatedData.append('cover_image', formData.cover_image);
         }
 
         try {
-            const result = await dispatch(updateBook({bookId: book.id, updatedData}));
+            const result = await dispatch(updateBook({ bookId: book.id, updatedData }));
             if (updateBook.fulfilled.match(result)) {
                 onClose();
             } else if (updateBook.rejected.match(result)) {
@@ -115,6 +130,7 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
                 description: book.description || '',
                 genres: book.genre_details.map((genre) => genre.id),
                 cover_image: null,
+                language: book.language || '', // Добавили язык
             });
             setCoverImagePreview(book.cover_image);
             setSubmitError(null);
@@ -126,7 +142,7 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
             <DialogTitle>Редактировать книгу</DialogTitle>
             <DialogContent>
                 {/* Превью обложки */}
-                <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <Avatar
                         alt="Cover Image Preview"
                         src={coverImagePreview || undefined}
@@ -143,14 +159,33 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
                             id="cover-image-upload"
                             type="file"
                             name="cover_image"
-                            style={{display: 'none'}}
+                            style={{ display: 'none' }}
                             onChange={handleInputChange}
                         />
                         <IconButton color="primary" aria-label="upload cover image" component="span">
-                            <PhotoCamera/>
+                            <PhotoCamera />
                         </IconButton>
                     </label>
                 </Box>
+
+                {/* Поле выбора языка */}
+                <FormControl fullWidth sx={{ mb: 2 }}>
+                    <InputLabel id="book-language-select-label">Язык книги</InputLabel>
+                    <Select
+                        labelId="book-language-select-label"
+                        value={language}
+                        label="Язык книги"
+                        name="language"
+                        onChange={handleLanguageChange}
+                        required
+                    >
+                        {languageOptions.map((lang) => (
+                            <MenuItem key={lang.code} value={lang.code}>
+                                {lang.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
 
                 {/* Поле ввода названия */}
                 <TextField
@@ -160,7 +195,7 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
                     value={title}
                     onChange={handleInputChange}
                     variant="outlined"
-                    sx={{mb: 2}}
+                    sx={{ mb: 2 }}
                     required
                 />
 
@@ -174,9 +209,9 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
                     variant="outlined"
                     multiline
                     rows={4}
-                    sx={{mb: 2}}
+                    sx={{ mb: 2 }}
                     placeholder="Введите описание книги"
-                    inputProps={{maxLength: 500}}
+                    inputProps={{ maxLength: 500 }}
                     helperText={`${description.length}/500`}
                 />
 
@@ -190,19 +225,19 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({open, onClose, book
 
                 {/* Отображение ошибок при загрузке жанров */}
                 {genresError && (
-                    <Alert severity="error" sx={{width: '100%', mb: 2}}>
+                    <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
                         {genresError}
                     </Alert>
                 )}
 
                 {/* Отображение ошибок при обновлении книги */}
                 {submitError && (
-                    <Alert severity="error" sx={{width: '100%', mb: 2}}>
+                    <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
                         {submitError}
                     </Alert>
                 )}
 
-                 {/* Индикатор загрузки: спиннер */}
+                {/* Индикатор загрузки: спиннер */}
                 {loading && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                         <CircularProgress />
