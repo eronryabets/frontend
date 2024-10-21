@@ -162,6 +162,14 @@ export const BookDetail: React.FC = () => {
                         <Typography variant="subtitle1" color="text.secondary" gutterBottom>
                             Добавлено: {new Date(book.created_at).toLocaleDateString()}
                         </Typography>
+                        {/* Дополнительная Информация */}
+                        <Typography variant="body2" color="text.secondary">
+                            Количество глав: {book.chapters.length}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Страниц : {book.total_pages}
+                        </Typography>
+
 
                         {/* Описание Книги */}
                         {book.description && (
@@ -172,6 +180,7 @@ export const BookDetail: React.FC = () => {
                                 </Typography>
                             </Box>
                         )}
+
 
                         {/* Жанры */}
                         <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
@@ -189,6 +198,7 @@ export const BookDetail: React.FC = () => {
                                 />
                             )}
                         </Box>
+
                     </CardContent>
 
                     {/* Кнопки управления */}

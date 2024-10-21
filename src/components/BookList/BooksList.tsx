@@ -172,6 +172,9 @@ export const BooksList: React.FC = () => {
                                             <Typography variant="body2" color="text.secondary">
                                                 Количество глав: {book.chapters.length}
                                             </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Страниц : {book.total_pages}
+                                            </Typography>
                                         </Box>
                                     </CardContent>
                                 </CardActionArea>

@@ -15,7 +15,7 @@ import { clearChapter, fetchChapter } from "../../redux/slices/chapterSlice";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { Chapter } from "../../types";
 import TextToSpeech from '../TextToSpeech/TextToSpeech';
-import SimpleTTS from "../SimpleTTS/SimpleTTS"; // Импортируем новый компонент
+import SimpleTTS from "../SimpleTTS/SimpleTTS";
 
 const ChapterDetail: React.FC = () => {
     const [searchParams] = useSearchParams();
