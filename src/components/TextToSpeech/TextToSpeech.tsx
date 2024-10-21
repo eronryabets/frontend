@@ -1,9 +1,6 @@
-// src/components/TextToSpeech/TextToSpeech.tsx
-
 import React, { useEffect, useRef, useState } from 'react';
 import {
     Box,
-    Button,
     FormControl,
     InputLabel,
     MenuItem,
@@ -12,9 +9,13 @@ import {
     Typography,
     IconButton,
     Drawer,
-    Stack
+    Stack,
+    Tooltip
 } from '@mui/material';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import StopIcon from '@mui/icons-material/Stop';
 
 interface TextToSpeechProps {
     text: string;
@@ -32,13 +33,12 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
         { code: 'ru-RU', name: 'Русский' },
         { code: 'uk-UA', name: 'Украинский' },
         { code: 'pl-PL', name: 'Польский' },
-        // Добавьте другие языки по необходимости
     ];
 
     const availableLanguages = languages && languages.length > 0 ? languages : defaultLanguages;
 
     // Состояния для параметров озвучивания
-    const [language, setLanguage] = useState<string>('ru-RU');
+    const [language, setLanguage] = useState<string>(''); // Язык не установлен по умолчанию
     const [pitch, setPitch] = useState<number>(1);
     const [rate, setRate] = useState<number>(1);
     const [volume, setVolume] = useState<number>(1);
@@ -59,29 +59,76 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
     // Состояние для управления выдвижной панелью
     const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
-    // Получение доступных голосов при монтировании
-    useEffect(() => {
-        const populateVoices = () => {
-            const availableVoices = window.speechSynthesis.getVoices();
-            setVoices(availableVoices);
+    // Состояние для загрузки голосов
+    const [voicesLoaded, setVoicesLoaded] = useState<boolean>(false);
 
-            // Устанавливаем голос по умолчанию для выбранного языка
-            const defaultVoice = availableVoices.find(voice => voice.lang === language);
-            if (defaultVoice) {
-                setSelectedVoiceName(defaultVoice.name);
+    // Состояние для текущего индекса символа (для паузы и возобновления)
+    const [currentCharIndex, setCurrentCharIndex] = useState<number>(0);
+
+    // Получение доступных голосов при монтировании и при изменении языка
+    useEffect(() => {
+        if (!language) {
+            setSelectedVoiceName('');
+            return;
+        }
+
+        const handleVoicesChanged = () => {
+            const availableVoices = window.speechSynthesis.getVoices();
+            if (availableVoices.length > 0) {
+                setVoices(availableVoices);
+                setVoicesLoaded(true);
+
+                const voicesForLanguage = availableVoices.filter(voice => voice.lang === language);
+
+                // Ищем Google голос среди голосов для текущего языка
+                const googleVoice = voicesForLanguage.find(
+                    voice => voice.name.toLowerCase().includes('google')
+                );
+
+                if (googleVoice) {
+                    setSelectedVoiceName(googleVoice.name);
+                } else if (voicesForLanguage.length > 0) {
+                    // Если Google голос не найден, выбираем первый доступный голос для языка
+                    setSelectedVoiceName(voicesForLanguage[0].name);
+                } else if (availableVoices.length > 0) {
+                    // Если нет голосов для языка, выбираем первый доступный голос из общего списка
+                    setSelectedVoiceName(availableVoices[0].name);
+                } else {
+                    setSelectedVoiceName('');
+                }
             }
         };
 
-        populateVoices();
-        window.speechSynthesis.onvoiceschanged = populateVoices;
+        window.speechSynthesis.addEventListener('voiceschanged', handleVoicesChanged);
+        handleVoicesChanged(); // Попытка загрузки голосов сразу
+
+        return () => {
+            window.speechSynthesis.removeEventListener('voiceschanged', handleVoicesChanged);
+        };
     }, [language]);
 
     // Функции управления озвучиванием
     const handlePlay = () => {
         if ('speechSynthesis' in window) {
+            // Проверяем, есть ли голоса
+            if (voices.length === 0) {
+                alert('Голоса ещё не загружены. Пожалуйста, попробуйте позже.');
+                return;
+            }
+
+            if (!language) {
+                alert('Пожалуйста, выберите язык.');
+                return;
+            }
+
+            if (!selectedVoiceName) {
+                alert('Голос не выбран или недоступен.');
+                return;
+            }
+
             window.speechSynthesis.cancel();
 
-            const utterance = new SpeechSynthesisUtterance(text);
+            const utterance = new SpeechSynthesisUtterance(text.slice(currentCharIndex));
             utterance.lang = language;
             utterance.pitch = pitch;
             utterance.rate = rate;
@@ -95,6 +142,13 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
                 return;
             }
 
+            // Отслеживаем текущий индекс символа
+            utterance.onboundary = (event) => {
+                if (event.name === 'word') {
+                    setCurrentCharIndex(currentCharIndex + event.charIndex);
+                }
+            };
+
             utterance.onstart = () => {
                 setIsSpeaking(true);
                 setIsPaused(false);
@@ -103,6 +157,7 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
             utterance.onend = () => {
                 setIsSpeaking(false);
                 setIsPaused(false);
+                setCurrentCharIndex(0); // Сбрасываем индекс после завершения
             };
 
             utterance.onerror = () => {
@@ -119,16 +174,18 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
     };
 
     const handlePause = () => {
-        if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-            window.speechSynthesis.pause();
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel(); // Отменяем текущую озвучку
             setIsPaused(true);
+            setIsSpeaking(false);
         }
     };
 
     const handleResume = () => {
-        if (window.speechSynthesis.paused) {
-            window.speechSynthesis.resume();
+        if (isPaused) {
             setIsPaused(false);
+            setIsSpeaking(true);
+            handlePlay(); // Запускаем озвучку с текущего индекса
         }
     };
 
@@ -136,6 +193,7 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
         window.speechSynthesis.cancel();
         setIsSpeaking(false);
         setIsPaused(false);
+        setCurrentCharIndex(0); // Сбрасываем индекс
     };
 
     return (
@@ -167,7 +225,10 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
                             labelId="tts-language-select-label"
                             value={language}
                             label="Язык"
-                            onChange={(e) => setLanguage(e.target.value)}
+                            onChange={(e) => {
+                                setLanguage(e.target.value);
+                                setCurrentCharIndex(0); // Сбрасываем индекс при смене языка
+                            }}
                         >
                             {availableLanguages.map((lang) => (
                                 <MenuItem key={lang.code} value={lang.code}>
@@ -178,14 +239,15 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
                     </FormControl>
 
                     {/* Выбор голоса */}
-                    <FormControl fullWidth sx={{ mb: 2 }}>
+                    <FormControl fullWidth sx={{ mb: 2 }} disabled={!language}>
                         <InputLabel id="tts-voice-select-label">Голос</InputLabel>
                         <Select
                             labelId="tts-voice-select-label"
-                            value={selectedVoiceName}
+                            value={voices.some(voice => voice.name === selectedVoiceName) ? selectedVoiceName : ''}
                             label="Голос"
                             onChange={(e) => {
                                 setSelectedVoiceName(e.target.value);
+                                setCurrentCharIndex(0); // Сбрасываем индекс при смене голоса
                             }}
                         >
                             {voices
@@ -235,43 +297,48 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
                         />
                     </Box>
 
-                    {/* Кнопки управления озвучкой */}
+                    {/* Кнопки управления озвучкой с иконками */}
                     <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 2 }}>
                         {!isSpeaking && (
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handlePlay}
-                            >
-                                Воспроизвести
-                            </Button>
-                        )}
-                        {isSpeaking && !isPaused && (
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={handlePause}
-                            >
-                                Пауза
-                            </Button>
-                        )}
-                        {isSpeaking && isPaused && (
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleResume}
-                            >
-                                Продолжить
-                            </Button>
+                            <Tooltip title="Воспроизвести">
+                                <IconButton
+                                    color="primary"
+                                    onClick={handlePlay}
+                                    disabled={!voicesLoaded || !language || !selectedVoiceName}
+                                >
+                                    <PlayArrowIcon />
+                                </IconButton>
+                            </Tooltip>
                         )}
                         {isSpeaking && (
-                            <Button
-                                variant="contained"
-                                color="error"
-                                onClick={handleStop}
-                            >
-                                Остановить
-                            </Button>
+                            <Tooltip title="Пауза">
+                                <IconButton
+                                    color="secondary"
+                                    onClick={handlePause}
+                                >
+                                    <PauseIcon />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                        {isPaused && (
+                            <Tooltip title="Продолжить">
+                                <IconButton
+                                    color="primary"
+                                    onClick={handleResume}
+                                >
+                                    <PlayArrowIcon />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                        {(isSpeaking || isPaused) && (
+                            <Tooltip title="Остановить">
+                                <IconButton
+                                    color="error"
+                                    onClick={handleStop}
+                                >
+                                    <StopIcon />
+                                </IconButton>
+                            </Tooltip>
                         )}
                     </Stack>
                 </Box>

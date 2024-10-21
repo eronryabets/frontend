@@ -14,7 +14,8 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { clearChapter, fetchChapter } from "../../redux/slices/chapterSlice";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { Chapter } from "../../types";
-import TextToSpeech from '../TextToSpeech/TextToSpeech'; // Импортируем новый компонент
+import TextToSpeech from '../TextToSpeech/TextToSpeech';
+import SimpleTTS from "../SimpleTTS/SimpleTTS"; // Импортируем новый компонент
 
 const ChapterDetail: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -119,6 +120,7 @@ const ChapterDetail: React.FC = () => {
             {/* Компонент TextToSpeech */}
             <Box sx={{ mt: 4 }}>
                 <TextToSpeech text={chapter.chapter_text} />
+                {/*<SimpleTTS/>*/}
             </Box>
 
             {/* Кнопки навигации */}
