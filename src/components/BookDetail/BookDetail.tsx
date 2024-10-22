@@ -1,6 +1,6 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 import {
     Card,
     CardMedia,
@@ -11,26 +11,34 @@ import {
     Container,
     Box,
     Chip,
+    Button,
+    useTheme,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
     List,
-    ListItem,
+    ListItemButton,
     ListItemText,
-    Button, useTheme, ListItemButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {RootState} from '../../redux/store';
+import {RootState, AppDispatch} from '../../redux/store';
 import defaultCover from '../../assets/default_cover.png';
-import {Dialog, DialogTitle, DialogContent, DialogActions} from '@mui/material';
-import {useAppDispatch} from '../../redux/hooks';
-import {deleteBook} from '../../redux/slices/downloadBookSlice';
+import {deleteBook, fetchBookDetails} from '../../redux/slices/downloadBookSlice';
 import {EditBookModal} from "../EditBookModal";
 import {Link as RouterLink} from 'react-router-dom';
+import {generatePageNumbers} from "../../utils/generatePageNumbers";
 
 export const BookDetail: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const {books, loading, error} = useSelector((state: RootState) => state.books);
     const theme = useTheme();
-    const dispatch = useAppDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -43,26 +51,37 @@ export const BookDetail: React.FC = () => {
         return books.find((b) => b.id === id);
     }, [books, id]);
 
-    // Мемоизируем список глав
+    // Загрузка деталей книги при монтировании
+    useEffect(() => {
+        if (!book || !book.chapters) {
+            dispatch(fetchBookDetails(id!));
+        }
+    }, [dispatch, id, book]);
+
+    // Мемоизируем список глав с отображением страниц
     const memoizedChapters = useMemo(() => {
         if (!book) return null;
         return book.chapters.map((chapter, index) => (
-            <ListItem key={chapter.id} disableGutters>
-                <ListItemButton
-                    component={RouterLink}
-                    to={`/chapters/get_chapter/?book_id=${book.id}&chapter_id=${chapter.id}`}
-                    sx={{
-                        '&:hover': {
-                            backgroundColor: theme.palette.action.hover,
-                            cursor: 'pointer',
-                        },
-                    }}
-                >
-                    <ListItemText primary={`${index + 1}. ${chapter.chapter_title}`}/>
-                </ListItemButton>
-            </ListItem>
+            <Accordion key={chapter.id}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
+                    <Typography>{`${index + 1}. ${chapter.chapter_title}`}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <List>
+                        {generatePageNumbers(chapter.start_page_number, chapter.end_page_number).map((pageNumber) => (
+                            <ListItemButton
+                                key={pageNumber}
+                                component={RouterLink}
+                                to={`/books/${book.id}/chapters/${chapter.id}/pages/${pageNumber}`}
+                            >
+                                <ListItemText primary={`Страница ${pageNumber}`}/>
+                            </ListItemButton>
+                        ))}
+                    </List>
+                </AccordionDetails>
+            </Accordion>
         ));
-    }, [book, theme.palette.action.hover]);
+    }, [book]);
 
     // Проверяем, что id определён
     if (!id) {
@@ -167,9 +186,8 @@ export const BookDetail: React.FC = () => {
                             Количество глав: {book.chapters.length}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Страниц : {book.total_pages}
+                            Страниц: {book.total_pages}
                         </Typography>
-
 
                         {/* Описание Книги */}
                         {book.description && (
@@ -180,7 +198,6 @@ export const BookDetail: React.FC = () => {
                                 </Typography>
                             </Box>
                         )}
-
 
                         {/* Жанры */}
                         <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
@@ -198,7 +215,6 @@ export const BookDetail: React.FC = () => {
                                 />
                             )}
                         </Box>
-
                     </CardContent>
 
                     {/* Кнопки управления */}
@@ -271,15 +287,13 @@ export const BookDetail: React.FC = () => {
                 <Typography variant="h6" gutterBottom>
                     Список Глав:
                 </Typography>
-                <List sx={{maxHeight: 300, overflow: 'auto'}}>
-                    {memoizedChapters ? (
-                        memoizedChapters
-                    ) : (
-                        <ListItem>
-                            <ListItemText primary="Главы отсутствуют."/>
-                        </ListItem>
-                    )}
-                </List>
+                <List sx={{maxHeight: 350, overflow: 'auto'}}>
+                {memoizedChapters ? (
+                    memoizedChapters
+                ) : (
+                    <Typography>Главы отсутствуют.</Typography>
+                )}
+                    </List>
             </Box>
 
             {/* Кнопка Назад */}
@@ -312,3 +326,4 @@ export const BookDetail: React.FC = () => {
         </Container>
     );
 };
+

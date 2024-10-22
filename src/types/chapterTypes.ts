@@ -1,15 +1,7 @@
 export interface Chapter {
     id: string;
+    book: string; // ID книги
+    start_page_number: number;
+    end_page_number: number;
     chapter_title: string;
-}
-
-export interface ChapterData {
-    chapter_title: string;
-    chapter_text: string;
-}
-
-export interface ChapterState {
-    data: ChapterData | null;
-    loading: boolean;
-    error: string | null;
 }

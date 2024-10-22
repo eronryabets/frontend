@@ -33,6 +33,26 @@ export const fetchBooks = createAsyncThunk<
     }
 );
 
+// Асинхронный thunk для получения книги по ид
+export const fetchBookDetails = createAsyncThunk<
+    Book,
+    string, // ID книги
+    { rejectValue: string }
+>(
+    'books/fetchBookDetails',
+    async (bookId: string, {rejectWithValue}) => {
+        try {
+            const response = await api.get<Book>(`${GET_BOOK_API_URL}${bookId}/`);
+            return response.data;
+        } catch (error: any) {
+            if (axios.isAxiosError(error) && error.response) {
+                return rejectWithValue(error.response.data.message || 'Не удалось загрузить детали книги.');
+            }
+            return rejectWithValue('Не удалось загрузить детали книги.');
+        }
+    }
+);
+
 // Асинхронный thunk для удаления книги
 export const deleteBook = createAsyncThunk<
     string, // Возвращает ID удалённой книги
@@ -60,7 +80,7 @@ export const updateBook = createAsyncThunk<
     { rejectValue: string }
 >(
     'books/updateBook',
-    async ({ bookId, updatedData }, { rejectWithValue }) => {
+    async ({bookId, updatedData}, {rejectWithValue}) => {
         try {
             const response = await api.patch<Book>(`${GET_BOOK_API_URL}${bookId}/`, updatedData, {
                 headers: {
@@ -115,7 +135,7 @@ const downloadBookSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || 'Не удалось удалить книгу.';
             })
-             // Обработка updateBook
+            // Обработка updateBook
             .addCase(updateBook.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -130,7 +150,19 @@ const downloadBookSlice = createSlice({
             .addCase(updateBook.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || 'Не удалось обновить книгу.';
-            });
+            })
+            .addCase(fetchBookDetails.fulfilled, (state, action: PayloadAction<Book>) => {
+                const updatedBook = action.payload;
+                const existingIndex = state.books.findIndex((book) => book.id === updatedBook.id);
+                if (existingIndex !== -1) {
+                    state.books[existingIndex] = updatedBook;
+                } else {
+                    state.books.push(updatedBook);
+                }
+                state.loading = false;
+            })
+            //обработать два других состояния pending и rejected
+
     },
 });
 
