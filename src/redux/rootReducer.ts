@@ -6,6 +6,7 @@ import themeReducer from './slices/themeSlice';
 import uploadBookReducer from "./slices/uploadBookSlice";
 import genresReducer from "./slices/genresSlice";
 import booksReducer from "./slices/bookSlice";
+import pageReducer from './slices/pageSlice';
 
 // Объединяем все редьюсеры в один root reducer
 const rootReducer = combineReducers({
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   uploadBook: uploadBookReducer,
   genres: genresReducer,
   books: booksReducer,
+  page: pageReducer,
 });
 
 export default rootReducer;

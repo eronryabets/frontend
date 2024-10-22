@@ -18,6 +18,7 @@ import {BookUpload} from "./components/BookUpload";
 import {BooksList} from "./components/BookList";
 import {BookDetail} from "./components/BookDetail";
 import {GlobalStyles} from './styles';
+import {PageDetail} from "./components/PageDetail/PageDetail";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -41,7 +42,7 @@ const AppContent = () => {
                     <Route path="/book" element={<BookUpload/>}/>
                     <Route path="/booklist" element={<BooksList/>}/>
                     <Route path="/book/:id" element={<BookDetail />} />
-                    {/*<Route path="/books/:bookId/chapters/:chapterId/pages/:pageNumber" element={<PageReader />} />*/}
+                    <Route path="/books/:bookId/chapters/:chapterId/pages/:pageNumber" element={<PageDetail />} />
                 </Route>
 
                 {/* Открытые маршруты */}
