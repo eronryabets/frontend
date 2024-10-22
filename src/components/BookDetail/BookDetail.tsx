@@ -22,9 +22,10 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions,
+    DialogActions, Tooltip, IconButton,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {RootState, AppDispatch} from '../../redux/store';
@@ -148,6 +149,18 @@ export const BookDetail: React.FC = () => {
     // Функция открытия модального окна редактирования
     const handleEdit = () => {
         setOpenEditDialog(true);
+    };
+
+    //Функции для развертывания и сворачивания всех глав
+    const handleExpandAll = () => {
+        // if (book) {
+        //     const allChapterIds = book.chapters.map((chapter) => chapter.id);
+        //     setExpandedChapters(new Set(allChapterIds));
+        // }
+    };
+
+    const handleCollapseAll = () => {
+        // setExpandedChapters(new Set());
     };
 
     return (
@@ -284,16 +297,30 @@ export const BookDetail: React.FC = () => {
                     borderRadius: 2,
                 }}
             >
-                <Typography variant="h6" gutterBottom>
-                    Список Глав:
-                </Typography>
+                <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+                    <Typography variant="h6" gutterBottom>
+                        Список Глав:
+                    </Typography>
+                    <Box>
+                        <Tooltip title="Развернуть все">
+                            <IconButton onClick={handleExpandAll} aria-label="expand all">
+                                <ExpandMoreIcon sx={{ borderRadius: 2, boxShadow: 6}}/>
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Свернуть все">
+                            <IconButton onClick={handleCollapseAll} aria-label="collapse all">
+                                <ExpandLessIcon sx={{ borderRadius: 2, boxShadow: 6}}/>
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+                </Box>
                 <List sx={{maxHeight: 350, overflow: 'auto'}}>
-                {memoizedChapters ? (
-                    memoizedChapters
-                ) : (
-                    <Typography>Главы отсутствуют.</Typography>
-                )}
-                    </List>
+                    {memoizedChapters ? (
+                        memoizedChapters
+                    ) : (
+                        <Typography>Главы отсутствуют.</Typography>
+                    )}
+                </List>
             </Box>
 
             {/* Кнопка Назад */}
