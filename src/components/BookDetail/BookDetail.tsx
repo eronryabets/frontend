@@ -44,7 +44,10 @@ export const BookDetail: React.FC = () => {
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [deleteError, setDeleteError] = useState<string | null>(null);
-    const [openEditDialog, setOpenEditDialog] = useState(false); // Состояние для модалки редактирования
+    // Состояние для модалки редактирования
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+    //состояние для разворота глав
+    const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
 
     // Найти книгу по id
     const book = useMemo(() => {
@@ -63,9 +66,14 @@ export const BookDetail: React.FC = () => {
     const memoizedChapters = useMemo(() => {
         if (!book) return null;
         return book.chapters.map((chapter, index) => (
-            <Accordion key={chapter.id}>
+            <Accordion
+                sx={{background: theme.customBackground.gradient }}
+                key={chapter.id}
+                expanded={expandedChapters.has(chapter.id)}
+                onChange={(event, isExpanded) => handleToggleChapter(chapter.id, isExpanded)}
+            >
                 <AccordionSummary expandIcon={<ExpandMoreIcon/>}>
-                    <Typography>{`${index + 1}. ${chapter.chapter_title}`}</Typography>
+                    <Typography>{`${chapter.chapter_title}`}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     <List>
@@ -82,7 +90,7 @@ export const BookDetail: React.FC = () => {
                 </AccordionDetails>
             </Accordion>
         ));
-    }, [book]);
+    }, [book, expandedChapters, theme]);
 
     // Проверяем, что id определён
     if (!id) {
@@ -153,18 +161,31 @@ export const BookDetail: React.FC = () => {
 
     //Функции для развертывания и сворачивания всех глав
     const handleExpandAll = () => {
-        // if (book) {
-        //     const allChapterIds = book.chapters.map((chapter) => chapter.id);
-        //     setExpandedChapters(new Set(allChapterIds));
-        // }
+        if (book) {
+            const allChapterIds = book.chapters.map((chapter) => chapter.id);
+            setExpandedChapters(new Set(allChapterIds));
+        }
     };
 
     const handleCollapseAll = () => {
-        // setExpandedChapters(new Set());
+        setExpandedChapters(new Set());
+    };
+
+    //Функция для переключения состояния конкретной главы
+    const handleToggleChapter = (chapterId: string, isExpanded: boolean) => {
+        setExpandedChapters((prev) => {
+            const newSet = new Set(prev);
+            if (isExpanded) {
+                newSet.add(chapterId);
+            } else {
+                newSet.delete(chapterId);
+            }
+            return newSet;
+        });
     };
 
     return (
-        <Container sx={{mt: 10, mb: 4}}>
+        <Container sx={{mt: 6, mb: 4}}>
             {/* Карточка с информацией о книге */}
             <Card
                 sx={{
@@ -304,12 +325,12 @@ export const BookDetail: React.FC = () => {
                     <Box>
                         <Tooltip title="Развернуть все">
                             <IconButton onClick={handleExpandAll} aria-label="expand all">
-                                <ExpandMoreIcon sx={{ borderRadius: 2, boxShadow: 6}}/>
+                                <ExpandMoreIcon sx={{borderRadius: 2, boxShadow: 6}}/>
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Свернуть все">
                             <IconButton onClick={handleCollapseAll} aria-label="collapse all">
-                                <ExpandLessIcon sx={{ borderRadius: 2, boxShadow: 6}}/>
+                                <ExpandLessIcon sx={{borderRadius: 2, boxShadow: 6}}/>
                             </IconButton>
                         </Tooltip>
                     </Box>
