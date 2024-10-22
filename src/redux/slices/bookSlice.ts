@@ -97,7 +97,7 @@ export const updateBook = createAsyncThunk<
     }
 );
 
-const downloadBookSlice = createSlice({
+const bookSlice = createSlice({
     name: 'books',
     initialState,
     reducers: {
@@ -151,6 +151,11 @@ const downloadBookSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || 'Не удалось обновить книгу.';
             })
+             // fetchBookDetails
+            .addCase(fetchBookDetails.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(fetchBookDetails.fulfilled, (state, action: PayloadAction<Book>) => {
                 const updatedBook = action.payload;
                 const existingIndex = state.books.findIndex((book) => book.id === updatedBook.id);
@@ -161,11 +166,14 @@ const downloadBookSlice = createSlice({
                 }
                 state.loading = false;
             })
-            //обработать два других состояния pending и rejected
+            .addCase(fetchBookDetails.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || 'Не удалось загрузить детали книги.';
+            })
 
     },
 });
 
-export const {setCurrentPage} = downloadBookSlice.actions;
+export const {setCurrentPage} = bookSlice.actions;
 
-export default downloadBookSlice.reducer;
+export default bookSlice.reducer;

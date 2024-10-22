@@ -30,7 +30,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {RootState, AppDispatch} from '../../redux/store';
 import defaultCover from '../../assets/default_cover.png';
-import {deleteBook, fetchBookDetails} from '../../redux/slices/downloadBookSlice';
+import {deleteBook, fetchBookDetails} from '../../redux/slices/bookSlice';
 import {EditBookModal} from "../EditBookModal";
 import {Link as RouterLink} from 'react-router-dom';
 import {generatePageNumbers} from "../../utils/generatePageNumbers";
