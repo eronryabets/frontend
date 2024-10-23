@@ -55,16 +55,23 @@ export const fetchBookDetails = createAsyncThunk<
 
 // Асинхронный thunk для удаления книги
 export const deleteBook = createAsyncThunk<
-    string, // Возвращает ID удалённой книги
-    string, // Принимает ID книги для удаления
+    string,
+    string,
     { rejectValue: string }
 >(
     'books/deleteBook',
-    async (bookId: string, {rejectWithValue}) => {
+    async (bookId: string, { rejectWithValue }) => {
         try {
-            await api.delete(`${GET_BOOK_API_URL}${bookId}/`);
-            return bookId;
+            const response = await api.delete(`${GET_BOOK_API_URL}${bookId}/`);
+            console.log('DELETE response status:', response.status);
+            if (response.status === 204) {
+                return bookId;
+            } else {
+                console.warn('Unexpected status code:', response.status);
+                return rejectWithValue('Не удалось удалить книгу.');
+            }
         } catch (error: any) {
+            console.error('Error in deleteBook thunk:', error);
             if (axios.isAxiosError(error) && error.response) {
                 return rejectWithValue(error.response.data.message || 'Не удалось удалить книгу.');
             }
