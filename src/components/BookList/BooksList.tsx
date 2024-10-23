@@ -149,7 +149,7 @@ export const BooksList: React.FC = () => {
                                                 mt: 1,
                                             }}
                                         >
-                                            {book.genre_details.slice(0, 4).map((genre) => (
+                                            {book.genre_details.slice(0, 3).map((genre) => (
                                                 <Chip
                                                     key={genre.id}
                                                     label={genre.name}
@@ -158,9 +158,9 @@ export const BooksList: React.FC = () => {
                                                     size="small"
                                                 />
                                             ))}
-                                            {book.genre_details.length > 4 && (
+                                            {book.genre_details.length > 3 && (
                                                 <Chip
-                                                    label={`+${book.genre_details.length - 4}`}
+                                                    label={`+${book.genre_details.length - 3}`}
                                                     variant="outlined"
                                                     color="primary"
                                                     size="small"
