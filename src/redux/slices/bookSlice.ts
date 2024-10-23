@@ -1,7 +1,7 @@
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import {Book, DownloadBooksState, FetchBooksResponse} from "../../types";
-import {GET_BOOK_API_URL} from "../../config/urls";
+import { Book, DownloadBooksState, FetchBooksResponse } from "../../types";
+import { GET_BOOK_API_URL } from "../../config/urls";
 import api from "../../utils/api";
 
 const initialState: DownloadBooksState = {
@@ -10,6 +10,7 @@ const initialState: DownloadBooksState = {
     error: null,
     currentPage: 1,
     totalPages: 1,
+    totalCount: 0, // Добавляем totalCount
     itemsPerPage: 6, // Предположим, что на каждой странице по 6 книг
 };
 
@@ -20,12 +21,16 @@ export const fetchBooks = createAsyncThunk<
     { rejectValue: string }
 >(
     'books/fetchBooks',
-    async (page: number, {rejectWithValue}) => {
+    async (page: number, { rejectWithValue }) => {
         try {
             const response = await api.get<FetchBooksResponse>(`${GET_BOOK_API_URL}?page=${page}`);
             return response.data;
         } catch (error: any) {
             if (axios.isAxiosError(error) && error.response) {
+                // Если запрашиваемая страница не существует
+                if (error.response.status === 404) {
+                    return rejectWithValue('Page not found');
+                }
                 return rejectWithValue(error.response.data.message || 'Не удалось загрузить книги.');
             }
             return rejectWithValue('Не удалось загрузить книги.');
@@ -33,14 +38,14 @@ export const fetchBooks = createAsyncThunk<
     }
 );
 
-// Асинхронный thunk для получения книги по ид
+// Асинхронный thunk для получения книги по ID
 export const fetchBookDetails = createAsyncThunk<
     Book,
     string, // ID книги
     { rejectValue: string }
 >(
     'books/fetchBookDetails',
-    async (bookId: string, {rejectWithValue}) => {
+    async (bookId: string, { rejectWithValue }) => {
         try {
             const response = await api.get<Book>(`${GET_BOOK_API_URL}${bookId}/`);
             return response.data;
@@ -87,7 +92,7 @@ export const updateBook = createAsyncThunk<
     { rejectValue: string }
 >(
     'books/updateBook',
-    async ({bookId, updatedData}, {rejectWithValue}) => {
+    async ({ bookId, updatedData }, { rejectWithValue }) => {
         try {
             const response = await api.patch<Book>(`${GET_BOOK_API_URL}${bookId}/`, updatedData, {
                 headers: {
@@ -122,11 +127,16 @@ const bookSlice = createSlice({
             .addCase(fetchBooks.fulfilled, (state, action: PayloadAction<FetchBooksResponse>) => {
                 state.loading = false;
                 state.books = action.payload.results;
+                state.totalCount = action.payload.count;
                 state.totalPages = Math.ceil(action.payload.count / state.itemsPerPage);
             })
             .addCase(fetchBooks.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || 'Не удалось загрузить книги.';
+                // Если ошибка связана с несуществующей страницей, уменьшить currentPage
+                if (action.payload === 'Page not found' && state.currentPage > 1) {
+                    state.currentPage -= 1;
+                }
             })
             // Обработка deleteBook
             .addCase(deleteBook.pending, (state) => {
@@ -137,6 +147,11 @@ const bookSlice = createSlice({
                 state.loading = false;
                 const deletedBookId = action.payload;
                 state.books = state.books.filter((book) => book.id !== deletedBookId);
+                state.totalCount -= 1;
+                state.totalPages = Math.ceil(state.totalCount / state.itemsPerPage) || 1;
+                if (state.currentPage > state.totalPages) {
+                    state.currentPage = state.totalPages;
+                }
             })
             .addCase(deleteBook.rejected, (state, action) => {
                 state.loading = false;
@@ -158,7 +173,7 @@ const bookSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || 'Не удалось обновить книгу.';
             })
-             // fetchBookDetails
+            // Обработка fetchBookDetails
             .addCase(fetchBookDetails.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -176,11 +191,10 @@ const bookSlice = createSlice({
             .addCase(fetchBookDetails.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || 'Не удалось загрузить детали книги.';
-            })
-
+            });
     },
 });
 
-export const {setCurrentPage} = bookSlice.actions;
+export const { setCurrentPage } = bookSlice.actions;
 
 export default bookSlice.reducer;

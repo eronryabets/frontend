@@ -72,4 +72,5 @@ export interface DownloadBooksState {
     currentPage: number;
     totalPages: number;
     itemsPerPage: number;
+    totalCount: number; // Добавляем общее количество книг
 }
