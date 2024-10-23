@@ -11,7 +11,7 @@ import {
     IconButton,
     useTheme,
     Pagination,
-    Tooltip,
+    Tooltip, useMediaQuery,
 } from '@mui/material';
 import {Book} from '@mui/icons-material';
 import {RootState, AppDispatch} from '../../redux/store';
@@ -36,6 +36,8 @@ export const PageDetail: React.FC = () => {
 
     // Найти книгу из состояния
     const book = books.find((b) => b.id === bookId);
+
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     // Функция для определения главы по номеру страницы
     const findChapterByPageNumber = (pageNumber: number) => {
@@ -143,7 +145,17 @@ export const PageDetail: React.FC = () => {
     }
 
     return (
-        <Container sx={{mt: 4}}>
+        <Container sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flexGrow: 1,
+            // overflow: 'hidden', // Предотвращает переполнение
+            overflowY: 'auto', // Добавляет вертикальную прокрутку при переполнении
+            position: 'relative',
+            paddingTop: '30px',
+            paddingBottom: isMobile ? '0px' : '80px', // Отступ для пагинации
+        }}
+        >
             {/* Заголовок и Кнопка Перехода к Книге */}
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
                 <Box display="flex" alignItems="center">
@@ -164,9 +176,9 @@ export const PageDetail: React.FC = () => {
                     </IconButton>
                 </Tooltip>
 
-                <Tooltip title="Озвучивание текста">
-                    <TextToSpeech text={page.content}/>
-                </Tooltip>
+                {/*<Tooltip title="Озвучивание текста">*/}
+                {/*    <TextToSpeech text={page.content}/>*/}
+                {/*</Tooltip>*/}
 
             </Box>
 
@@ -179,13 +191,33 @@ export const PageDetail: React.FC = () => {
                     borderRadius: 2,
                     mb: 4,
                     whiteSpace: 'pre-wrap',
+                    flexGrow: 1, // Занимает всё доступное пространство
+                    overflowY: 'auto', // Добавляет вертикальную прокрутку при переполнении
+                    // paddingBottom: '80px', // Добавляем нижний отступ, равный высоте пагинации
+                    // minHeight: '80vh',
                 }}
             >
                 <Typography variant="body1">{page.content}</Typography>
             </Box>
 
             {/* Пагинация по всей книге */}
-            <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
+            <Box display="flex"
+                 sx={{
+                     display: 'flex',
+                     justifyContent: 'center',
+                     alignItems: 'center',
+                     mb: isMobile ? 4 : 0, // Margin bottom for mobile
+                     [theme.breakpoints.up('sm')]: {
+                         position: 'fixed',
+                         bottom: 20,
+                         left: 0,
+                         right: 0,
+                         padding: '16px',
+                         // background: 'rgba(255, 255, 255, 0.8)',
+                         zIndex: 1000,
+                     },
+                 }}
+            >
                 <Pagination
                     count={totalPagesInBook}
                     page={currentPageNumber}

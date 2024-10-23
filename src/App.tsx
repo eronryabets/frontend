@@ -12,37 +12,32 @@ import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-
 import {LoginPage} from "./components/LoginPage";
 import {ProfilePage} from "./components/ProfilePage";
 import {NotFoundPage} from "./components/NotFoundPage";
-import {NavBar} from "./components/NavBar";
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import {BookUpload} from "./components/BookUpload";
 import {BooksList} from "./components/BookList";
 import {BookDetail} from "./components/BookDetail";
 import {GlobalStyles} from './styles';
 import {PageDetail} from "./components/PageDetail/PageDetail";
+import Layout from "./components/Layout/Layout";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
     const theme = React.useMemo(() => MuiTheme(themeMode), [themeMode]);
-    const location = useLocation();
-
-    // Определяем, нужно ли показывать NavBar в зависимости от текущего маршрута
-    const hideNavBarRoutes = ['/login', '/registration', '/notfound'];
-    const shouldHideNavBar = hideNavBarRoutes.includes(location.pathname.toLowerCase());
 
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline/>
-             <GlobalStyles />
-            {!shouldHideNavBar && <NavBar/>} {/* Отображаем NavBar только если текущий маршрут не в списке */}
-            {!shouldHideNavBar && <Toolbar/>} {/* Добавляем Toolbar как спейсер */}
+            <GlobalStyles/>
             <Routes>
                 {/* Защищенные маршруты */}
                 <Route element={<ProtectedRoute/>}>
-                    <Route path="/profile" element={<ProfilePage/>}/>
-                    <Route path="/book" element={<BookUpload/>}/>
-                    <Route path="/booklist" element={<BooksList/>}/>
-                    <Route path="/book/:id" element={<BookDetail />} />
-                    <Route path="/books/:bookId/chapters/:chapterId/pages/:pageNumber" element={<PageDetail />} />
+                    <Route element={<Layout/>}>
+                        <Route path="/profile" element={<ProfilePage/>}/>
+                        <Route path="/book" element={<BookUpload/>}/>
+                        <Route path="/booklist" element={<BooksList/>}/>
+                        <Route path="/book/:id" element={<BookDetail/>}/>
+                        <Route path="/books/:bookId/chapters/:chapterId/pages/:pageNumber" element={<PageDetail/>}/>
+                    </Route>
                 </Route>
 
                 {/* Открытые маршруты */}
