@@ -20,11 +20,13 @@ import {fetchBookDetails} from '../../redux/slices/bookSlice';
 import TextToSpeech from "../TextToSpeech/TextToSpeech";
 
 export const PageDetail: React.FC = () => {
+
     const {bookId, chapterId, pageNumber} = useParams<{
         bookId: string;
         chapterId: string;
         pageNumber: string;
     }>();
+
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const theme = useTheme();
@@ -85,31 +87,6 @@ export const PageDetail: React.FC = () => {
         }
     };
 
-    const handlePreviousPage = () => {
-        if (currentPageNumber > 1) {
-            const newPageNumber = currentPageNumber - 1;
-            const newChapter = findChapterByPageNumber(newPageNumber);
-
-            if (newChapter) {
-                navigate(`/books/${bookId}/chapters/${newChapter.id}/pages/${newPageNumber}`);
-            } else {
-                console.error('Chapter not found for page number:', newPageNumber);
-            }
-        }
-    };
-
-    const handleNextPage = () => {
-        if (currentPageNumber < totalPagesInBook) {
-            const newPageNumber = currentPageNumber + 1;
-            const newChapter = findChapterByPageNumber(newPageNumber);
-
-            if (newChapter) {
-                navigate(`/books/${bookId}/chapters/${newChapter.id}/pages/${newPageNumber}`);
-            } else {
-                console.error('Chapter not found for page number:', newPageNumber);
-            }
-        }
-    };
 
     if (loading || !book) {
         return (
@@ -176,9 +153,10 @@ export const PageDetail: React.FC = () => {
                     </IconButton>
                 </Tooltip>
 
-                {/*<Tooltip title="Озвучивание текста">*/}
-                {/*    <TextToSpeech text={page.content}/>*/}
-                {/*</Tooltip>*/}
+                {/* TODO озвучка текста -> to Navbar*/}
+                <Tooltip title="Озвучивание текста">
+                    <TextToSpeech text={page.content}/>
+                </Tooltip>
 
             </Box>
 
