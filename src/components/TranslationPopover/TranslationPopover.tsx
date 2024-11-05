@@ -1,8 +1,7 @@
 import React from 'react';
-import { Popover, Box, Typography, CircularProgress, Alert, Button } from '@mui/material';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../../redux/store';
-import { clearTranslation } from '../../redux/slices/translationSlice';
+import { Popover, Box, Typography, CircularProgress, Alert } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 
 interface TranslationPopoverProps {
     anchorEl: HTMLElement | null;
@@ -11,7 +10,7 @@ interface TranslationPopoverProps {
     selectedText: string;
 }
 
-const TranslationPopover: React.FC<TranslationPopoverProps> = ({ anchorEl, open, onClose, selectedText }) => {
+export const TranslationPopover: React.FC<TranslationPopoverProps> = ({ anchorEl, open, onClose, selectedText }) => {
     const { translation, loading, error } = useSelector((state: RootState) => state.translation);
 
 
@@ -47,4 +46,3 @@ const TranslationPopover: React.FC<TranslationPopoverProps> = ({ anchorEl, open,
     );
 };
 
-export default TranslationPopover;

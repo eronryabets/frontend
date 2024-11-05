@@ -21,8 +21,8 @@ import { fetchPageByNumber } from '../../redux/slices/pageSlice';
 import { fetchBookDetails } from '../../redux/slices/bookSlice';
 import TextToSpeech from "../TextToSpeech/TextToSpeech";
 import { fetchTranslation, clearTranslation } from '../../redux/slices/translationSlice';
-import Word from '../Word/Word';
-import TranslationPopover from '../TranslationPopover/TranslationPopover';
+import { Word } from '../Word';
+import { TranslationPopover } from '../TranslationPopover';
 
 export const PageDetail: React.FC = () => {
 
@@ -97,21 +97,24 @@ export const PageDetail: React.FC = () => {
     };
 
     // Обработчик выделения текста
+    //ВЫНЕСТИ В ОТДЕЛЬНЫЙ КОД TODO
     const handleTextClick = (event: MouseEvent<HTMLDivElement>) => {
-        const selection = window.getSelection();
-        const text = selection?.toString().trim();
+    const selection = window.getSelection();
+    const text = selection?.toString().trim();
 
-        if (text) {
-            setSelectedText(text);
-            setAnchorEl(event.currentTarget as HTMLElement);
-            // Делаем запрос на перевод
-            dispatch(fetchTranslation({
-                word: text,
-                source_lang: 'en', // Можно динамически определить язык
-                target_lang: 'ru',
-            }));
-        }
-    };
+    if (text) {
+        // Нормализация текста: удаление переносов строк и замена нескольких пробелов на один
+        const normalizedText = text.replace(/\s+/g, ' ');
+        setSelectedText(normalizedText);
+        setAnchorEl(event.currentTarget as HTMLElement);
+        // Делаем запрос на перевод
+        dispatch(fetchTranslation({
+            word: normalizedText,
+            source_lang: 'en', // Нужно динамически определить язык TODO
+            target_lang: 'ru',
+        }));
+    }
+};
 
     const handlePopoverClose = () => {
         setAnchorEl(null);
@@ -166,12 +169,24 @@ export const PageDetail: React.FC = () => {
     }
 
     // Разделение текста на слова и оборачивание каждого слова в компонент Word для обработки кликов
+    //ВЫНЕСТИ В ОТДЕЛЬНЫЙ КОД TODO
     const renderContent = () => {
-        const words = page.content.split(' ');
-        return words.map((word, index) => (
-            <Word key={index} word={word} onClick={handleWordClick} />
-        ));
-    };
+    // Регулярное выражение для разделения текста на слова, знаки препинания и пробелы
+    const tokens = page.content.match(/(\s+|[\w'-]+|[^\s\w])/g) || [];
+
+    return tokens.map((token, index) => {
+        if (/^\s+$/.test(token)) {
+            // Если токен состоит только из пробелов или табуляций, отображаем его как есть
+            return <span key={index}>{token}</span>;
+        } else if (/^\w+$/.test(token)) {
+            // Если токен - слово, оборачиваем его в компонент Word
+            return <Word key={index} word={token} onClick={handleWordClick} />;
+        } else {
+            // Если токен - знак препинания или другой символ, отображаем его как есть
+            return <span key={index}>{token}</span>;
+        }
+    });
+};
 
     return (
         <Container sx={{
