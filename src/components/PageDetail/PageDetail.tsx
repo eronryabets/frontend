@@ -1,3 +1,5 @@
+// src/components/PageDetail/PageDetail.tsx
+
 import React, { useEffect, useState, MouseEvent } from 'react';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,16 +13,16 @@ import {
     IconButton,
     useTheme,
     Pagination,
-    Tooltip,
-    useMediaQuery,
-    Popover,
+    Tooltip, useMediaQuery,
 } from '@mui/material';
-import { Book, Translate } from '@mui/icons-material';
+import { Book } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../redux/store';
 import { fetchPageByNumber } from '../../redux/slices/pageSlice';
 import { fetchBookDetails } from '../../redux/slices/bookSlice';
 import TextToSpeech from "../TextToSpeech/TextToSpeech";
 import { fetchTranslation, clearTranslation } from '../../redux/slices/translationSlice';
+import Word from '../Word/Word';
+import TranslationPopover from '../TranslationPopover/TranslationPopover';
 
 export const PageDetail: React.FC = () => {
 
@@ -36,8 +38,6 @@ export const PageDetail: React.FC = () => {
 
     const { page, loading, error } = useSelector((state: RootState) => state.page);
     const { books } = useSelector((state: RootState) => state.books);
-    const { translation, loading: translationLoading, error: translationError } = useSelector(
-        (state: RootState) => state.translation);
 
     const currentPageNumber = Number(pageNumber);
 
@@ -96,7 +96,7 @@ export const PageDetail: React.FC = () => {
         }
     };
 
-    // Обработчик клика для выделенного текста
+    // Обработчик выделения текста
     const handleTextClick = (event: MouseEvent<HTMLDivElement>) => {
         const selection = window.getSelection();
         const text = selection?.toString().trim();
@@ -120,11 +120,9 @@ export const PageDetail: React.FC = () => {
     };
 
     const open = Boolean(anchorEl);
-    const id = open ? 'translation-popover' : undefined;
 
-    // Функция для обработки клика по отдельному слову
-    const handleWordClick = (word: string, event: MouseEvent<HTMLSpanElement>) => {
-        event.stopPropagation(); // Предотвращаем всплытие события
+    // Обработчик клика по отдельному слову
+    const handleWordClick = (event: MouseEvent<HTMLSpanElement>, word: string) => {
         setSelectedText(word);
         setAnchorEl(event.currentTarget);
         dispatch(fetchTranslation({
@@ -167,17 +165,11 @@ export const PageDetail: React.FC = () => {
         );
     }
 
-    // Разделение текста на слова и оборачивание каждого слова в Span для обработки кликов
+    // Разделение текста на слова и оборачивание каждого слова в компонент Word для обработки кликов
     const renderContent = () => {
         const words = page.content.split(' ');
         return words.map((word, index) => (
-            <span
-                key={index}
-                onClick={(e) => handleWordClick(word, e)}
-                style={{ cursor: 'pointer', position: 'relative' }}
-            >
-                {word}{' '}
-            </span>
+            <Word key={index} word={word} onClick={handleWordClick} />
         ));
     };
 
@@ -265,35 +257,12 @@ export const PageDetail: React.FC = () => {
             </Box>
 
             {/* Popover для перевода */}
-            <Popover
-                id={id}
-                open={open}
+            <TranslationPopover
                 anchorEl={anchorEl}
+                open={open}
                 onClose={handlePopoverClose}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                }}
-            >
-                <Box sx={{ p: 2, maxWidth: 300 }}>
-                    {translationLoading && <CircularProgress size={24} />}
-                    {translationError && <Alert severity="error">{translationError}</Alert>}
-                    {translation && (
-                        <>
-                            <Typography variant="subtitle1" gutterBottom>
-                                {selectedText}
-                            </Typography>
-                            <Typography variant="body2">
-                                {translation}
-                            </Typography>
-                        </>
-                    )}
-                </Box>
-            </Popover>
+                selectedText={selectedText}
+            />
         </Container>
     );
 };
