@@ -10,3 +10,4 @@ export const BOOK_GENRES_API_URL = 'http://book.drunar.space/genres/';
 export const BOOK_CHAPTER_API_URL = 'http://book.drunar.space/chapters/';
 
 export const BOOK_PAGE_API_URL = 'http://book.drunar.space/pages/';
+export const TRANSLATE_API_URL = 'http://translator.drunar.space/translate/';
