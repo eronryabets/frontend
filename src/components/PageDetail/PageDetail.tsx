@@ -1,8 +1,6 @@
-// src/components/PageDetail/PageDetail.tsx
-
-import React, { useEffect, useState, MouseEvent } from 'react';
-import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import React, {useEffect} from 'react';
+import {useParams, useNavigate, Link as RouterLink} from 'react-router-dom';
+import {useSelector, useDispatch} from 'react-redux';
 import {
     Container,
     Typography,
@@ -13,16 +11,17 @@ import {
     IconButton,
     useTheme,
     Pagination,
-    Tooltip, useMediaQuery,
+    Tooltip,
+    useMediaQuery,
 } from '@mui/material';
-import { Book } from '@mui/icons-material';
-import { RootState, AppDispatch } from '../../redux/store';
-import { fetchPageByNumber } from '../../redux/slices/pageSlice';
-import { fetchBookDetails } from '../../redux/slices/bookSlice';
-import TextToSpeech from "../TextToSpeech/TextToSpeech";
-import { fetchTranslation, clearTranslation } from '../../redux/slices/translationSlice';
-import { Word } from '../Word';
-import { TranslationPopover } from '../TranslationPopover';
+import {Book} from '@mui/icons-material';
+import {RootState, AppDispatch} from '../../redux/store';
+import {fetchPageByNumber} from '../../redux/slices/pageSlice';
+import {fetchBookDetails} from '../../redux/slices/bookSlice';
+import {TextToSpeech} from "../TextToSpeech";
+import {useTextSelection} from '../../hooks';
+import {TextRenderer} from '../TextRenderer/';
+import {TranslationPopover} from "../TranslationPopover";
 
 export const PageDetail: React.FC = () => {
 
@@ -38,6 +37,8 @@ export const PageDetail: React.FC = () => {
 
     const { page, loading, error } = useSelector((state: RootState) => state.page);
     const { books } = useSelector((state: RootState) => state.books);
+    const { translation, loading: translationLoading, error: translationError } = useSelector(
+        (state: RootState) => state.translation);
 
     const currentPageNumber = Number(pageNumber);
 
@@ -46,9 +47,14 @@ export const PageDetail: React.FC = () => {
 
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    // Состояния для Popover
-    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-    const [selectedText, setSelectedText] = useState<string>('');
+    // Используем кастомный хук для обработки выделения текста
+    const {
+        anchorEl,
+        selectedText,
+        handleTextClick,
+        handleWordClick,
+        handlePopoverClose,
+    } = useTextSelection();
 
     // Функция для определения главы по номеру страницы
     const findChapterByPageNumber = (pageNumber: number) => {
@@ -96,44 +102,8 @@ export const PageDetail: React.FC = () => {
         }
     };
 
-    // Обработчик выделения текста
-    //ВЫНЕСТИ В ОТДЕЛЬНЫЙ КОД TODO
-    const handleTextClick = (event: MouseEvent<HTMLDivElement>) => {
-    const selection = window.getSelection();
-    const text = selection?.toString().trim();
-
-    if (text) {
-        // Нормализация текста: удаление переносов строк и замена нескольких пробелов на один
-        const normalizedText = text.replace(/\s+/g, ' ');
-        setSelectedText(normalizedText);
-        setAnchorEl(event.currentTarget as HTMLElement);
-        // Делаем запрос на перевод
-        dispatch(fetchTranslation({
-            word: normalizedText,
-            source_lang: 'en', // Нужно динамически определить язык TODO
-            target_lang: 'ru',
-        }));
-    }
-};
-
-    const handlePopoverClose = () => {
-        setAnchorEl(null);
-        setSelectedText('');
-        dispatch(clearTranslation());
-    };
-
-    const open = Boolean(anchorEl);
-
-    // Обработчик клика по отдельному слову
-    const handleWordClick = (event: MouseEvent<HTMLSpanElement>, word: string) => {
-        setSelectedText(word);
-        setAnchorEl(event.currentTarget);
-        dispatch(fetchTranslation({
-            word: word,
-            source_lang: 'en',
-            target_lang: 'ru',
-        }));
-    };
+    // Обработчик клика по отдельному слову теперь будет вызван из хука
+    // Нет необходимости здесь дополнительно что-то делать
 
     if (loading || !book) {
         return (
@@ -167,26 +137,6 @@ export const PageDetail: React.FC = () => {
             </Container>
         );
     }
-
-    // Разделение текста на слова и оборачивание каждого слова в компонент Word для обработки кликов
-    //ВЫНЕСТИ В ОТДЕЛЬНЫЙ КОД TODO
-    const renderContent = () => {
-    // Регулярное выражение для разделения текста на слова, знаки препинания и пробелы
-    const tokens = page.content.match(/(\s+|[\w'-]+|[^\s\w])/g) || [];
-
-    return tokens.map((token, index) => {
-        if (/^\s+$/.test(token)) {
-            // Если токен состоит только из пробелов или табуляций, отображаем его как есть
-            return <span key={index}>{token}</span>;
-        } else if (/^\w+$/.test(token)) {
-            // Если токен - слово, оборачиваем его в компонент Word
-            return <Word key={index} word={token} onClick={handleWordClick} />;
-        } else {
-            // Если токен - знак препинания или другой символ, отображаем его как есть
-            return <span key={index}>{token}</span>;
-        }
-    });
-};
 
     return (
         <Container sx={{
@@ -234,13 +184,13 @@ export const PageDetail: React.FC = () => {
                     boxShadow: 3,
                     borderRadius: 2,
                     mb: 4,
-                    whiteSpace: 'pre-wrap',
+                    whiteSpace: 'pre-wrap', // Сохраняем переносы строк
                     flexGrow: 1,
                     overflowY: 'auto',
                 }}
             >
                 <Typography variant="body1">
-                    {renderContent()}
+                    <TextRenderer content={page.content} onWordClick={handleWordClick} />
                 </Typography>
             </Box>
 
@@ -274,9 +224,12 @@ export const PageDetail: React.FC = () => {
             {/* Popover для перевода */}
             <TranslationPopover
                 anchorEl={anchorEl}
-                open={open}
+                open={Boolean(anchorEl)} // Используем булево значение
                 onClose={handlePopoverClose}
                 selectedText={selectedText}
+                translation={translation}
+                translationLoading={translationLoading}
+                translationError={translationError}
             />
         </Container>
     );

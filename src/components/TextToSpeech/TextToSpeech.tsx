@@ -22,7 +22,7 @@ interface TextToSpeechProps {
     languages?: Array<{ code: string; name: string }>;
 }
 
-const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
+export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
     // Список популярных языков, если не передан через props
     const defaultLanguages = [
         { code: 'en-US', name: 'Английский (США)' },

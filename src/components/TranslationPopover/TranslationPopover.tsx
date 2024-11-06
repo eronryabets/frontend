@@ -1,18 +1,36 @@
 import React from 'react';
-import { Popover, Box, Typography, CircularProgress, Alert } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { Popover, Box, Typography, CircularProgress, Alert, Button } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../redux/store';
+// import { addWordToDictionary } from '../../redux/slices/dictionarySlice';
 
 interface TranslationPopoverProps {
     anchorEl: HTMLElement | null;
     open: boolean;
     onClose: () => void;
     selectedText: string;
+    translation: string;
+    translationLoading: boolean;
+    translationError: string | null;
 }
 
-export const TranslationPopover: React.FC<TranslationPopoverProps> = ({ anchorEl, open, onClose, selectedText }) => {
-    const { translation, loading, error } = useSelector((state: RootState) => state.translation);
+export const TranslationPopover: React.FC<TranslationPopoverProps> = ({
+    anchorEl,
+    open,
+    onClose,
+    selectedText,
+    translation,
+    translationLoading,
+    translationError,
+}) => {
+    const dispatch = useDispatch<AppDispatch>();
 
+    const handleAddToDictionary = () => {
+        if (selectedText && translation) {
+            // dispatch(addWordToDictionary({ word: selectedText, translation })); TODO
+            onClose();
+        }
+    };
 
     return (
         <Popover
@@ -29,8 +47,8 @@ export const TranslationPopover: React.FC<TranslationPopoverProps> = ({ anchorEl
             }}
         >
             <Box sx={{ p: 2, maxWidth: 300 }}>
-                {loading && <CircularProgress size={24} />}
-                {error && <Alert severity="error">{error}</Alert>}
+                {translationLoading && <CircularProgress size={24} />}
+                {translationError && <Alert severity="error">{translationError}</Alert>}
                 {translation && (
                     <>
                         <Typography variant="subtitle1" gutterBottom>
@@ -39,6 +57,9 @@ export const TranslationPopover: React.FC<TranslationPopoverProps> = ({ anchorEl
                         <Typography variant="body2" gutterBottom>
                             {translation}
                         </Typography>
+                        <Button variant="contained" color="primary" onClick={handleAddToDictionary}>
+                            Добавить в словарь
+                        </Button>
                     </>
                 )}
             </Box>
@@ -46,3 +67,4 @@ export const TranslationPopover: React.FC<TranslationPopoverProps> = ({ anchorEl
     );
 };
 
+export default TranslationPopover;
