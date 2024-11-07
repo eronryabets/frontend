@@ -11,6 +11,7 @@ const initialState: UserInfoState = {
         email: null,
         first_name: null,
         last_name: null,
+        native_language: null,
         avatar: null,
         settings: null,
     },
@@ -95,6 +96,7 @@ const userInfoSlice = createSlice({
                 email: null,
                 first_name: null,
                 last_name: null,
+                native_language: null,
                 avatar: null,
                 settings: null,
             };
@@ -125,6 +127,7 @@ const userInfoSlice = createSlice({
                     email: userData.email,
                     first_name: userData.first_name || null,
                     last_name: userData.last_name || null,
+                    native_language: userData.native_language || null,
                     avatar: userData.avatar || null,
                     settings: null,
                 };

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
-import { useAppDispatch } from '../../redux/hooks';
+import {useAppDispatch} from '../../redux/hooks';
 import {getUserInfo, patchUserAuthInfo, patchUserProfileInfo, resetUpdateState} from '../../redux/slices/userInfoSlice';
 import {
     Avatar,
@@ -11,11 +11,13 @@ import {
     TextField,
     Button,
     IconButton,
-    useTheme, Alert, Snackbar, CircularProgress,
+    useTheme, Alert, Snackbar, CircularProgress, FormControl, InputLabel, Select, MenuItem,
 } from '@mui/material';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import {v4 as uuidv4} from 'uuid';
 import {USER_API_MEDIA_URL} from "../../config/urls";
+import {languageOptions} from "../../config/languageOptions";
+import {SelectChangeEvent} from "@mui/material/Select";
 
 export const ProfilePage: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -28,6 +30,7 @@ export const ProfilePage: React.FC = () => {
     const [password, setPassword] = useState('');
     const [firstName, setFirstName] = useState(userData.first_name || '');
     const [lastName, setLastName] = useState(userData.last_name || '');
+    const [nativeLanguage, setNativeLanguage] = useState(userData.native_language || '');
     const [avatarPreview, setAvatarPreview] = useState<string | null>(`${USER_API_MEDIA_URL}${userData.avatar}` || null);
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [showSnackbar, setShowSnackbar] = useState(false); // Для уведомления об успешной операции
@@ -67,13 +70,23 @@ export const ProfilePage: React.FC = () => {
         }
     };
 
+    // Обработка выбора языка
+    const handleLanguageChange = (e: SelectChangeEvent<string>) => {
+        setNativeLanguage(e.target.value);
+    };
+
     // Функция для отправки изменений
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault(); // Предотвращаем перезагрузку страницы
 
         // Формируем объекты только с изменёнными полями
         const updatedDataAuth: Partial<{ email: string, password: string }> = {};
-        const updatedDataUser: Partial<{ first_name: string, last_name: string, avatar: File | string }> = {};
+        const updatedDataUser: Partial<{
+            first_name: string,
+            last_name: string,
+            native_language: string,
+            avatar: File | string
+        }> = {};
 
         if (email !== userData.email) {
             updatedDataAuth.email = email;
@@ -86,6 +99,9 @@ export const ProfilePage: React.FC = () => {
         }
         if (lastName !== userData.last_name) {
             updatedDataUser.last_name = lastName;
+        }
+        if (nativeLanguage !== userData.native_language) {
+            updatedDataUser.native_language = nativeLanguage;
         }
         if (avatarFile) {
             updatedDataUser.avatar = avatarFile;
@@ -113,7 +129,7 @@ export const ProfilePage: React.FC = () => {
         }
     }, [error, updateError]);
 
-     // Закрытие Error Snackbar
+    // Закрытие Error Snackbar
     const handleErrorSnackbarClose = () => {
         setOpenErrorSnackbar(false);
         dispatch(resetUpdateState()); // Сбрасываем состояние ошибки после закрытия
@@ -220,9 +236,28 @@ export const ProfilePage: React.FC = () => {
                         sx={{mb: 2}}
                     />
 
+                    {/* Native Language */}
+                    <FormControl fullWidth sx={{mb: 2}}>
+                        <InputLabel id="native_language-select-label">Native Language</InputLabel>
+                        <Select
+                            labelId="native_language-select-label"
+                            value={nativeLanguage}
+                            label="Родной язык"
+                            name="native_language"
+                            onChange={handleLanguageChange}
+                            required
+                        >
+                            {languageOptions.map((lang) => (
+                                <MenuItem key={lang.code} value={lang.code}>
+                                    {lang.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+
                     {error && (
                         <Alert severity="error" sx={{width: '100%', mb: 2}}>
-                             {/*Ошибка: {typeof error === 'object' ? error.detail : error}*/}
+                            {/*Ошибка: {typeof error === 'object' ? error.detail : error}*/}
                             Ошибка: {typeof error === 'object' && error.detail ? error.detail : error}
                         </Alert>
                     )}

@@ -37,6 +37,7 @@ export interface ProfileData {
     first_name?: string;
     last_name?: string;
     avatar?: string | File;
+    native_language: string;
 }
 
 export interface Settings {
@@ -53,6 +54,7 @@ export interface UserInfoState {
         email: string | null;
         first_name?: string | null;
         last_name?: string | null;
+        native_language: string | null;
         avatar?: string | null;
         settings?: Settings | null;
     };
@@ -83,6 +85,7 @@ export interface UserInfoResponseData {
     email: string;
     first_name?: string;
     last_name?: string;
+    native_language: string;
     avatar?: string;
     settings?: string;
 }

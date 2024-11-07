@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
-import { registerUser } from "../../redux/slices/registrationSlice";
+import React, {useState} from 'react';
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../redux/store";
+import {registerUser} from "../../redux/slices/registrationSlice";
 
 import {
     TextField,
@@ -15,15 +15,15 @@ import {
     InputLabel,
     Select, MenuItem
 } from '@mui/material';
-import { PhotoCamera } from "@mui/icons-material";
-import { v4 as uuidv4 } from 'uuid';
+import {PhotoCamera} from "@mui/icons-material";
+import {v4 as uuidv4} from 'uuid';
 import {languageOptions} from "../../config/languageOptions";
 import {SelectChangeEvent} from "@mui/material/Select";
 
 export const RegistrationPage: React.FC = () => {
 
     const dispatch = useDispatch<AppDispatch>();
-    const { loading, success, error, responseData } = useSelector((state: RootState) => state.registration);
+    const {loading, success, error, responseData} = useSelector((state: RootState) => state.registration);
     const theme = useTheme();
 
     const [formData, setFormData] = useState({
@@ -37,7 +37,7 @@ export const RegistrationPage: React.FC = () => {
         avatar: null as File | null,
     });
 
-    const { username, password, confirmPassword, email, first_name, last_name, native_language } = formData;
+    const {username, password, confirmPassword, email, first_name, last_name, native_language} = formData;
 
     // Универсальное состояние для ошибок формы
     const [localError, setLocalError] = useState<Record<string, string>>({});
@@ -46,12 +46,12 @@ export const RegistrationPage: React.FC = () => {
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, files } = e.target;
+        const {name, value, files} = e.target;
 
         if (name === 'avatar' && files && files.length > 0) {
             const file = files[0];
             const uniqueFileName = `${uuidv4()}-${file.name}`;
-            const newFile = new File([file], uniqueFileName, { type: file.type });
+            const newFile = new File([file], uniqueFileName, {type: file.type});
 
             setFormData({
                 ...formData,
@@ -64,7 +64,7 @@ export const RegistrationPage: React.FC = () => {
                 [name]: value,
             });
             // Очистить ошибку для изменённого поля
-            setLocalError((prev) => ({ ...prev, [name]: '' }));
+            setLocalError((prev) => ({...prev, [name]: ''}));
         }
     };
 
@@ -127,19 +127,19 @@ export const RegistrationPage: React.FC = () => {
 
                 {/* Отображение успешной регистрации */}
                 {success && (
-                    <Typography variant="h6" sx={{ mb: 2, color: 'green', textAlign: 'center' }}>
+                    <Typography variant="h6" sx={{mb: 2, color: 'green', textAlign: 'center'}}>
                         Success registration {responseData?.username}!
                     </Typography>
                 )}
 
                 {/* Отображение общих ошибок */}
                 {error && typeof error !== 'string' && error.general && (
-                    <Typography variant="h6" sx={{ mb: 2, color: 'red', textAlign: 'center' }}>
+                    <Typography variant="h6" sx={{mb: 2, color: 'red', textAlign: 'center'}}>
                         {error.general.join(' ')}
                     </Typography>
                 )}
 
-                <Typography variant="h5" sx={{ mb: 2, textAlign: 'center' }}>
+                <Typography variant="h5" sx={{mb: 2, textAlign: 'center'}}>
                     Registration
                 </Typography>
 
@@ -150,7 +150,7 @@ export const RegistrationPage: React.FC = () => {
                     onChange={handleChange}
                     required
                     fullWidth
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     autoComplete="username"
                     error={!!error?.username || !!localError.username}
                     helperText={localError.username || (error?.username ? error.username.join(' ') : '')}
@@ -164,7 +164,7 @@ export const RegistrationPage: React.FC = () => {
                     onChange={handleChange}
                     required
                     fullWidth
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     autoComplete="new-password"
                     error={!!error?.password || !!localError.password}
                     helperText={localError.password || (error?.password ? error.password.join(' ') : '')}
@@ -178,7 +178,7 @@ export const RegistrationPage: React.FC = () => {
                     onChange={handleChange}
                     required
                     fullWidth
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     autoComplete="new-password"
                     error={!!localError.confirmPassword}
                     helperText={localError.confirmPassword}
@@ -192,7 +192,7 @@ export const RegistrationPage: React.FC = () => {
                     onChange={handleChange}
                     required
                     fullWidth
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     error={!!error?.email || !!localError.email}
                     helperText={localError.email || (error?.email ? error.email.join(' ') : '')}
                 />
@@ -203,7 +203,7 @@ export const RegistrationPage: React.FC = () => {
                     value={first_name}
                     onChange={handleChange}
                     fullWidth
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     error={!!error?.first_name || !!localError.first_name}
                     helperText={localError.first_name || (error?.first_name ? error.first_name.join(' ') : '')}
                 />
@@ -214,35 +214,36 @@ export const RegistrationPage: React.FC = () => {
                     value={last_name}
                     onChange={handleChange}
                     fullWidth
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     error={!!error?.last_name || !!localError.last_name}
                     helperText={localError.last_name || (error?.last_name ? error.last_name.join(' ') : '')}
                 />
 
-                    <FormControl fullWidth sx={{ mb: 2 }}>
-                        <InputLabel id="native_language-select-label">Native Language</InputLabel>
-                        <Select
-                            labelId="native_language-select-label"
-                            value={native_language}
-                            label="Родной язык"
-                            name="native_language"
-                            onChange={handleLanguageChange}
-                            required
-                        >
-                            {languageOptions.map((lang) => (
-                                <MenuItem key={lang.code} value={lang.code}>
-                                    {lang.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                {/* Native Language */}
+                <FormControl fullWidth sx={{mb: 2}}>
+                    <InputLabel id="native_language-select-label">Native Language</InputLabel>
+                    <Select
+                        labelId="native_language-select-label"
+                        value={native_language}
+                        label="Родной язык"
+                        name="native_language"
+                        onChange={handleLanguageChange}
+                        required
+                    >
+                        {languageOptions.map((lang) => (
+                            <MenuItem key={lang.code} value={lang.code}>
+                                {lang.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
 
                 {/* Avatar Upload */}
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
                     <Avatar
                         alt="Avatar Preview"
                         src={avatarPreview || undefined}
-                        sx={{ width: 56, height: 56, mr: 2 }}
+                        sx={{width: 56, height: 56, mr: 2}}
                     />
                     <label htmlFor="avatar-upload">
                         <input
@@ -250,11 +251,11 @@ export const RegistrationPage: React.FC = () => {
                             id="avatar-upload"
                             type="file"
                             name="avatar"
-                            style={{ display: 'none' }}
+                            style={{display: 'none'}}
                             onChange={handleChange}
                         />
                         <IconButton color="primary" aria-label="upload picture" component="span">
-                            <PhotoCamera />
+                            <PhotoCamera/>
                         </IconButton>
                     </label>
                 </Box>
