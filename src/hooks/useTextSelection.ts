@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import { fetchTranslation, clearTranslation } from '../redux/slices/translationSlice';
-import { AppDispatch } from '../redux/store';
+import {AppDispatch, RootState} from '../redux/store';
 
 interface UseTextSelectionReturn {
     anchorEl: HTMLElement | null;
@@ -11,40 +11,51 @@ interface UseTextSelectionReturn {
     handlePopoverClose: () => void;
 }
 
-export const useTextSelection = (): UseTextSelectionReturn => {
+export const useTextSelection = (bookLanguage: string): UseTextSelectionReturn => {
     const dispatch = useDispatch<AppDispatch>();
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const [selectedText, setSelectedText] = useState<string>('');
+    //для определения языка перевода
+    const userData = useSelector((state: RootState) => state.userInfo.userData);
+    const {native_language} = userData;
 
     const handleTextClick = (event: React.MouseEvent<HTMLDivElement>) => {
         const selection = window.getSelection();
         const text = selection?.toString().trim();
 
-        if (text && text.length > 1) { // Минимальная длина 2 символа
+        if (text && text.length > 1 && native_language) { // Проверяем, что native_language не null
             // Нормализация текста: удаление переносов строк и замена нескольких пробелов на один
             const normalizedText = text.replace(/\s+/g, ' ');
             setSelectedText(normalizedText);
             setAnchorEl(event.currentTarget as HTMLElement);
+
             // Отправляем запрос на перевод
             dispatch(fetchTranslation({
                 word: normalizedText,
-                source_lang: 'en', // TODO: Динамически определить язык
-                target_lang: 'ru',
+                source_lang: bookLanguage.slice(0, 2),      // 'en_US' -> 'en'
+                target_lang: native_language.slice(0, 2),
             }));
+        } else if (!native_language) {
+            // Обработка случая, когда native_language отсутствует
+            alert('Родной язык не установлен. Пожалуйста, установите родной язык в профиле.');
         }
     };
 
     const handleWordClick = (event: React.MouseEvent<HTMLSpanElement>, word: string) => {
         event.stopPropagation(); // Предотвращаем всплытие события
-        // Устанавливаем выделенный текст как кликнутое слово
-        setSelectedText(word);
-        setAnchorEl(event.currentTarget as HTMLElement);
-        // Отправляем запрос на перевод
-        dispatch(fetchTranslation({
-            word: word,
-            source_lang: 'en', // TODO: Динамически определить язык
-            target_lang: 'ru',
-        }));
+
+        if (word && word.length > 1 && native_language) { // Проверяем, что native_language не null
+            setSelectedText(word);
+            setAnchorEl(event.currentTarget as HTMLElement);
+            // Отправляем запрос на перевод
+            dispatch(fetchTranslation({
+                word: word,
+                source_lang: bookLanguage.slice(0, 2),     // 'en_US' -> 'en'
+                target_lang: native_language.slice(0, 2),
+            }));
+        } else if (!native_language) {
+            alert('Родной язык не установлен. Пожалуйста, установите родной язык в профиле.');
+        }
     };
 
     const handlePopoverClose = () => {
