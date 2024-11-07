@@ -16,6 +16,7 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
+import {languageOptions} from "../../config/languageOptions";
 
 interface TextToSpeechProps {
     text: string;
@@ -24,16 +25,17 @@ interface TextToSpeechProps {
 
 export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
     // Список популярных языков, если не передан через props
-    const defaultLanguages = [
-        { code: 'en-US', name: 'Английский (США)' },
-        { code: 'en-GB', name: 'Английский (Великобритания)' },
-        { code: 'de-DE', name: 'Немецкий' },
-        { code: 'es-ES', name: 'Испанский (Испания)' },
-        { code: 'es-MX', name: 'Испанский (Мексика)' },
-        { code: 'ru-RU', name: 'Русский' },
-        { code: 'uk-UA', name: 'Украинский' },
-        { code: 'pl-PL', name: 'Польский' },
-    ];
+    const defaultLanguages = languageOptions;
+    // const defaultLanguages = [
+    //     { code: 'en-US', name: 'Английский (США)' },
+    //     { code: 'en-GB', name: 'Английский (Великобритания)' },
+    //     { code: 'de-DE', name: 'Немецкий' },
+    //     { code: 'es-ES', name: 'Испанский (Испания)' },
+    //     { code: 'es-MX', name: 'Испанский (Мексика)' },
+    //     { code: 'ru-RU', name: 'Русский' },
+    //     { code: 'uk-UA', name: 'Украинский' },
+    //     { code: 'pl-PL', name: 'Польский' },
+    // ];
 
     const availableLanguages = languages && languages.length > 0 ? languages : defaultLanguages;
 

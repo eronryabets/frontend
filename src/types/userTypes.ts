@@ -6,6 +6,7 @@ export interface RegistrationData {
     email: string;
     first_name?: string;
     last_name?: string;
+    native_language: string;
     avatar?: File | null;
 }
 

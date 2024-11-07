@@ -41,6 +41,7 @@ export const registerUser = createAsyncThunk(
                 if (formData.first_name) userData.append('first_name', formData.first_name);
                 if (formData.last_name) userData.append('last_name', formData.last_name);
                 if (formData.avatar) userData.append('avatar', formData.avatar);
+                if (formData.native_language) userData.append('native_language', formData.native_language);
 
                 await api.post(`${USER_API_URL}create/`, userData, {
                     withCredentials: true,
@@ -51,6 +52,7 @@ export const registerUser = createAsyncThunk(
             }
 
         } catch (error: any) {
+            console.log("ERROR!");
             if (axios.isAxiosError(error) && error.response) {
                 return rejectWithValue(error.response.data);
             } else {
