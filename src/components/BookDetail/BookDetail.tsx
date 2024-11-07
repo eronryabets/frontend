@@ -233,6 +233,9 @@ export const BookDetail: React.FC = () => {
                                 </Typography>
                                 {/* Дополнительная Информация */}
                                 <Typography variant="body2" color="text.secondary">
+                                    Язык: {book.language}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
                                     Количество глав: {book.chapters.length}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">

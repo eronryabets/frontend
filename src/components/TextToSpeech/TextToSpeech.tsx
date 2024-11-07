@@ -20,27 +20,16 @@ import {languageOptions} from "../../config/languageOptions";
 
 interface TextToSpeechProps {
     text: string;
+    bookLanguage: string;
     languages?: Array<{ code: string; name: string }>;
 }
 
-export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, languages }) => {
-    // Список популярных языков, если не передан через props
-    const defaultLanguages = languageOptions;
-    // const defaultLanguages = [
-    //     { code: 'en-US', name: 'Английский (США)' },
-    //     { code: 'en-GB', name: 'Английский (Великобритания)' },
-    //     { code: 'de-DE', name: 'Немецкий' },
-    //     { code: 'es-ES', name: 'Испанский (Испания)' },
-    //     { code: 'es-MX', name: 'Испанский (Мексика)' },
-    //     { code: 'ru-RU', name: 'Русский' },
-    //     { code: 'uk-UA', name: 'Украинский' },
-    //     { code: 'pl-PL', name: 'Польский' },
-    // ];
+export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, languages }) => {
 
-    const availableLanguages = languages && languages.length > 0 ? languages : defaultLanguages;
+    const availableLanguages = languages && languages.length > 0 ? languages : languageOptions;
 
     // Состояния для параметров озвучивания
-    const [language, setLanguage] = useState<string>(''); // Язык не установлен по умолчанию
+    const [language, setLanguage] = useState<string>(bookLanguage); // Установили язык который указан в книге
     const [pitch, setPitch] = useState<number>(1);
     const [rate, setRate] = useState<number>(1);
     const [volume, setVolume] = useState<number>(1);

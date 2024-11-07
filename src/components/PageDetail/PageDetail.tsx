@@ -171,7 +171,7 @@ export const PageDetail: React.FC = () => {
 
                 {/* Озвучка текста */}
                 <Tooltip title="Озвучивание текста">
-                    <TextToSpeech text={page.content} />
+                    <TextToSpeech text={page.content} bookLanguage={book.language} />
                 </Tooltip>
             </Box>
 
