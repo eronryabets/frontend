@@ -53,7 +53,7 @@ export const PageDetail: React.FC = () => {
         handleTextClick,
         handleWordClick,
         handlePopoverClose,
-    } = useTextSelection(book!.language);
+    } = useTextSelection(book ? book.language : 'en');
 
     // Функция для определения главы по номеру страницы
     const findChapterByPageNumber = (pageNumber: number) => {
@@ -228,6 +228,7 @@ export const PageDetail: React.FC = () => {
                 translation={translation}
                 translationLoading={translationLoading}
                 translationError={translationError}
+                sourceLanguage={book.language.slice(0,2)}
             />
         </Container>
     );
