@@ -21,7 +21,7 @@ import {fetchBookDetails} from '../../redux/slices/bookSlice';
 import {TextToSpeech} from "../TextToSpeech";
 import {useTextSelection} from '../../hooks';
 import {TextRenderer} from '../TextRenderer/';
-import {TranslationPopover} from "../TranslationPopover";
+import {TranslationDialog} from "../TranslationDialog";
 
 export const PageDetail: React.FC = () => {
 
@@ -49,7 +49,6 @@ export const PageDetail: React.FC = () => {
 
     // Используем кастомный хук для обработки выделения текста
     const {
-        anchorEl,
         selectedText,
         handleTextClick,
         handleWordClick,
@@ -102,8 +101,8 @@ export const PageDetail: React.FC = () => {
         }
     };
 
-    // Обработчик клика по отдельному слову теперь будет вызван из хука
-    // Нет необходимости здесь дополнительно что-то делать
+    // Проверяем, открыто ли окно перевода
+    const isDialogOpen = Boolean(selectedText && translation);
 
     if (loading || !book) {
         return (
@@ -221,10 +220,9 @@ export const PageDetail: React.FC = () => {
                 />
             </Box>
 
-            {/* Popover для перевода */}
-            <TranslationPopover
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)} // Используем булево значение
+            {/* Dialog для перевода */}
+            <TranslationDialog
+                open={isDialogOpen}
                 onClose={handlePopoverClose}
                 selectedText={selectedText}
                 translation={translation}
