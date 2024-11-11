@@ -136,10 +136,10 @@ export const TranslationDialog: React.FC<TranslationDialogProps> = ({
                 )}
                 {translation && (
                     <Box>
-                        <Typography variant="subtitle1" gutterBottom>
+                        <Typography variant="subtitle2" gutterBottom>
                             {selectedText}
                         </Typography>
-                        <Typography variant="body2" gutterBottom>
+                        <Typography variant="body1" gutterBottom>
                             {translation}
                         </Typography>
                     </Box>
