@@ -67,7 +67,7 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
 
         },
         typography: {
-            fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+            fontFamily: '"Helvetica", "Arial", sans-serif', //"Roboto"
             // Настройка остальных уровней типографики
         },
         //Настройка Компонентов
