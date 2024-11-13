@@ -188,7 +188,7 @@ export const PageDetail: React.FC = () => {
                     overflowY: 'auto',
                 }}
             >
-                <Typography variant="body1">
+                <Typography variant="body1" sx={{ fontWeight: 350, fontSize: '1rem' }} >
                     <TextRenderer content={page.content} onWordClick={handleWordClick} />
                 </Typography>
             </Box>
