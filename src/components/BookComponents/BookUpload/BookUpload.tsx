@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
+import { AppDispatch, RootState } from "../../../redux/store";
 import {
     Alert,
     Avatar,
@@ -19,12 +19,12 @@ import {
     useTheme,
 } from "@mui/material";
 import { PhotoCamera } from "@mui/icons-material";
-import { resetState, uploadBook } from "../../redux/slices/uploadBookSlice";
-import { fetchGenres } from "../../redux/slices/genresSlice";
-import { BookFormState, BookData } from '../../types';
+import { resetState, uploadBook } from "../../../redux/slices/uploadBookSlice";
+import { fetchGenres } from "../../../redux/slices/genresSlice";
+import { BookFormState, BookData } from '../../../types';
 import { GenreSelect } from '../GenreSelect';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { languageOptions } from '../../config/languageOptions'; // Импорт списка языков
+import { languageOptions } from '../../../config/languageOptions'; // Импорт списка языков
 
 export const BookUpload: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();

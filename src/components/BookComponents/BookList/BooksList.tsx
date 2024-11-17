@@ -9,10 +9,10 @@ import {
     CircularProgress,
     Alert, Container, Box, Pagination, Chip, CardActionArea, useTheme,
 } from '@mui/material';
-import defaultCover from '../../assets/default_cover.png';
-import {fetchBooks, setCurrentPage} from "../../redux/slices/bookSlice";
-import {RootState} from "../../redux/store";
-import {useAppDispatch} from '../../redux/hooks';
+import defaultCover from '../../../assets/default_cover.png';
+import {fetchBooks, setCurrentPage} from "../../../redux/slices/bookSlice";
+import {RootState} from "../../../redux/store";
+import {useAppDispatch} from '../../../redux/hooks';
 import {Link} from "react-router-dom";
 
 export const BooksList: React.FC = () => {

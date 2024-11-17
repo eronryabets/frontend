@@ -92,7 +92,7 @@ const uploadBookSlice = createSlice({
             .addCase(uploadBook.fulfilled, (state, action: PayloadAction<BookResponseData>) => {
                 state.loading = false;
                 state.success = true;
-                state.responseMessage = { general: ["Book uploaded successfully."] };
+                state.responseMessage = { general: ["BookComponents uploaded successfully."] };
             })
             .addCase(uploadBook.rejected, (state, action) => {
                 state.loading = false;

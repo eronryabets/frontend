@@ -5,19 +5,19 @@ import {store, persistor, RootState} from './redux/store';
 
 import {ThemeProvider} from '@mui/material/styles';
 import {MuiTheme} from "./components/MuiTheme";
-import {CssBaseline, Toolbar} from "@mui/material";
+import {CssBaseline} from "@mui/material";
 import {RegistrationPage} from "./components/RegistrationPage";
 import {HelmetProvider} from "react-helmet-async";
-import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import {LoginPage} from "./components/LoginPage";
 import {ProfilePage} from "./components/ProfilePage";
 import {NotFoundPage} from "./components/NotFoundPage";
 import {ProtectedRoute} from "./components/ProtectedRoute";
-import {BookUpload} from "./components/BookUpload";
-import {BooksList} from "./components/BookList";
-import {BookDetail} from "./components/BookDetail";
+import {BookUpload} from "./components/BookComponents/BookUpload";
+import {BooksList} from "./components/BookComponents/BookList";
+import {BookDetail} from "./components/BookComponents/BookDetail";
 import {GlobalStyles} from './styles';
-import {PageDetail} from "./components/PageDetail/PageDetail";
+import {PageDetail} from "./components/BookComponents/PageDetail/PageDetail";
 import Layout from "./components/Layout/Layout";
 
 const AppContent = () => {

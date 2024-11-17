@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { VolumeUp as VolumeUpIcon, Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../redux/store';
+import { AppDispatch } from '../../../redux/store';
 // import { addWordToDictionary } from '../../redux/slices/dictionarySlice';
 
 interface TranslationDialogProps {

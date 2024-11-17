@@ -15,11 +15,11 @@ import {
     useMediaQuery,
 } from '@mui/material';
 import {Book} from '@mui/icons-material';
-import {RootState, AppDispatch} from '../../redux/store';
-import {fetchPageByNumber} from '../../redux/slices/pageSlice';
-import {fetchBookDetails} from '../../redux/slices/bookSlice';
+import {RootState, AppDispatch} from '../../../redux/store';
+import {fetchPageByNumber} from '../../../redux/slices/pageSlice';
+import {fetchBookDetails} from '../../../redux/slices/bookSlice';
 import {TextToSpeech} from "../TextToSpeech";
-import {useTextSelection} from '../../hooks';
+import {useTextSelection} from '../../../hooks';
 import {TextRenderer} from '../TextRenderer/';
 import {TranslationDialog} from "../TranslationDialog";
 

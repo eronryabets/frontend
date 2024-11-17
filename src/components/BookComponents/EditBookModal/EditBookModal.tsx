@@ -18,13 +18,13 @@ import {
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../../redux/store';
-import { Book } from "../../types";
-import { fetchGenres } from "../../redux/slices/genresSlice";
-import { updateBook } from "../../redux/slices/bookSlice";
+import { RootState, AppDispatch } from '../../../redux/store';
+import { Book } from "../../../types";
+import { fetchGenres } from "../../../redux/slices/genresSlice";
+import { updateBook } from "../../../redux/slices/bookSlice";
 import { GenreSelect } from "../GenreSelect";
 import { SelectChangeEvent } from '@mui/material/Select'; // Импортируем SelectChangeEvent
-import { languageOptions } from '../../config/languageOptions'; // Импортируем список языков
+import { languageOptions } from '../../../config/languageOptions'; // Импортируем список языков
 
 interface EditBookModalProps {
     open: boolean;

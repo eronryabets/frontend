@@ -30,12 +30,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { RootState, AppDispatch } from '../../redux/store';
-import defaultCover from '../../assets/default_cover.png';
-import { deleteBook, fetchBookDetails } from '../../redux/slices/bookSlice';
+import { RootState, AppDispatch } from '../../../redux/store';
+import defaultCover from '../../../assets/default_cover.png';
+import { deleteBook, fetchBookDetails } from '../../../redux/slices/bookSlice';
 import { EditBookModal } from "../EditBookModal";
 import { Link as RouterLink } from 'react-router-dom';
-import { generatePageNumbers } from "../../utils/generatePageNumbers";
+import { generatePageNumbers } from "../../../utils/generatePageNumbers";
 
 export const BookDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
