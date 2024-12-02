@@ -19,6 +19,7 @@ import {BookDetail} from "./components/BookComponents/BookDetail";
 import {GlobalStyles} from './styles';
 import {PageDetail} from "./components/BookComponents/PageDetail/PageDetail";
 import Layout from "./components/Layout/Layout";
+import DictionariesList from "./components/DictionariesComponents/DictionariesList/DictionariesList";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -33,10 +34,13 @@ const AppContent = () => {
                 <Route element={<ProtectedRoute/>}>
                     <Route element={<Layout/>}>
                         <Route path="/profile" element={<ProfilePage/>}/>
+                        {/*BOOK*/}
                         <Route path="/book" element={<BookUpload/>}/>
                         <Route path="/booklist" element={<BooksList/>}/>
                         <Route path="/book/:id" element={<BookDetail/>}/>
                         <Route path="/books/:bookId/chapters/:chapterId/pages/:pageNumber" element={<PageDetail/>}/>
+                        {/*DICTIONARY*/}
+                        <Route path="/dictionaries" element={<DictionariesList />} />
                     </Route>
                 </Route>
 

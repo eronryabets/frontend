@@ -173,8 +173,8 @@ export const NavBar = () => {
                         <MenuItem component={Link} to="/profile" onClick={handleUserMenuClose}>
                             My Profile
                         </MenuItem>
-                        <MenuItem component={Link} to="/vocabulary" onClick={handleUserMenuClose}>
-                            Vocabulary
+                        <MenuItem component={Link} to="/dictionaries" onClick={handleUserMenuClose}>
+                            Dictionaries
                         </MenuItem>
                         <MenuItem component={Link} to="/book" onClick={handleUserMenuClose}>
                             Books

@@ -8,6 +8,7 @@ import genresReducer from "./slices/genresSlice";
 import booksReducer from "./slices/bookSlice";
 import pageReducer from './slices/pageSlice';
 import translationReducer from './slices/translationSlice';
+import dictionaryReducer from './slices/dictionarySlice';
 
 // Объединяем все редьюсеры в один root reducer
 const rootReducer = combineReducers({
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   books: booksReducer,
   page: pageReducer,
   translation: translationReducer,
+  dictionaries: dictionaryReducer,
 });
 
 export default rootReducer;
