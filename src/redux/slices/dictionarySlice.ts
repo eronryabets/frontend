@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { GET_DICTIONARY_API_URL } from "../../config/urls";
 import api from "../../utils/api";
-import {DictionariesResponse, DictionaryState} from "../../types/dictionary";
+import {DictionariesResponse, DictionaryState} from "../../types";
 
 const initialState: DictionaryState = {
     dictionaries: [],
