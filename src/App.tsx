@@ -20,6 +20,7 @@ import {GlobalStyles} from './styles';
 import {PageDetail} from "./components/BookComponents/PageDetail/PageDetail";
 import Layout from "./components/Layout/Layout";
 import DictionariesList from "./components/DictionariesComponents/DictionariesList/DictionariesList";
+import WordsList from "./components/DictionariesComponents/WordsList/WordsList";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -41,6 +42,7 @@ const AppContent = () => {
                         <Route path="/books/:bookId/chapters/:chapterId/pages/:pageNumber" element={<PageDetail/>}/>
                         {/*DICTIONARY*/}
                         <Route path="/dictionaries" element={<DictionariesList />} />
+                        <Route path="/dictionary/:id" element={<WordsList />} />
                     </Route>
                 </Route>
 

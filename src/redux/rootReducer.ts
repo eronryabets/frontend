@@ -9,6 +9,7 @@ import booksReducer from "./slices/bookSlice";
 import pageReducer from './slices/pageSlice';
 import translationReducer from './slices/translationSlice';
 import dictionaryReducer from './slices/dictionarySlice';
+import wordsReducer from './slices/wordsSlice';
 
 // Объединяем все редьюсеры в один root reducer
 const rootReducer = combineReducers({
@@ -22,6 +23,7 @@ const rootReducer = combineReducers({
   page: pageReducer,
   translation: translationReducer,
   dictionaries: dictionaryReducer,
+  words: wordsReducer,
 });
 
 export default rootReducer;
