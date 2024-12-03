@@ -1,18 +1,28 @@
+// your_app/components/DictionariesComponents/WordsList/WordsList.tsx
 
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { fetchWords, setCurrentPage, setDictionaryId } from '../../../redux/slices/wordsSlice';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { Pagination, CircularProgress, Grid, Card, CardMedia, CardContent, Typography, Box } from '@mui/material';
-
-// TODO this is simple demo version. (you should change visualizations, errors, pagination, grid -> box)
+import {
+    Pagination,
+    CircularProgress,
+    Table,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    Typography,
+    Box,
+    Avatar
+} from '@mui/material';
+import defaultCover from '../../../assets/default_cover.png';
 
 const WordsList: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const dispatch = useDispatch<AppDispatch>();
-    const { words, loading, error, currentPage, totalPages,
-        dictionaryId } = useSelector((state: RootState) => state.words);
+    const { words, loading, error, currentPage, totalPages, dictionaryId } = useSelector((state: RootState) => state.words);
     const [searchParams, setSearchParams] = useSearchParams();
 
     // Установка dictionaryId и текущей страницы из URL при монтировании
@@ -47,38 +57,47 @@ const WordsList: React.FC = () => {
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
 
     return (
-        <Box>
+        <Box p={3}>
             <Typography variant="h4" gutterBottom>
                 Слова в словаре
             </Typography>
             {words && words.length > 0 ? (
-                <Grid container spacing={2}>
-                    {words.map((word) => (
-                        <Grid item xs={12} sm={6} md={4} key={word.id}>
-                            <Card>
-                                {word.image_path && (
-                                    <CardMedia
-                                        component="img"
-                                        height="140"
-                                        image={word.image_path}
-                                        alt={word.word}
-                                    />
-                                )}
-                                <CardContent>
-                                    <Typography gutterBottom variant="h5" component="div">
-                                        {word.word}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Перевод: {word.translation}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Теги: {word.tags.map(tag => tag.name).join(', ')}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
+                <Box>
+                    <Table sx={{ minWidth: 650 }} aria-label="words table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell><strong>Изображение</strong></TableCell>
+                                <TableCell><strong>Слово</strong></TableCell>
+                                <TableCell><strong>Перевод</strong></TableCell>
+                                <TableCell><strong>Теги</strong></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {words.map((word) => (
+                                <TableRow key={word.id}>
+                                    <TableCell>
+                                        <Avatar
+                                            src={word.image_path ? word.image_path : defaultCover}
+                                            alt={word.word}
+                                            sx={{ width: 40, height: 40 }}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="subtitle1">{word.word}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2">{word.translation}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2">
+                                            {word.tags.length > 0 ? word.tags.map(tag => tag.name).join(', ') : '—'}
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Box>
             ) : (
                 <Typography variant="h6" align="center" mt={4}>
                     В этом словаре пока нет слов.
