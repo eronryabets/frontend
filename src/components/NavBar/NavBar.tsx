@@ -12,23 +12,23 @@ import {
     Box,
     Fade
 } from '@mui/material';
-import { toggleTheme } from "../../redux/slices/themeSlice";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import { useAppDispatch } from '../../redux/hooks';
+import {toggleTheme} from "../../redux/slices/themeSlice";
+import {useSelector} from "react-redux";
+import {RootState} from "../../redux/store";
+import {useAppDispatch} from '../../redux/hooks';
 
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
-import { logout } from "../../redux/slices/authorizationSlice";
-import { Link } from "react-router-dom";
-import { USER_API_MEDIA_URL } from "../../config/urls";
+import {logout} from "../../redux/slices/authorizationSlice";
+import {Link, useLocation} from "react-router-dom";
+import {USER_API_MEDIA_URL} from "../../config/urls";
 
 
 export const NavBar = () => {
     const dispatch = useAppDispatch();
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState<null | HTMLElement>(null);
     const [booksMenuAnchorEl, setBooksMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-
+    const location = useLocation();
 
     const themeMode = useSelector((state: RootState) => state.theme.mode);
     const userData = useSelector((state: RootState) => state.userInfo.userData);
@@ -71,11 +71,16 @@ export const NavBar = () => {
     const isUserMenuOpen = Boolean(userMenuAnchorEl);
     const isBooksMenuOpen = Boolean(booksMenuAnchorEl);
 
+    // Функция для определения, является ли путь активным
+    const isActive = (path: string) => {
+        return location.pathname === path;
+    };
+
     return (
         <AppBar position="fixed">
             <Toolbar>
                 {/* Название приложения */}
-                 {/* Кликабельная надпись "Smart Reader" */}
+                {/* Кликабельная надпись "Smart Reader" */}
                 <Typography
                     variant="h6"
                     component={Link}
@@ -92,11 +97,23 @@ export const NavBar = () => {
 
                 {/* Основные кнопки навигации */}
                 <Box sx={{display: 'flex', alignItems: 'center',}}>
-                    <Button color="inherit">Vocabulary</Button>
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/dictionaries"
+                        sx={{
+                            textTransform: 'none', // Опционально: убрать заглавные буквы
+                            border: isActive('/dictionaries') ? '2px solid white' : 'none',
+                            borderRadius: 1, // Для более аккуратного вида
+                            mr: 2, // Отступ справа
+                        }}
+                    >
+                        Vocabulary
+                    </Button>
 
                     {/* Кнопка "Books" с выпадающим меню */}
                     <Box
-                        sx={{ position: 'relative' }}
+                        sx={{position: 'relative'}}
                         onMouseEnter={handleBooksMenuOpen}
                         onMouseLeave={handleBooksMenuClose}
                     >
@@ -141,12 +158,12 @@ export const NavBar = () => {
                                 color="inherit"
                                 sx={{mr: 1}}
                     >
-                        {themeMode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+                        {themeMode === 'dark' ? <Brightness7Icon/> : <Brightness4Icon/>}
                     </IconButton>
 
                     {/* Аватар пользователя с меню */}
                     <Tooltip title="Открыть меню">
-                        <IconButton onClick={handleUserMenuOpen} sx={{ p: 0 }}>
+                        <IconButton onClick={handleUserMenuOpen} sx={{p: 0}}>
                             <Avatar
                                 alt="User Avatar"
                                 src={`${USER_API_MEDIA_URL}${userData.avatar}`}
