@@ -70,6 +70,8 @@ const WordsList: React.FC = () => {
                                 <TableCell><strong>Слово</strong></TableCell>
                                 <TableCell><strong>Перевод</strong></TableCell>
                                 <TableCell><strong>Теги</strong></TableCell>
+                                <TableCell><strong>count</strong></TableCell>
+                                <TableCell><strong>progress</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -92,6 +94,12 @@ const WordsList: React.FC = () => {
                                         <Typography variant="body2">
                                             {word.tags.length > 0 ? word.tags.map(tag => tag.name).join(', ') : '—'}
                                         </Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2">{word.count}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2">{word.progress}</Typography>
                                     </TableCell>
                                 </TableRow>
                             ))}

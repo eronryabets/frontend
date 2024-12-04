@@ -13,6 +13,8 @@ export interface Word {
     translation: string;
     image_path: string | null;
     tags: Tag[];
+    count: number;
+    progress: number;
     created_at: string;
     updated_at: string;
 }
