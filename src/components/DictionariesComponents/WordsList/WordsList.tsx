@@ -1,6 +1,6 @@
-// your_app/components/DictionariesComponents/WordsList/WordsList.tsx
+// src/components/WordsList.tsx
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { fetchWords, setCurrentPage, setDictionaryId } from '../../../redux/slices/wordsSlice';
@@ -15,15 +15,21 @@ import {
     TableBody,
     Typography,
     Box,
-    Avatar
+    Avatar,
+    Button
 } from '@mui/material';
 import defaultCover from '../../../assets/default_cover.png';
+import MapsUgcIcon from '@mui/icons-material/MapsUgc';
+import {AddWordModal} from "../AddWordModal/AddWordModal";
+
 
 const WordsList: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const dispatch = useDispatch<AppDispatch>();
     const { words, loading, error, currentPage, totalPages, dictionaryId } = useSelector((state: RootState) => state.words);
     const [searchParams, setSearchParams] = useSearchParams();
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Состояние для модального окна
 
     // Установка dictionaryId и текущей страницы из URL при монтировании
     useEffect(() => {
@@ -53,6 +59,14 @@ const WordsList: React.FC = () => {
         dispatch(setCurrentPage(value));
     };
 
+    const handleOpenAddModal = () => {
+        setIsAddModalOpen(true);
+    };
+
+    const handleCloseAddModal = () => {
+        setIsAddModalOpen(false);
+    };
+
     if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
 
@@ -61,6 +75,17 @@ const WordsList: React.FC = () => {
             <Typography variant="h4" gutterBottom>
                 Слова в словаре
             </Typography>
+            <Box sx={{ pl: 2, pb: 2 }}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<MapsUgcIcon />}
+                    sx={{ mr: 2 }}
+                    onClick={handleOpenAddModal} // Открытие модалки добавления слова
+                >
+                    Добавить слово
+                </Button>
+            </Box>
             {words && words.length > 0 ? (
                 <Box>
                     <Table sx={{ minWidth: 650 }} aria-label="words table">
@@ -70,8 +95,8 @@ const WordsList: React.FC = () => {
                                 <TableCell><strong>Слово</strong></TableCell>
                                 <TableCell><strong>Перевод</strong></TableCell>
                                 <TableCell><strong>Теги</strong></TableCell>
-                                <TableCell><strong>count</strong></TableCell>
-                                <TableCell><strong>progress</strong></TableCell>
+                                <TableCell><strong>Count</strong></TableCell>
+                                <TableCell><strong>Progress</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -120,6 +145,14 @@ const WordsList: React.FC = () => {
                         color="primary"
                     />
                 </Box>
+            )}
+            {/* Добавляем компонент AddWordModal */}
+            {id && (
+                <AddWordModal
+                    open={isAddModalOpen}
+                    onClose={handleCloseAddModal}
+                    dictionaryId={id}
+                />
             )}
         </Box>
     );

@@ -33,7 +33,16 @@ export interface WordsState {
     currentPage: number;
     totalPages: number;
     dictionaryId: string | null;
+    adding: boolean;
+    addError: string | null;
 }
 
+export interface AddWordPayload {
+    dictionaryId: string;
+    word: string;
+    translation: string;
+    tag_names: string[];
+    image_path?: File | null;
+}
 
 
