@@ -13,7 +13,7 @@ import {
     Alert,
     CircularProgress,
     Chip,
-    Autocomplete,
+    Stack,
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
@@ -26,46 +26,53 @@ interface AddWordModalProps {
     dictionaryId: string;
 }
 
-export const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId }) => {
+const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { adding, addError } = useSelector((state: RootState) => state.words);
 
-    const [formData, setFormData] = useState({
-        word: '',
-        translation: '',
-        tag_names: [] as string[],
-        image_path: null as File | null,
-    });
-
+    const [word, setWord] = useState('');
+    const [translation, setTranslation] = useState('');
+    const [tagInput, setTagInput] = useState('');
+    const [tagNames, setTagNames] = useState<string[]>([]);
+    const [imagePath, setImagePath] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    const { word, translation, tag_names, image_path } = formData;
-
     // Обработка изменений в форме
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, files } = e.target;
+    const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setWord(e.target.value);
+    };
 
-        if (name === 'image_path' && files && files.length > 0) {
-            const file = files[0];
-            setFormData((prev) => ({
-                ...prev,
-                image_path: file,
-            }));
-            setImagePreview(URL.createObjectURL(file));
-        } else {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
+    const handleTranslationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTranslation(e.target.value);
+    };
+
+    const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTagInput(e.target.value);
+    };
+
+    const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            const newTag = tagInput.trim();
+            if (newTag && !tagNames.includes(newTag)) {
+                setTagNames((prev) => [...prev, newTag]);
+            }
+            setTagInput('');
         }
     };
 
-    const handleTagsChange = (event: any, value: string[]) => {
-        setFormData((prev) => ({
-            ...prev,
-            tag_names: value,
-        }));
+    const handleRemoveTag = (tagToRemove: string) => {
+        setTagNames((prev) => prev.filter((tag) => tag !== tagToRemove));
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { files } = e.target;
+        if (files && files.length > 0) {
+            const file = files[0];
+            setImagePath(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
     };
 
     // Обработка отправки формы
@@ -75,22 +82,21 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dicti
             return;
         }
         setSubmitError(null);
+        console.log('Submitting word with tags:', tagNames); // Логирование массива тегов
         try {
             const resultAction = await dispatch(addWord({
                 dictionaryId,
                 word,
                 translation,
-                tag_names,
-                image_path,
+                tag_names: tagNames,
+                image_path: imagePath,
             }));
             if (addWord.fulfilled.match(resultAction)) {
                 // Очистка формы и закрытие модалки
-                setFormData({
-                    word: '',
-                    translation: '',
-                    tag_names: [],
-                    image_path: null,
-                });
+                setWord('');
+                setTranslation('');
+                setTagNames([]);
+                setImagePath(null);
                 setImagePreview(null);
                 onClose();
             } else {
@@ -104,12 +110,11 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dicti
     // Сброс состояния при закрытии модалки
     useEffect(() => {
         if (!open) {
-            setFormData({
-                word: '',
-                translation: '',
-                tag_names: [],
-                image_path: null,
-            });
+            setWord('');
+            setTranslation('');
+            setTagNames([]);
+            setTagInput('');
+            setImagePath(null);
             setImagePreview(null);
             setSubmitError(null);
             dispatch(resetAddWordState());
@@ -139,7 +144,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dicti
                             type="file"
                             name="image_path"
                             style={{ display: 'none' }}
-                            onChange={handleInputChange}
+                            onChange={handleImageChange}
                         />
                         <IconButton color="primary" aria-label="upload image" component="span">
                             <PhotoCamera />
@@ -153,7 +158,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dicti
                     label="Слово"
                     name="word"
                     value={word}
-                    onChange={handleInputChange}
+                    onChange={handleWordChange}
                     variant="outlined"
                     sx={{ mb: 2 }}
                     required
@@ -165,34 +170,38 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dicti
                     label="Перевод"
                     name="translation"
                     value={translation}
-                    onChange={handleInputChange}
+                    onChange={handleTranslationChange}
                     variant="outlined"
                     sx={{ mb: 2 }}
                     required
                 />
 
                 {/* Поле ввода тегов */}
-                <Autocomplete
-                    multiple
-                    freeSolo
-                    options={[]}
-                    value={tag_names}
-                    onChange={handleTagsChange}
-                    renderTags={(value: string[], getTagProps) =>
-                        value.map((option: string, index: number) => (
-                            <Chip variant="outlined" label={option} {...getTagProps({ index })} key={option + index} />
-                        ))
-                    }
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            variant="outlined"
-                            label="Теги"
-                            placeholder="Введите теги"
-                            sx={{ mb: 2 }}
-                        />
-                    )}
+                <TextField
+                    fullWidth
+                    label="Теги"
+                    name="tags"
+                    value={tagInput}
+                    onChange={handleTagInputChange}
+                    onKeyDown={handleTagKeyDown}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    placeholder="Введите теги через запятую и нажмите Enter"
                 />
+
+                {/* Отображение добавленных тегов */}
+                {tagNames.length > 0 && (
+                    <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }}>
+                        {tagNames.map((tag) => (
+                            <Chip
+                                key={tag}
+                                label={tag}
+                                onDelete={() => handleRemoveTag(tag)}
+                                variant="outlined"
+                            />
+                        ))}
+                    </Stack>
+                )}
 
                 {/* Отображение ошибок при добавлении слова */}
                 {addError && (
@@ -225,4 +234,7 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dicti
             </DialogActions>
         </Dialog>
     );
+
 };
+
+export default AddWordModal;

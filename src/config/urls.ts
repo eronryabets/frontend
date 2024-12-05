@@ -13,3 +13,4 @@ export const BOOK_PAGE_API_URL = 'http://book.drunar.space/pages/';
 export const TRANSLATE_API_URL = 'http://translator.drunar.space/translate/';
 
 export const GET_DICTIONARY_API_URL = 'http://dictionary.drunar.space/dictionaries/';
+export const GET_DICT_WORDS_URL = 'http://dictionary.drunar.space/words/';

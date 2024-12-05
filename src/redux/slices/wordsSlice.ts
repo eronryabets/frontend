@@ -1,8 +1,7 @@
-
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import api from "../../utils/api";
 import {WordsResponse, WordsState, DictionaryResponse, Word, AddWordPayload} from "../../types";
-import { GET_DICTIONARY_API_URL } from "../../config/urls";
+import {GET_DICTIONARY_API_URL, GET_DICT_WORDS_URL} from "../../config/urls";
 
 const initialState: WordsState = {
     words: [],
@@ -22,7 +21,7 @@ export const fetchWords = createAsyncThunk<
     { rejectValue: string }
 >(
     'words/fetchWords',
-    async ({ dictionaryId, page }, thunkAPI) => {
+    async ({dictionaryId, page}, thunkAPI) => {
         try {
             const response = await api.get<DictionaryResponse>(
                 `${GET_DICTIONARY_API_URL}${dictionaryId}/?page=${page}`
@@ -43,7 +42,13 @@ export const addWord = createAsyncThunk<
 >(
     'words/addWord',
     async (payload, thunkAPI) => {
-        const { dictionaryId, word, translation, tag_names, image_path } = payload;
+        const {
+            dictionaryId,
+            word,
+            translation,
+            tag_names,
+            image_path
+        } = payload;
         const formData = new FormData();
         formData.append('dictionary', dictionaryId);
         formData.append('word', word);
@@ -55,7 +60,7 @@ export const addWord = createAsyncThunk<
 
         try {
             const response = await api.post<Word>(
-                'http://dictionary.drunar.space/words/',
+                `${GET_DICT_WORDS_URL}`,
                 formData,
                 {
                     headers: {
@@ -65,7 +70,6 @@ export const addWord = createAsyncThunk<
             );
             return response.data;
         } catch (error: any) {
-            // Если сервер возвращает ошибку с данными, можно попробовать извлечь её
             if (error.response && error.response.data) {
                 return thunkAPI.rejectWithValue(error.response.data.detail || 'Ошибка при добавлении слова');
             }
@@ -110,6 +114,7 @@ const wordsSlice = createSlice({
                 state.addError = null;
             })
             .addCase(addWord.fulfilled, (state, action) => {
+                //TODO
                 state.adding = false;
                 // Добавляем новое слово в начало списка
                 state.words.unshift(action.payload);
@@ -123,5 +128,5 @@ const wordsSlice = createSlice({
     },
 });
 
-export const { setCurrentPage, setDictionaryId, resetAddWordState } = wordsSlice.actions;
+export const {setCurrentPage, setDictionaryId, resetAddWordState} = wordsSlice.actions;
 export default wordsSlice.reducer;
