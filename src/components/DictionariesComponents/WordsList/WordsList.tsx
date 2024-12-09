@@ -1,10 +1,10 @@
 // src/components/WordsList.tsx
 
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../../redux/store';
-import { fetchWords, setCurrentPage, setDictionaryId } from '../../../redux/slices/wordsSlice';
-import { useParams, useSearchParams } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState, AppDispatch} from '../../../redux/store';
+import {fetchWords, setCurrentPage, setDictionaryId} from '../../../redux/slices/wordsSlice';
+import {useParams, useSearchParams} from 'react-router-dom';
 import {
     Pagination,
     CircularProgress,
@@ -18,21 +18,24 @@ import {
     Avatar,
     Button
 } from '@mui/material';
-import defaultCover from '../../../assets/default_cover.png';
+import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import EditIcon from '@mui/icons-material/Edit';
 import AddWordModal from "../AddWordModal/AddWordModal";
-
-
+import {MyIconButton} from "../../utils";
 
 const WordsList: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const dispatch = useDispatch<AppDispatch>();
-    const { words,
+    const {
+        words,
         loading,
         error,
         currentPage,
         totalPages,
-        dictionaryId } = useSelector((state: RootState) => state.words);
+        dictionaryId
+    } = useSelector((state: RootState) => state.words);
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Состояние для модального окна
@@ -51,14 +54,14 @@ const WordsList: React.FC = () => {
     // Фетчинг слов при изменении dictionaryId или currentPage
     useEffect(() => {
         if (id && dictionaryId) {
-            dispatch(fetchWords({ dictionaryId: id, page: currentPage }));
-            setSearchParams({ page: currentPage.toString() });
+            dispatch(fetchWords({dictionaryId: id, page: currentPage}));
+            setSearchParams({page: currentPage.toString()});
         }
     }, [dispatch, id, dictionaryId, currentPage, setSearchParams]);
 
     // Логирование состояния для отладки
     useEffect(() => {
-        console.log('WordsList state:', { words, loading, error, currentPage, totalPages, dictionaryId });
+        console.log('WordsList state:', {words, loading, error, currentPage, totalPages, dictionaryId});
     }, [words, loading, error, currentPage, totalPages, dictionaryId]);
 
     const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -73,20 +76,24 @@ const WordsList: React.FC = () => {
         setIsAddModalOpen(false);
     };
 
-    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;
+    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
+
+    function handleOpenEditModal() {
+        //TODO
+    }
 
     return (
         <Box p={3}>
             <Typography variant="h4" gutterBottom>
                 Слова в словаре
             </Typography>
-            <Box sx={{ pl: 2, pb: 2 }}>
+            <Box sx={{pl: 2, pb: 2}}>
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<MapsUgcIcon />}
-                    sx={{ mr: 2 }}
+                    startIcon={<MapsUgcIcon/>}
+                    sx={{mr: 2}}
                     onClick={handleOpenAddModal} // Открытие модалки добавления слова
                 >
                     Добавить слово
@@ -94,7 +101,7 @@ const WordsList: React.FC = () => {
             </Box>
             {words && words.length > 0 ? (
                 <Box>
-                    <Table sx={{ minWidth: 650 }} aria-label="words table">
+                    <Table sx={{minWidth: 650}} aria-label="words table">
                         <TableHead>
                             <TableRow>
                                 <TableCell><strong>Изображение</strong></TableCell>
@@ -104,6 +111,7 @@ const WordsList: React.FC = () => {
                                 <TableCell><strong>Count</strong></TableCell>
                                 <TableCell><strong>Progress</strong></TableCell>
                                 <TableCell><strong>Added</strong></TableCell>
+                                <TableCell><strong>Edit</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -113,10 +121,11 @@ const WordsList: React.FC = () => {
                                         <Avatar
                                             src={word.image_path ? word.image_path : defaultCover}
                                             alt={word.word}
-                                            sx={{ width: 40, height: 40 }}
+                                            sx={{width: 60, height: 60,  borderRadius: 4,}}
                                         />
                                     </TableCell>
                                     <TableCell>
+                                        {/*TODO sound*/}
                                         <Typography variant="subtitle1">{word.word}</Typography>
                                     </TableCell>
                                     <TableCell>
@@ -136,6 +145,14 @@ const WordsList: React.FC = () => {
                                     <TableCell>
                                         <Typography variant="body2">{word.created_at.substring(0, 10)}</Typography>
                                     </TableCell>
+                                    <TableCell>
+                                        <MyIconButton
+                                            color="primary"
+                                            startIcon={<EditIcon/>}
+                                            onClick={handleOpenEditModal}>
+                                        </MyIconButton>
+                                    </TableCell>
+
                                 </TableRow>
                             ))}
                         </TableBody>
