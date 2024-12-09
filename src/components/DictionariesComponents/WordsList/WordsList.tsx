@@ -20,7 +20,8 @@ import {
 } from '@mui/material';
 import defaultCover from '../../../assets/default_cover.png';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
-import {AddWordModal} from "../AddWordModal/AddWordModal";
+import AddWordModal from "../AddWordModal/AddWordModal";
+
 
 
 const WordsList: React.FC = () => {
@@ -97,6 +98,7 @@ const WordsList: React.FC = () => {
                                 <TableCell><strong>Теги</strong></TableCell>
                                 <TableCell><strong>Count</strong></TableCell>
                                 <TableCell><strong>Progress</strong></TableCell>
+                                <TableCell><strong>Added</strong></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -125,6 +127,9 @@ const WordsList: React.FC = () => {
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="body2">{word.progress}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="body2">{word.created_at.substring(0, 10)}</Typography>
                                     </TableCell>
                                 </TableRow>
                             ))}
