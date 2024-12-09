@@ -27,7 +27,12 @@ import AddWordModal from "../AddWordModal/AddWordModal";
 const WordsList: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const dispatch = useDispatch<AppDispatch>();
-    const { words, loading, error, currentPage, totalPages, dictionaryId } = useSelector((state: RootState) => state.words);
+    const { words,
+        loading,
+        error,
+        currentPage,
+        totalPages,
+        dictionaryId } = useSelector((state: RootState) => state.words);
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Состояние для модального окна

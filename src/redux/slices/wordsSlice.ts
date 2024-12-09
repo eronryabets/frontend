@@ -103,7 +103,7 @@ const wordsSlice = createSlice({
             .addCase(fetchWords.fulfilled, (state, action) => {
                 state.loading = false;
                 state.words = action.payload.results;
-                state.totalPages = Math.ceil(action.payload.count / 20); // 20 слов на странице
+                state.totalPages = Math.ceil(action.payload.count / 50); //TODO пока что захардил под 50
             })
             .addCase(fetchWords.rejected, (state, action) => {
                 state.loading = false;
@@ -119,7 +119,7 @@ const wordsSlice = createSlice({
                 // Добавляем новое слово в начало списка
                 state.words.unshift(action.payload);
                 // Увеличиваем счетчик слов и, возможно, количество страниц
-                state.totalPages = Math.ceil((state.words.length + 1) / 20);
+                state.totalPages = Math.ceil((state.words.length + 1) / 50); //TODO пока что захардил под 50
             })
             .addCase(addWord.rejected, (state, action) => {
                 state.adding = false;
