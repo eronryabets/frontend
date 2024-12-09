@@ -1,10 +1,9 @@
-// src/components/WordsList.tsx
 
-import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState, AppDispatch} from '../../../redux/store';
-import {fetchWords, setCurrentPage, setDictionaryId} from '../../../redux/slices/wordsSlice';
-import {useParams, useSearchParams} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../../../redux/store';
+import { fetchWords, setCurrentPage, setDictionaryId } from '../../../redux/slices/wordsSlice';
+import { useParams, useSearchParams } from 'react-router-dom';
 import {
     Pagination,
     CircularProgress,
@@ -20,25 +19,27 @@ import {
 } from '@mui/material';
 import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import AddWordModal from "../AddWordModal/AddWordModal";
-import {MyIconButton} from "../../utils";
+import { MyIconButton } from "../../utils";
+import EditWordModal from "../EditWordModal/EditWordModal";
 
 const WordsList: React.FC = () => {
-    const {id} = useParams<{ id: string }>();
+    const { id } = useParams<{ id: string }>();
     const dispatch = useDispatch<AppDispatch>();
-    const {
-        words,
-        loading,
-        error,
-        currentPage,
-        totalPages,
-        dictionaryId
-    } = useSelector((state: RootState) => state.words);
+    const { words, loading, error, currentPage, totalPages, dictionaryId } = useSelector((state: RootState) => state.words);
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false); // Состояние для модального окна
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Состояние для модального окна
+    //состояние для модалки редактирования слова :
+    const [editWordData, setEditWordData] = useState<null | {
+        id: string;
+        word: string;
+        translation: string;
+        tags: { name: string }[];
+        image_path: string | null;
+    }>(null);
 
     // Установка dictionaryId и текущей страницы из URL при монтировании
     useEffect(() => {
@@ -51,18 +52,13 @@ const WordsList: React.FC = () => {
         }
     }, [dispatch, id, searchParams, dictionaryId]);
 
-    // Фетчинг слов при изменении dictionaryId или currentPage
+     // Фетчинг слов при изменении dictionaryId или currentPage
     useEffect(() => {
         if (id && dictionaryId) {
-            dispatch(fetchWords({dictionaryId: id, page: currentPage}));
-            setSearchParams({page: currentPage.toString()});
+            dispatch(fetchWords({ dictionaryId: id, page: currentPage }));
+            setSearchParams({ page: currentPage.toString() });
         }
     }, [dispatch, id, dictionaryId, currentPage, setSearchParams]);
-
-    // Логирование состояния для отладки
-    useEffect(() => {
-        console.log('WordsList state:', {words, loading, error, currentPage, totalPages, dictionaryId});
-    }, [words, loading, error, currentPage, totalPages, dictionaryId]);
 
     const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         dispatch(setCurrentPage(value));
@@ -76,32 +72,44 @@ const WordsList: React.FC = () => {
         setIsAddModalOpen(false);
     };
 
-    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
-    if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
+    const handleOpenEditModal = (word: any) => {
+        setEditWordData({
+            id: word.id,
+            word: word.word,
+            translation: word.translation,
+            tags: word.tags,
+            image_path: word.image_path
+        });
+        setIsEditModalOpen(true);
+    };
 
-    function handleOpenEditModal() {
-        //TODO
-    }
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setEditWordData(null);
+    };
+
+    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;
+    if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
 
     return (
         <Box p={3}>
             <Typography variant="h4" gutterBottom>
                 Слова в словаре
             </Typography>
-            <Box sx={{pl: 2, pb: 2}}>
+            <Box sx={{ pl: 2, pb: 2 }}>
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<MapsUgcIcon/>}
-                    sx={{mr: 2}}
-                    onClick={handleOpenAddModal} // Открытие модалки добавления слова
+                    startIcon={<MapsUgcIcon />}
+                    sx={{ mr: 2 }}
+                    onClick={handleOpenAddModal}
                 >
                     Добавить слово
                 </Button>
             </Box>
             {words && words.length > 0 ? (
                 <Box>
-                    <Table sx={{minWidth: 650}} aria-label="words table">
+                    <Table sx={{ minWidth: 650 }} aria-label="words table">
                         <TableHead>
                             <TableRow>
                                 <TableCell><strong>Изображение</strong></TableCell>
@@ -121,11 +129,10 @@ const WordsList: React.FC = () => {
                                         <Avatar
                                             src={word.image_path ? word.image_path : defaultCover}
                                             alt={word.word}
-                                            sx={{width: 60, height: 60,  borderRadius: 4,}}
+                                            sx={{ width: 60, height: 60, borderRadius: 4 }}
                                         />
                                     </TableCell>
                                     <TableCell>
-                                        {/*TODO sound*/}
                                         <Typography variant="subtitle1">{word.word}</Typography>
                                     </TableCell>
                                     <TableCell>
@@ -148,11 +155,10 @@ const WordsList: React.FC = () => {
                                     <TableCell>
                                         <MyIconButton
                                             color="primary"
-                                            startIcon={<EditIcon/>}
-                                            onClick={handleOpenEditModal}>
+                                            startIcon={<EditIcon />}
+                                            onClick={() => handleOpenEditModal(word)}>
                                         </MyIconButton>
                                     </TableCell>
-
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -173,12 +179,19 @@ const WordsList: React.FC = () => {
                     />
                 </Box>
             )}
-            {/* Добавляем компонент AddWordModal */}
             {id && (
                 <AddWordModal
                     open={isAddModalOpen}
                     onClose={handleCloseAddModal}
                     dictionaryId={id}
+                />
+            )}
+            {id && editWordData && (
+                <EditWordModal
+                    open={isEditModalOpen}
+                    onClose={handleCloseEditModal}
+                    dictionaryId={id}
+                    wordData={editWordData}
                 />
             )}
         </Box>

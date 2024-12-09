@@ -1,6 +1,6 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import api from "../../utils/api";
-import {WordsResponse, WordsState, DictionaryResponse, Word, AddWordPayload} from "../../types";
+import {WordsResponse, WordsState, DictionaryResponse, Word, AddWordPayload, UpdateWordPayload} from "../../types";
 import {GET_DICTIONARY_API_URL, GET_DICT_WORDS_URL} from "../../config/urls";
 
 const initialState: WordsState = {
@@ -78,6 +78,69 @@ export const addWord = createAsyncThunk<
     }
 );
 
+// Thunk для обновления слова
+export const updateWord = createAsyncThunk<
+    Word,
+    UpdateWordPayload,
+    { rejectValue: string }
+>(
+    'words/updateWord',
+    async (payload, thunkAPI) => {
+        const {
+            wordId,
+            dictionaryId,
+            word, translation,
+            tag_names,
+            image_path
+        } = payload;
+        const formData = new FormData();
+        formData.append('dictionary', dictionaryId);
+        formData.append('word', word);
+        formData.append('translation', translation);
+        tag_names.forEach(tag => formData.append('tag_names', tag));
+        if (image_path) {
+            formData.append('image_path', image_path);
+        }
+
+        try {
+            // обновление слова по URL: /words/{wordId}/
+            const response = await api.put<Word>(
+                `${GET_DICT_WORDS_URL}${wordId}/`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+            return response.data;
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                return thunkAPI.rejectWithValue(error.response.data.detail || 'Ошибка при обновлении слова');
+            }
+            return thunkAPI.rejectWithValue(error.message || 'Ошибка при обновлении слова');
+        }
+    }
+);
+
+// Thunk для удаления слова
+export const deleteWord = createAsyncThunk<
+    string, // возвращаем wordId удалённого слова
+    { wordId: string },
+    { rejectValue: string }
+>(
+    'words/deleteWord',
+    async ({wordId}, thunkAPI) => {
+        try {
+            // удаление слова по URL: /words/{wordId}/, метод DELETE
+            await api.delete(`${GET_DICT_WORDS_URL}${wordId}/`);
+            return wordId;
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(error.message || 'Ошибка при удалении слова');
+        }
+    }
+);
+
 const wordsSlice = createSlice({
     name: 'words',
     initialState,
@@ -124,6 +187,26 @@ const wordsSlice = createSlice({
             .addCase(addWord.rejected, (state, action) => {
                 state.adding = false;
                 state.addError = action.payload || 'Неизвестная ошибка при добавлении слова';
+            })
+            .addCase(updateWord.fulfilled, (state, action) => {
+                // Обновляем слово в списке words
+                const index = state.words.findIndex(w => w.id === action.payload.id);
+                if (index !== -1) {
+                    state.words[index] = action.payload;
+                }
+            })
+            .addCase(updateWord.rejected, (state, action) => {
+                state.error = action.payload || 'Ошибка при обновлении слова';
+            })
+
+            .addCase(deleteWord.fulfilled, (state, action) => {
+                // Удаляем слово из массива words
+                state.words = state.words.filter(w => w.id !== action.payload);
+                // Пересчитываем totalPages, если нужно
+                state.totalPages = Math.ceil(state.words.length / 50);
+            })
+            .addCase(deleteWord.rejected, (state, action) => {
+                state.error = action.payload || 'Ошибка при удалении слова';
             });
     },
 });

@@ -45,4 +45,11 @@ export interface AddWordPayload {
     image_path?: File | null;
 }
 
-
+export interface UpdateWordPayload {
+  wordId: string;
+  dictionaryId: string;
+  word: string;
+  translation: string;
+  tag_names: string[];
+  image_path?: File | null;
+}
