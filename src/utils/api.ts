@@ -9,7 +9,7 @@ const api = axios.create({
     withCredentials: true, // Включаем cookie в запросах
 });
 
-// Interceptor для перехвата ошибок 401 (неавторизован)
+// Interceptor для перехвата ошибок 401 (неавторизован) и 403 (нет прав доступа, может не быть токена - обновляем)
 api.interceptors.response.use(
     (response) => {
         console.log("Response received:", response);
@@ -18,8 +18,8 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        if (error.response.status === 401 && !originalRequest._retry) {
-            console.log("401 error detected, attempting token refresh");
+        if ((error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {
+            console.log("401(403) error detected, attempting token refresh");
 
             originalRequest._retry = true;
 
