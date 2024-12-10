@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
@@ -15,14 +14,18 @@ import {
     Typography,
     Box,
     Avatar,
-    Button
+    Button,
+    IconButton,
+    Tooltip
 } from '@mui/material';
 import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 import EditIcon from '@mui/icons-material/Edit';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import StopIcon from '@mui/icons-material/Stop';
 import AddWordModal from "../AddWordModal/AddWordModal";
-import { MyIconButton } from "../../utils";
 import EditWordModal from "../EditWordModal/EditWordModal";
+import { MyIconButton } from "../../utils";
 
 const WordsList: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -31,8 +34,7 @@ const WordsList: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Состояние для модального окна
-    //состояние для модалки редактирования слова :
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editWordData, setEditWordData] = useState<null | {
         id: string;
         word: string;
@@ -41,7 +43,9 @@ const WordsList: React.FC = () => {
         image_path: string | null;
     }>(null);
 
-    // Установка dictionaryId и текущей страницы из URL при монтировании
+    // Вместо boolean храните id говорящего слова или null
+    const [speakingWordId, setSpeakingWordId] = useState<string | null>(null);
+
     useEffect(() => {
         if (id) {
             if (dictionaryId !== id) {
@@ -52,7 +56,6 @@ const WordsList: React.FC = () => {
         }
     }, [dispatch, id, searchParams, dictionaryId]);
 
-     // Фетчинг слов при изменении dictionaryId или currentPage
     useEffect(() => {
         if (id && dictionaryId) {
             dispatch(fetchWords({ dictionaryId: id, page: currentPage }));
@@ -86,6 +89,35 @@ const WordsList: React.FC = () => {
     const handleCloseEditModal = () => {
         setIsEditModalOpen(false);
         setEditWordData(null);
+    };
+
+    const handleSpeak = (wordId: string, text: string) => {
+        if (!speakingWordId) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+
+                utterance.onstart = () => {
+                    setSpeakingWordId(wordId);
+                };
+
+                utterance.onend = () => {
+                    setSpeakingWordId(null);
+                };
+
+                utterance.onerror = () => {
+                    setSpeakingWordId(null);
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Ваш браузер не поддерживает Web Speech API.');
+            }
+        } else {
+            // Если уже есть звучащее слово, останавливаем его
+            window.speechSynthesis.cancel();
+            setSpeakingWordId(null);
+        }
     };
 
     if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;
@@ -133,7 +165,19 @@ const WordsList: React.FC = () => {
                                         />
                                     </TableCell>
                                     <TableCell>
-                                        <Typography variant="subtitle1">{word.word}</Typography>
+                                        <Box display="flex" alignItems="center">
+                                            <Tooltip title={speakingWordId === word.id ? "Остановить озвучивание" : "Озвучить слово"}>
+                                                <IconButton
+                                                    onClick={() => handleSpeak(word.id, word.word)}
+                                                    color={speakingWordId === word.id ? "secondary" : "primary"}
+                                                    aria-label="speak text"
+                                                    sx={{ mr: 1 }}
+                                                >
+                                                    {speakingWordId === word.id ? <StopIcon /> : <VolumeUpIcon />}
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Typography variant="subtitle1">{word.word}</Typography>
+                                        </Box>
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="body2">{word.translation}</Typography>
