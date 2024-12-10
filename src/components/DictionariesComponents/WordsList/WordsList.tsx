@@ -172,6 +172,12 @@ const WordsList: React.FC = () => {
                                             backgroundColor: 'rgba(0, 0, 255, 0.05)', // легкий синий оттенок
                                             boxShadow: '0px 4px 20px rgba(0, 0, 255, 0.1)',
                                         },
+                                        // Добавим плавный эффект для картинки при наведении на строку
+                                        '&:hover img': {
+                                            transform: 'scale(1.05)', // увеличиваем картинку
+                                            boxShadow: '0 0 20px rgba(0, 0, 255, 0.5)',
+                                            filter: 'brightness(1.1) contrast(1.1)',
+                                        }
                                     }}
                                 >
                                     <TableCell>
