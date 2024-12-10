@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../../redux/store';
-import { fetchWords, setCurrentPage, setDictionaryId } from '../../../redux/slices/wordsSlice';
-import { useParams, useSearchParams } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState, AppDispatch} from '../../../redux/store';
+import {fetchWords, setCurrentPage, setDictionaryId} from '../../../redux/slices/wordsSlice';
+import {useParams, useSearchParams} from 'react-router-dom';
 import {
     Pagination,
     CircularProgress,
@@ -25,12 +25,19 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import StopIcon from '@mui/icons-material/Stop';
 import AddWordModal from "../AddWordModal/AddWordModal";
 import EditWordModal from "../EditWordModal/EditWordModal";
-import { MyIconButton } from "../../utils";
+import {MyIconButton} from "../../utils";
 
 const WordsList: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const dispatch = useDispatch<AppDispatch>();
-    const { words, loading, error, currentPage, totalPages, dictionaryId } = useSelector((state: RootState) => state.words);
+    const {
+        words,
+        loading,
+        error,
+        currentPage,
+        totalPages,
+        dictionaryId
+    } = useSelector((state: RootState) => state.words);
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -58,8 +65,8 @@ const WordsList: React.FC = () => {
 
     useEffect(() => {
         if (id && dictionaryId) {
-            dispatch(fetchWords({ dictionaryId: id, page: currentPage }));
-            setSearchParams({ page: currentPage.toString() });
+            dispatch(fetchWords({dictionaryId: id, page: currentPage}));
+            setSearchParams({page: currentPage.toString()});
         }
     }, [dispatch, id, dictionaryId, currentPage, setSearchParams]);
 
@@ -120,7 +127,7 @@ const WordsList: React.FC = () => {
         }
     };
 
-    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;
+    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
 
     return (
@@ -128,12 +135,12 @@ const WordsList: React.FC = () => {
             <Typography variant="h4" gutterBottom>
                 Слова в словаре
             </Typography>
-            <Box sx={{ pl: 2, pb: 2 }}>
+            <Box sx={{pl: 2, pb: 2}}>
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<MapsUgcIcon />}
-                    sx={{ mr: 2 }}
+                    startIcon={<MapsUgcIcon/>}
+                    sx={{mr: 2}}
                     onClick={handleOpenAddModal}
                 >
                     Добавить слово
@@ -141,7 +148,7 @@ const WordsList: React.FC = () => {
             </Box>
             {words && words.length > 0 ? (
                 <Box>
-                    <Table sx={{ minWidth: 650 }} aria-label="words table">
+                    <Table sx={{minWidth: 650}} aria-label="words table">
                         <TableHead>
                             <TableRow>
                                 <TableCell><strong>Изображение</strong></TableCell>
@@ -156,24 +163,35 @@ const WordsList: React.FC = () => {
                         </TableHead>
                         <TableBody>
                             {words.map((word) => (
-                                <TableRow key={word.id}>
+                                <TableRow
+                                    key={word.id}
+                                    sx={{
+                                        transition: 'background-color 0.3s, box-shadow 0.3s',
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(0, 0, 255, 0.05)', // легкий синий оттенок
+                                            boxShadow: '0px 4px 20px rgba(0, 0, 255, 0.1)',
+                                        },
+                                    }}
+                                >
                                     <TableCell>
                                         <Avatar
                                             src={word.image_path ? word.image_path : defaultCover}
                                             alt={word.word}
-                                            sx={{ width: 60, height: 60, borderRadius: 4 }}
+                                            sx={{width: 60, height: 60, borderRadius: 4}}
                                         />
                                     </TableCell>
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
-                                            <Tooltip title={speakingWordId === word.id ? "Остановить озвучивание" : "Озвучить слово"}>
+                                            <Tooltip
+                                                title={speakingWordId === word.id ? "Остановить озвучивание" : "Озвучить слово"}>
                                                 <IconButton
                                                     onClick={() => handleSpeak(word.id, word.word)}
                                                     color={speakingWordId === word.id ? "secondary" : "primary"}
                                                     aria-label="speak text"
-                                                    sx={{ mr: 1 }}
+                                                    sx={{mr: 1}}
                                                 >
-                                                    {speakingWordId === word.id ? <StopIcon /> : <VolumeUpIcon />}
+                                                    {speakingWordId === word.id ? <StopIcon/> : <VolumeUpIcon/>}
                                                 </IconButton>
                                             </Tooltip>
                                             <Typography variant="subtitle1">{word.word}</Typography>
@@ -199,7 +217,7 @@ const WordsList: React.FC = () => {
                                     <TableCell>
                                         <MyIconButton
                                             color="primary"
-                                            startIcon={<EditIcon />}
+                                            startIcon={<EditIcon/>}
                                             onClick={() => handleOpenEditModal(word)}>
                                         </MyIconButton>
                                     </TableCell>
