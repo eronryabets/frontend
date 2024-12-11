@@ -162,8 +162,8 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     variant="outlined"
                     sx={{ mb: 2 }}
                     required
-                    inputProps={{ maxLength: 255 }}
-                    helperText={`${word.length}/255`}
+                    inputProps={{ maxLength: 500 }}
+                    helperText={`${word.length}/500`}
                 />
 
                 {/* Поле ввода перевода */}
@@ -176,8 +176,8 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     variant="outlined"
                     sx={{ mb: 2 }}
                     required
-                    inputProps={{ maxLength: 255 }}
-                    helperText={`${translation.length}/255`}
+                    inputProps={{ maxLength: 500 }}
+                    helperText={`${translation.length}/500`}
                 />
 
                 {/* Поле ввода тегов */}

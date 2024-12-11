@@ -175,8 +175,8 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                     variant="outlined"
                     sx={{ mb: 2 }}
                     required
-                    inputProps={{ maxLength: 255 }}
-                    helperText={`${currentWord.length}/255`}
+                    inputProps={{ maxLength: 500 }}
+                    helperText={`${currentWord.length}/500`}
                 />
 
                 <TextField
@@ -188,8 +188,8 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                     variant="outlined"
                     sx={{ mb: 2 }}
                     required
-                    inputProps={{ maxLength: 255 }}
-                    helperText={`${translation.length}/255`}
+                    inputProps={{ maxLength: 500 }}
+                    helperText={`${translation.length}/500`}
                 />
 
                 <TextField

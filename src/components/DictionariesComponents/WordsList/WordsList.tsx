@@ -203,20 +203,38 @@ const WordsList: React.FC = () => {
                                                     {speakingWordId === word.id ? <StopIcon/> : <VolumeUpIcon/>}
                                                 </IconButton>
                                             </Tooltip>
-                                            <Typography variant="subtitle1">{word.word}</Typography>
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={{
+                                                    maxWidth: '50ch',
+                                                    whiteSpace: 'normal',
+                                                    overflowWrap: 'break-word'
+                                                }}
+                                            >
+                                                {word.word}
+                                            </Typography>
                                         </Box>
                                     </TableCell>
 
                                     {/*translation*/}
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
-                                        <MyIconButton
-                                            color="primary"
-                                            startIcon={<EditIcon/>}
-                                            onClick={() => handleOpenEditModal(word)}>
-                                        </MyIconButton>
-                                        <Typography variant="body2">{word.translation}</Typography>
-                                            </Box>
+                                            <MyIconButton
+                                                color="primary"
+                                                startIcon={<EditIcon/>}
+                                                onClick={() => handleOpenEditModal(word)}>
+                                            </MyIconButton>
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={{
+                                                    maxWidth: '50ch',          // Примерно 50 символов в ширину
+                                                    whiteSpace: 'normal',      // Разрешаем перенос на новую строку
+                                                    overflowWrap: 'break-word' // Переносим слова, если не помещаются
+                                                }}
+                                            >
+                                                {word.translation}
+                                            </Typography>
+                                        </Box>
                                     </TableCell>
 
                                     {/*count*/}
@@ -224,13 +242,13 @@ const WordsList: React.FC = () => {
                                         <Typography variant="body2">{word.count}</Typography>
                                     </TableCell>
 
-                                     {/*progress*/}
+                                    {/*progress*/}
                                     <TableCell>
                                         <Typography variant="body2">{word.progress}</Typography>
                                     </TableCell>
 
                                     {/*TAGS*/}
-                                     <TableCell>
+                                    <TableCell>
                                         {/*<Typography variant="body2">*/}
                                         {/*    {word.tags.length > 0 ? word.tags.map(tag => tag.name).join(', ') : '—'}*/}
                                         {/*</Typography>*/}
@@ -244,16 +262,16 @@ const WordsList: React.FC = () => {
                                                 mt: 1,
                                             }}
                                         >
-                                            {   word.tags.length > 0 ?
+                                            {word.tags.length > 0 ?
                                                 word.tags.slice(0, 3).map((tag) => (
-                                                <Chip
-                                                    key={tag.id}
-                                                    label={tag.name}
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    size="small"
-                                                />
-                                            ))
+                                                    <Chip
+                                                        key={tag.id}
+                                                        label={tag.name}
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        size="small"
+                                                    />
+                                                ))
                                                 : '—'
                                             }
                                             {word.tags.length > 3 && (
