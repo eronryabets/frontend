@@ -12,7 +12,8 @@ import {
     Alert,
     CircularProgress,
     Chip,
-    Stack
+    Stack,
+    Typography
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
@@ -44,6 +45,9 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
     const [imagePath, setImagePath] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(wordData.image_path || null);
     const [submitError, setSubmitError] = useState<string | null>(null);
+
+    // Состояние для диалога подтверждения удаления
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     useEffect(() => {
         if (open) {
@@ -119,20 +123,22 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
         }
     };
 
-    const handleDelete = async () => {
-        //TODO заменить на модалку наш window.
-        const confirmed = window.confirm('Вы уверены что хотите удалить слово?');
-        if (confirmed) {
-            try {
-                const resultAction = await dispatch(deleteWord({ wordId: wordData.id }));
-                if (deleteWord.fulfilled.match(resultAction)) {
-                    onClose();
-                } else {
-                    setSubmitError(resultAction.payload || 'Не удалось удалить слово.');
-                }
-            } catch (err) {
-                setSubmitError('Не удалось удалить слово.');
+    const handleDelete = () => {
+        // Открываем диалог подтверждения удаления
+        setOpenDeleteDialog(true);
+    };
+
+    const confirmDelete = async () => {
+        setOpenDeleteDialog(false);
+        try {
+            const resultAction = await dispatch(deleteWord({ wordId: wordData.id }));
+            if (deleteWord.fulfilled.match(resultAction)) {
+                onClose();
+            } else {
+                setSubmitError(resultAction.payload || 'Не удалось удалить слово.');
             }
+        } catch (err) {
+            setSubmitError('Не удалось удалить слово.');
         }
     };
 
@@ -246,6 +252,22 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                     Сохранить
                 </Button>
             </DialogActions>
+
+            {/* Диалог подтверждения удаления */}
+            <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+                <DialogTitle>Подтверждение удаления</DialogTitle>
+                <DialogContent>
+                    <Typography>Вы уверены, что хотите удалить слово "{currentWord}"?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
+                        Отмена
+                    </Button>
+                    <Button onClick={confirmDelete} color="secondary">
+                        Удалить
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Dialog>
     );
 };
