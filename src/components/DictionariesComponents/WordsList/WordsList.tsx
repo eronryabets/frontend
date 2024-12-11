@@ -16,7 +16,7 @@ import {
     Avatar,
     Button,
     IconButton,
-    Tooltip
+    Tooltip, Chip
 } from '@mui/material';
 import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
@@ -151,14 +151,14 @@ const WordsList: React.FC = () => {
                     <Table sx={{minWidth: 650}} aria-label="words table">
                         <TableHead>
                             <TableRow>
-                                <TableCell><strong>Изображение</strong></TableCell>
-                                <TableCell><strong>Слово</strong></TableCell>
-                                <TableCell><strong>Перевод</strong></TableCell>
-                                <TableCell><strong>Теги</strong></TableCell>
+                                <TableCell><strong></strong></TableCell>
+                                <TableCell><strong>Termin</strong></TableCell>
+                                <TableCell><strong>Translate</strong></TableCell>
                                 <TableCell><strong>Count</strong></TableCell>
                                 <TableCell><strong>Progress</strong></TableCell>
+                                <TableCell><strong>Теги</strong></TableCell>
                                 <TableCell><strong>Added</strong></TableCell>
-                                <TableCell><strong>Edit</strong></TableCell>
+                                {/*<TableCell><strong>Edit</strong></TableCell>*/}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -167,7 +167,7 @@ const WordsList: React.FC = () => {
                                     key={word.id}
                                     sx={{
                                         transition: 'background-color 0.3s, box-shadow 0.3s',
-                                        cursor: 'pointer',
+                                        // cursor: 'pointer',
                                         '&:hover': {
                                             backgroundColor: 'rgba(0, 0, 255, 0.05)', // легкий синий оттенок
                                             boxShadow: '0px 4px 20px rgba(0, 0, 255, 0.1)',
@@ -180,6 +180,7 @@ const WordsList: React.FC = () => {
                                         }
                                     }}
                                 >
+                                    {/*WORD'S IMAGE*/}
                                     <TableCell>
                                         <Avatar
                                             src={word.image_path ? word.image_path : defaultCover}
@@ -187,6 +188,8 @@ const WordsList: React.FC = () => {
                                             sx={{width: 60, height: 60, borderRadius: 4}}
                                         />
                                     </TableCell>
+
+                                    {/*VolumeUpIcon & WORD*/}
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
                                             <Tooltip
@@ -203,30 +206,81 @@ const WordsList: React.FC = () => {
                                             <Typography variant="subtitle1">{word.word}</Typography>
                                         </Box>
                                     </TableCell>
+
+                                    {/*translation*/}
                                     <TableCell>
-                                        <Typography variant="body2">{word.translation}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2">
-                                            {word.tags.length > 0 ? word.tags.map(tag => tag.name).join(', ') : '—'}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2">{word.count}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2">{word.progress}</Typography>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Typography variant="body2">{word.created_at.substring(0, 10)}</Typography>
-                                    </TableCell>
-                                    <TableCell>
+                                        <Box display="flex" alignItems="center">
                                         <MyIconButton
                                             color="primary"
                                             startIcon={<EditIcon/>}
                                             onClick={() => handleOpenEditModal(word)}>
                                         </MyIconButton>
+                                        <Typography variant="body2">{word.translation}</Typography>
+                                            </Box>
                                     </TableCell>
+
+                                    {/*count*/}
+                                    <TableCell>
+                                        <Typography variant="body2">{word.count}</Typography>
+                                    </TableCell>
+
+                                     {/*progress*/}
+                                    <TableCell>
+                                        <Typography variant="body2">{word.progress}</Typography>
+                                    </TableCell>
+
+                                    {/*TAGS*/}
+                                     <TableCell>
+                                        {/*<Typography variant="body2">*/}
+                                        {/*    {word.tags.length > 0 ? word.tags.map(tag => tag.name).join(', ') : '—'}*/}
+                                        {/*</Typography>*/}
+
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexWrap: 'wrap',
+                                                // justifyContent: 'center',
+                                                gap: 1, // Отступы между чипами
+                                                mt: 1,
+                                            }}
+                                        >
+                                            {   word.tags.length > 0 ?
+                                                word.tags.slice(0, 3).map((tag) => (
+                                                <Chip
+                                                    key={tag.id}
+                                                    label={tag.name}
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    size="small"
+                                                />
+                                            ))
+                                                : '—'
+                                            }
+                                            {word.tags.length > 3 && (
+                                                <Chip
+                                                    label={`+${word.tags.length - 3}`}
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    size="small"
+                                                />
+                                            )}
+                                        </Box>
+                                    </TableCell>
+
+                                    {/*created_at*/}
+                                    <TableCell>
+                                        <Typography variant="body2">{word.created_at.substring(0, 10)}</Typography>
+                                    </TableCell>
+
+                                    {/*edit*/}
+                                    {/*<TableCell>*/}
+                                    {/*    <MyIconButton*/}
+                                    {/*        color="primary"*/}
+                                    {/*        startIcon={<EditIcon/>}*/}
+                                    {/*        onClick={() => handleOpenEditModal(word)}>*/}
+                                    {/*    </MyIconButton>*/}
+                                    {/*</TableCell>*/}
+
                                 </TableRow>
                             ))}
                         </TableBody>
