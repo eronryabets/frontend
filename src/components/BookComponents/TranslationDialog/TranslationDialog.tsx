@@ -11,9 +11,6 @@ import {
     Box, Button, DialogActions,
 } from '@mui/material';
 import { VolumeUp as VolumeUpIcon, Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../../redux/store';
-// import { addWordToDictionary } from '../../redux/slices/dictionarySlice';
 
 interface TranslationDialogProps {
     open: boolean;
@@ -23,6 +20,7 @@ interface TranslationDialogProps {
     translationLoading: boolean;
     translationError: string | null;
     sourceLanguage: string;
+    onAddToDictionaryClick: (word: string, translation: string) => void;
 }
 
 export const TranslationDialog: React.FC<TranslationDialogProps> = ({
@@ -33,12 +31,11 @@ export const TranslationDialog: React.FC<TranslationDialogProps> = ({
     translationLoading,
     translationError,
     sourceLanguage,
+    onAddToDictionaryClick, // <-- Добавлено
 }) => {
-    const dispatch = useDispatch<AppDispatch>();
     const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
 
     useEffect(() => {
-        // Останавливаем озвучку при закрытии диалога
         if (!open && isSpeaking) {
             window.speechSynthesis.cancel();
             setIsSpeaking(false);
@@ -47,8 +44,8 @@ export const TranslationDialog: React.FC<TranslationDialogProps> = ({
 
     const handleAddToDictionary = () => {
         if (selectedText && translation) {
-            // dispatch(addWordToDictionary({ word: selectedText, translation })); // TODO
-            onClose();
+            // Вместо dispatch добавим вызов пропа:
+            onAddToDictionaryClick(selectedText, translation);
         }
     };
 
@@ -88,10 +85,8 @@ export const TranslationDialog: React.FC<TranslationDialogProps> = ({
             aria-describedby="translation-dialog-description"
             maxWidth="sm"
             fullWidth
-            // Добавляем onMouseUp с stopPropagation для предотвращения всплытия
             onMouseUp={(e) => e.stopPropagation()}
         >
-            {/* Заголовок с кнопкой озвучивания и крестиком для закрытия */}
             <DialogTitle
                 id="translation-dialog-title"
                 sx={{
@@ -147,15 +142,9 @@ export const TranslationDialog: React.FC<TranslationDialogProps> = ({
             </DialogContent>
 
             <DialogActions>
-
                 <Button onClick={handleAddToDictionary} color="primary" variant="contained">
                     Добавить в словарь
                 </Button>
-
-                {/*<Button onClick={onClose} color="primary" variant="outlined">*/}
-                {/*    Закрыть*/}
-                {/*</Button>*/}
-
             </DialogActions>
         </Dialog>
     );

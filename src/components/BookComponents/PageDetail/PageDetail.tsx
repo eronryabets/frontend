@@ -1,4 +1,5 @@
-import React, {useEffect} from 'react';
+
+import React, {useEffect, useState} from 'react';
 import {useParams, useNavigate, Link as RouterLink} from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import {
@@ -22,9 +23,10 @@ import {TextToSpeech} from "../TextToSpeech";
 import {useTextSelection} from '../../../hooks';
 import {TextRenderer} from '../TextRenderer/';
 import {TranslationDialog} from "../TranslationDialog";
+import AddWordModal from "../../DictionariesComponents/AddWordModal/AddWordModal";
+
 
 export const PageDetail: React.FC = () => {
-
     const { bookId, chapterId, pageNumber } = useParams<{
         bookId: string;
         chapterId: string;
@@ -42,12 +44,9 @@ export const PageDetail: React.FC = () => {
 
     const currentPageNumber = Number(pageNumber);
 
-    // Найти книгу из состояния
     const book = books.find((b) => b.id === bookId);
-
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    // Используем кастомный хук для обработки выделения текста
     const {
         selectedText,
         handleTextClick,
@@ -55,18 +54,15 @@ export const PageDetail: React.FC = () => {
         handlePopoverClose,
     } = useTextSelection(book ? book.language : 'en');
 
-    // Функция для определения главы по номеру страницы
     const findChapterByPageNumber = (pageNumber: number) => {
         return book?.chapters.find((c) => {
             return pageNumber >= c.start_page_number && pageNumber <= c.end_page_number;
         });
     };
 
-    // Определяем текущую главу
     const chapter = findChapterByPageNumber(currentPageNumber);
 
     useEffect(() => {
-        // Если книга не найдена, загрузить детали книги
         if (!book) {
             dispatch(fetchBookDetails(bookId!));
         }
@@ -76,7 +72,6 @@ export const PageDetail: React.FC = () => {
         if (book && chapter) {
             dispatch(fetchPageByNumber({ chapterId: chapter.id, pageNumber: currentPageNumber }));
         } else if (book) {
-            // Если глава не найдена для текущей страницы, попробуем найти её
             const newChapter = findChapterByPageNumber(currentPageNumber);
             if (newChapter) {
                 navigate(`/books/${bookId}/chapters/${newChapter.id}/pages/${currentPageNumber}`);
@@ -86,10 +81,8 @@ export const PageDetail: React.FC = () => {
         }
     }, [dispatch, book, chapter, currentPageNumber, navigate, bookId]);
 
-    // Расчёт общего количества страниц в книге
     const totalPagesInBook = book?.total_pages || 0;
 
-    // Пагинация
     const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         const newPageNumber = value;
         const newChapter = findChapterByPageNumber(newPageNumber);
@@ -101,8 +94,22 @@ export const PageDetail: React.FC = () => {
         }
     };
 
-    // Проверяем, открыто ли окно перевода
+    // Состояния для AddWordModal
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [selectedWordForModal, setSelectedWordForModal] = useState('');
+    const [selectedTranslationForModal, setSelectedTranslationForModal] = useState('');
+
     const isDialogOpen = Boolean(selectedText && translation);
+
+    // Коллбек для TranslationDialog, вызывается при нажатии "Добавить в словарь"
+    const handleAddToDictionaryClick = (word: string, trans: string) => {
+        // Закрываем TranslationDialog
+        handlePopoverClose();
+        // Открываем AddWordModal с переданными данными
+        setSelectedWordForModal(word);
+        setSelectedTranslationForModal(trans);
+        setIsAddModalOpen(true);
+    };
 
     if (loading || !book) {
         return (
@@ -147,9 +154,8 @@ export const PageDetail: React.FC = () => {
             paddingTop: '30px',
             paddingBottom: isMobile ? '0px' : '80px',
         }}
-            onMouseUp={handleTextClick} // Обработка выделения текста
+            onMouseUp={handleTextClick}
         >
-            {/* Заголовок и Кнопка Перехода к Книге */}
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
                 <Box display="flex" alignItems="center">
                     {chapter && (
@@ -169,13 +175,11 @@ export const PageDetail: React.FC = () => {
                     </IconButton>
                 </Tooltip>
 
-                {/* Озвучка текста */}
                 <Tooltip title="Озвучивание текста">
                     <TextToSpeech text={page.content} bookLanguage={book.language} />
                 </Tooltip>
             </Box>
 
-            {/* Контент страницы */}
             <Box
                 sx={{
                     p: 3,
@@ -183,7 +187,7 @@ export const PageDetail: React.FC = () => {
                     boxShadow: 3,
                     borderRadius: 2,
                     mb: 4,
-                    whiteSpace: 'pre-wrap', // Сохраняем переносы строк
+                    whiteSpace: 'pre-wrap',
                     flexGrow: 1,
                     overflowY: 'auto',
                 }}
@@ -193,7 +197,6 @@ export const PageDetail: React.FC = () => {
                 </Typography>
             </Box>
 
-            {/* Пагинация по всей книге */}
             <Box display="flex"
                 sx={{
                     display: 'flex',
@@ -220,7 +223,7 @@ export const PageDetail: React.FC = () => {
                 />
             </Box>
 
-            {/* Dialog для перевода */}
+            {/* Передаём onAddToDictionaryClick в TranslationDialog */}
             <TranslationDialog
                 open={isDialogOpen}
                 onClose={handlePopoverClose}
@@ -229,6 +232,16 @@ export const PageDetail: React.FC = () => {
                 translationLoading={translationLoading}
                 translationError={translationError}
                 sourceLanguage={book.language.slice(0,2)}
+                onAddToDictionaryClick={handleAddToDictionaryClick} // <-- Добавлено
+            />
+
+            {/* Открываем AddWordModal с переданными initialWord и initialTranslation */}
+            <AddWordModal
+                open={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                dictionaryId={bookId!}
+                initialWord={selectedWordForModal}            // <-- Добавлено
+                initialTranslation={selectedTranslationForModal} // <-- Добавлено
             />
         </Container>
     );

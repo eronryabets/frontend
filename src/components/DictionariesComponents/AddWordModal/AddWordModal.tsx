@@ -14,21 +14,31 @@ import {
     CircularProgress,
     Chip,
     Stack,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { addWord, resetAddWordState } from '../../../redux/slices/wordsSlice';
+import defaultCover from '../../../assets/default_word_image.jpg';
 
 interface AddWordModalProps {
     open: boolean;
     onClose: () => void;
-    dictionaryId: string;
+    dictionaryId?: string;
+    initialWord?: string;
+    initialTranslation?: string;
 }
 
-const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId }) => {
+const LOCAL_STORAGE_KEY = 'lastSelectedDictionaryId'; // Ключ для localStorage
+
+const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId, initialWord, initialTranslation }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { adding, addError } = useSelector((state: RootState) => state.words);
+    const { dictionaries } = useSelector((state: RootState) => state.dictionaries);
 
     const [word, setWord] = useState('');
     const [translation, setTranslation] = useState('');
@@ -38,7 +48,40 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    // Обработка изменений в форме
+    // Состояние для выбранного словаря
+    const [selectedDictionaryId, setSelectedDictionaryId] = useState<string>('');
+
+    useEffect(() => {
+        if (open) {
+            setWord(initialWord || '');
+            setTranslation(initialTranslation || '');
+            setTagNames([]);
+            setTagInput('');
+            setImagePath(null);
+            setImagePreview(null);
+            setSubmitError(null);
+            dispatch(resetAddWordState());
+
+            if (dictionaries && dictionaries.length > 0) {
+                // Проверяем есть ли сохранённый словарь в localStorage
+                const lastSelected = localStorage.getItem(LOCAL_STORAGE_KEY);
+
+                if (lastSelected && dictionaries.find(d => d.id === lastSelected)) {
+                    // Если сохранённый словарь существует в текущем списке словарей, используем его
+                    setSelectedDictionaryId(lastSelected);
+                } else if (dictionaryId && dictionaries.find(d => d.id === dictionaryId)) {
+                    // Если есть переданный dictionaryId и он в списке словарей
+                    setSelectedDictionaryId(dictionaryId);
+                } else {
+                    // Иначе выбираем первый словарь
+                    setSelectedDictionaryId(dictionaries[0].id);
+                }
+            } else {
+                setSelectedDictionaryId('');
+            }
+        }
+    }, [open, initialWord, initialTranslation, dictionaryId, dictionaries, dispatch]);
+
     const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setWord(e.target.value);
     };
@@ -75,24 +118,30 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
         }
     };
 
-    // Обработка отправки формы
     const handleSubmit = async () => {
         if (!word || !translation) {
             setSubmitError('Пожалуйста, заполните все обязательные поля.');
             return;
         }
+
+        if (!selectedDictionaryId) {
+            setSubmitError('Пожалуйста, выберите словарь.');
+            return;
+        }
+
         setSubmitError(null);
-        console.log('Submitting word with tags:', tagNames); // Логирование массива тегов
         try {
             const resultAction = await dispatch(addWord({
-                dictionaryId,
+                dictionaryId: selectedDictionaryId,
                 word,
                 translation,
                 tag_names: tagNames,
                 image_path: imagePath,
             }));
             if (addWord.fulfilled.match(resultAction)) {
-                // Очистка формы и закрытие модалки
+                // Сохраняем выбранный словарь в localStorage
+                localStorage.setItem(LOCAL_STORAGE_KEY, selectedDictionaryId);
+
                 setWord('');
                 setTranslation('');
                 setTagNames([]);
@@ -107,29 +156,14 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
         }
     };
 
-    // Сброс состояния при закрытии модалки
-    useEffect(() => {
-        if (!open) {
-            setWord('');
-            setTranslation('');
-            setTagNames([]);
-            setTagInput('');
-            setImagePath(null);
-            setImagePreview(null);
-            setSubmitError(null);
-            dispatch(resetAddWordState());
-        }
-    }, [open, dispatch]);
-
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>Добавить слово</DialogTitle>
             <DialogContent>
-                {/* Превью изображения */}
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <Avatar
                         alt="Image Preview"
-                        src={imagePreview || undefined}
+                        src={imagePreview || defaultCover}
                         sx={{
                             width: 80,
                             height: 80,
@@ -152,7 +186,29 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     </label>
                 </Box>
 
-                {/* Поле ввода слова */}
+                {dictionaries && dictionaries.length > 0 ? (
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <InputLabel id="dictionary-select-label">Словарь</InputLabel>
+                        <Select
+                            labelId="dictionary-select-label"
+                            value={selectedDictionaryId}
+                            label="Словарь"
+                            onChange={(e) => setSelectedDictionaryId(e.target.value as string)}
+                            required
+                        >
+                            {dictionaries.map((dict) => (
+                                <MenuItem key={dict.id} value={dict.id}>
+                                    {dict.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                ) : (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        У вас нет словарей, пожалуйста, создайте словарь перед добавлением слов.
+                    </Alert>
+                )}
+
                 <TextField
                     fullWidth
                     label="Слово"
@@ -166,7 +222,6 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     helperText={`${word.length}/500`}
                 />
 
-                {/* Поле ввода перевода */}
                 <TextField
                     fullWidth
                     label="Перевод"
@@ -180,7 +235,6 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     helperText={`${translation.length}/500`}
                 />
 
-                {/* Поле ввода тегов */}
                 <TextField
                     fullWidth
                     label="Теги"
@@ -193,7 +247,6 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     placeholder="Введите теги через запятую и нажмите Enter"
                 />
 
-                {/* Отображение добавленных тегов */}
                 {tagNames.length > 0 && (
                     <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }}>
                         {tagNames.map((tag) => (
@@ -207,21 +260,18 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     </Stack>
                 )}
 
-                {/* Отображение ошибок при добавлении слова */}
                 {addError && (
                     <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
                         {addError}
                     </Alert>
                 )}
 
-                {/* Отображение ошибок при заполнении формы */}
                 {submitError && (
                     <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
                         {submitError}
                     </Alert>
                 )}
 
-                {/* Индикатор загрузки: спиннер */}
                 {adding && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                         <CircularProgress />
@@ -232,13 +282,12 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                 <Button onClick={onClose} color="primary" disabled={adding}>
                     Отмена
                 </Button>
-                <Button onClick={handleSubmit} color="primary" variant="contained" disabled={adding}>
+                <Button onClick={handleSubmit} color="primary" variant="contained" disabled={adding || !selectedDictionaryId}>
                     Добавить
                 </Button>
             </DialogActions>
         </Dialog>
     );
-
 };
 
 export default AddWordModal;
