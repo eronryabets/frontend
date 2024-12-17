@@ -10,9 +10,10 @@ import pageReducer from './slices/pageSlice';
 import translationReducer from './slices/translationSlice';
 import dictionaryReducer from './slices/dictionarySlice';
 import wordsReducer from './slices/wordsSlice';
+import wordsProgressSReducer from './slices/wordsProgressSlice';
 
-// Объединяем все редьюсеры в один root reducer
-const rootReducer = combineReducers({
+// Объединяем все редьюсеры в один appReducer
+const appReducer = combineReducers({
   registration: registrationReducer,
   authorization: authorizationReducer,
   userInfo: userInfoReducer,
@@ -24,6 +25,19 @@ const rootReducer = combineReducers({
   translation: translationReducer,
   dictionaries: dictionaryReducer,
   words: wordsReducer,
+  wordsProgress: wordsProgressSReducer,
 });
+
+// Определяем тип RootState
+export type RootState = ReturnType<typeof appReducer>;
+
+// Создаём корневой редюсер с логикой сброса состояния. (очищаем наш persist из local storage при логауте)
+const rootReducer = (state: RootState | undefined, action: any): RootState => {
+  if (action.type === 'authorization/logout/fulfilled') {
+    // Возвращаем undefined, чтобы сбросить состояние до initial state
+    state = undefined;
+  }
+  return appReducer(state, action);
+};
 
 export default rootReducer;

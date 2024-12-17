@@ -1,5 +1,5 @@
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {useParams, useNavigate, Link as RouterLink} from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import {
@@ -19,19 +19,16 @@ import {Book} from '@mui/icons-material';
 import {RootState, AppDispatch} from '../../../redux/store';
 import {fetchPageByNumber} from '../../../redux/slices/pageSlice';
 import {fetchBookDetails} from '../../../redux/slices/bookSlice';
+import {fetchWordsProgress} from '../../../redux/slices/wordsProgressSlice';
 import {TextToSpeech} from "../TextToSpeech";
 import {useTextSelection} from '../../../hooks';
 import {TextRenderer} from '../TextRenderer/';
 import {TranslationDialog} from "../TranslationDialog";
 import AddWordModal from "../../DictionariesComponents/AddWordModal/AddWordModal";
-
+import {getBackgroundColorByProgress} from '../../../utils/getBackgroundColorByProgress';
 
 export const PageDetail: React.FC = () => {
-    const { bookId, chapterId, pageNumber } = useParams<{
-        bookId: string;
-        chapterId: string;
-        pageNumber: string;
-    }>();
+    const { bookId, chapterId, pageNumber } = useParams<{ bookId: string; chapterId: string; pageNumber: string; }>();
 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
@@ -39,11 +36,12 @@ export const PageDetail: React.FC = () => {
 
     const { page, loading, error } = useSelector((state: RootState) => state.page);
     const { books } = useSelector((state: RootState) => state.books);
-    const { translation, loading: translationLoading, error: translationError } = useSelector(
-        (state: RootState) => state.translation);
+    const { translation, loading: translationLoading, error: translationError } = useSelector((state: RootState) => state.translation);
+
+    // Слова с прогрессом из wordsProgressSlice
+    const { words: wordsProgress } = useSelector((state: RootState) => state.wordsProgress);
 
     const currentPageNumber = Number(pageNumber);
-
     const book = books.find((b) => b.id === bookId);
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -81,6 +79,15 @@ export const PageDetail: React.FC = () => {
         }
     }, [dispatch, book, chapter, currentPageNumber, navigate, bookId]);
 
+    // Загружаем слова с прогрессом при первом заходе, если они не загружены
+    useEffect(() => {
+        if (bookId && wordsProgress.length === 0) {
+            // bookId TODO -> vocabulary id
+            // @ts-ignore
+            dispatch(fetchWordsProgress({ dictionaryId: localStorage.getItem('lastSelectedDictionaryId') }));
+        }
+    }, [dispatch, bookId, wordsProgress.length]);
+
     const totalPagesInBook = book?.total_pages || 0;
 
     const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -94,21 +101,33 @@ export const PageDetail: React.FC = () => {
         }
     };
 
-    // Состояния для AddWordModal
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [selectedWordForModal, setSelectedWordForModal] = useState('');
     const [selectedTranslationForModal, setSelectedTranslationForModal] = useState('');
 
     const isDialogOpen = Boolean(selectedText && translation);
 
-    // Коллбек для TranslationDialog, вызывается при нажатии "Добавить в словарь"
     const handleAddToDictionaryClick = (word: string, trans: string) => {
-        // Закрываем TranslationDialog
         handlePopoverClose();
-        // Открываем AddWordModal с переданными данными
         setSelectedWordForModal(word);
         setSelectedTranslationForModal(trans);
         setIsAddModalOpen(true);
+    };
+
+    // Создадим Map для быстрого доступа к progress по слову
+    const wordsMap = useMemo(() => {
+        const map = new Map<string, number>();
+        wordsProgress.forEach(w => map.set(w.word.toLowerCase(), w.progress));
+        return map;
+    }, [wordsProgress]);
+
+    // Функция подсветки слова
+    const highlightWord = (word: string): React.CSSProperties | undefined => {
+        const progress = wordsMap.get(word.toLowerCase());
+        if (progress !== undefined) {
+            return { backgroundColor: getBackgroundColorByProgress(progress) };
+        }
+        return undefined;
     };
 
     if (loading || !book) {
@@ -193,7 +212,11 @@ export const PageDetail: React.FC = () => {
                 }}
             >
                 <Typography variant="body1" sx={{ fontWeight: 350, fontSize: '1rem' }} >
-                    <TextRenderer content={page.content} onWordClick={handleWordClick} />
+                    <TextRenderer
+                        content={page.content}
+                        onWordClick={handleWordClick}
+                        highlightWord={highlightWord}
+                    />
                 </Typography>
             </Box>
 
@@ -223,7 +246,6 @@ export const PageDetail: React.FC = () => {
                 />
             </Box>
 
-            {/* Передаём onAddToDictionaryClick в TranslationDialog */}
             <TranslationDialog
                 open={isDialogOpen}
                 onClose={handlePopoverClose}
@@ -232,16 +254,15 @@ export const PageDetail: React.FC = () => {
                 translationLoading={translationLoading}
                 translationError={translationError}
                 sourceLanguage={book.language.slice(0,2)}
-                onAddToDictionaryClick={handleAddToDictionaryClick} // <-- Добавлено
+                onAddToDictionaryClick={handleAddToDictionaryClick}
             />
 
-            {/* Открываем AddWordModal с переданными initialWord и initialTranslation */}
             <AddWordModal
                 open={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
                 dictionaryId={bookId!}
-                initialWord={selectedWordForModal}            // <-- Добавлено
-                initialTranslation={selectedTranslationForModal} // <-- Добавлено
+                initialWord={selectedWordForModal}
+                initialTranslation={selectedTranslationForModal}
             />
         </Container>
     );

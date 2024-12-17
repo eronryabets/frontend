@@ -53,3 +53,14 @@ export interface UpdateWordPayload {
   tag_names: string[];
   image_path?: File | null;
 }
+
+export interface WordProgress {
+    word: string;
+    progress: number; // 0 до 10
+}
+
+export interface WordsProgressState {
+    words: WordProgress[];
+    loading: boolean;
+    error: string | null;
+}

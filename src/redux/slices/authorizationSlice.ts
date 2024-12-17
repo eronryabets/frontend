@@ -1,9 +1,10 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import axios from 'axios';
 import api from "../../utils/api";
 import {AUTH_API_URL} from "../../config/urls";
 import {clearUserInfo, getUserInfo} from "./userInfoSlice";
 import {AuthorizationData, AuthorizationState} from "../../types";
+import {persistor} from "../store";
 
 // Изначальное состояние авторизации
 const initialState: AuthorizationState = {
@@ -18,7 +19,7 @@ const initialState: AuthorizationState = {
 // Авторизация пользователя
 export const authorizationUser = createAsyncThunk(
     'authorization/authorizationUser',
-    async (formData: AuthorizationData, { dispatch, rejectWithValue }) => {
+    async (formData: AuthorizationData, {dispatch, rejectWithValue}) => {
         try {
             // Aвторизация на сервисе
             const authResponse = await axios.post(`${AUTH_API_URL}login/`, formData, {
@@ -50,12 +51,20 @@ export const authorizationUser = createAsyncThunk(
 // Логаут пользователя
 export const logout = createAsyncThunk(
     'authorization/logout',
-    async (_, { dispatch, rejectWithValue }) => {
+    async (_, {dispatch, rejectWithValue}) => {
         try {
             // Отправляем запрос на логаут (cookies автоматически отправятся)
             await api.post(`${AUTH_API_URL}logout/`, {}, {});
-            // Вызываем очистку данных профиля после логаута
+
+            // Очищаем persisted state
+            await persistor.purge();
+
+            // Дополнительно очищаем LocalStorage, что б наверняка
+            localStorage.clear();
+
+            // Сброс состояния пользователя в Redux
             dispatch(clearUserInfo());
+
         } catch (error: any) {
             return rejectWithValue('Logout failed.');
         }
@@ -91,13 +100,13 @@ const authorizationSlice = createSlice({
                 // state.status.error = action.payload ?? 'Authorization failed';
                 if (action.payload) { // Проверяем, что payload существует
                     if (typeof action.payload === 'string') {
-                        state.status.error = { general: [action.payload] };
+                        state.status.error = {general: [action.payload]};
                     } else {
                         state.status.error = action.payload;
                     }
                 } else {
                     // Если payload отсутствует, устанавливаем общую ошибку
-                    state.status.error = { general: ['Unknown error occurred.'] };
+                    state.status.error = {general: ['Unknown error occurred.']};
                 }
             })
             // Logout Cases
@@ -116,5 +125,5 @@ const authorizationSlice = createSlice({
             });
     },
 });
-export const { resetState } = authorizationSlice.actions;
+export const {resetState} = authorizationSlice.actions;
 export default authorizationSlice.reducer;

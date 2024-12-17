@@ -3,9 +3,10 @@ import React, { MouseEvent } from 'react';
 interface WordProps {
     word: string;
     onClick: (event: MouseEvent<HTMLSpanElement>, word: string) => void;
+    style?: React.CSSProperties; // <-- Добавлено
 }
 
-export const Word: React.FC<WordProps> = ({ word, onClick }) => {
+export const Word: React.FC<WordProps> = ({ word, onClick, style }) => {
 
     const handleClick = (event: MouseEvent<HTMLSpanElement>) => {
         event.stopPropagation(); // Предотвращаем всплытие события
@@ -13,10 +14,7 @@ export const Word: React.FC<WordProps> = ({ word, onClick }) => {
     };
 
     return (
-        <span
-            onClick={handleClick}
-            style={{ cursor: 'pointer', position: 'relative' }}
-        >
+        <span style={style} onClick={handleClick}>
             {word}
         </span>
     );

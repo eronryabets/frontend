@@ -1,14 +1,16 @@
+
 import React from 'react';
 import { Word } from '../Word';
 
 interface TextRendererProps {
     content: string;
     onWordClick: (event: React.MouseEvent<HTMLSpanElement>, word: string) => void;
+    highlightWord?: (word: string) => React.CSSProperties | undefined;
 }
 
-export const TextRenderer: React.FC<TextRendererProps> = ({ content, onWordClick }) => {
+export const TextRenderer: React.FC<TextRendererProps> = ({ content, onWordClick, highlightWord }) => {
     // Регулярное выражение для разделения текста на слова, знаки препинания и пробелы
-     const tokens = content.match(/(\n|\s+|[\w'-]+|[^\s\w])/g) || [];
+    const tokens = content.match(/(\n|\s+|[\w'-]+|[^\s\w])/g) || [];
 
     return (
         <>
@@ -20,8 +22,9 @@ export const TextRenderer: React.FC<TextRendererProps> = ({ content, onWordClick
                     // Если токен состоит только из пробелов или табуляций, отображаем его как есть
                     return <span key={index}>{token}</span>;
                 } else if (/^[\w'-]+$/.test(token)) {
-                    // Если токен - слово (включая апострофы и дефисы), оборачиваем его в компонент Word
-                    return <Word key={index} word={token} onClick={onWordClick} />;
+                    // Если токен - слово, получаем стили подсветки
+                    const style = highlightWord ? highlightWord(token) : undefined;
+                    return <Word key={index} word={token} onClick={onWordClick} style={style} />;
                 } else {
                     // Если токен - знак препинания или другой символ, отображаем его как есть
                     return <span key={index}>{token}</span>;

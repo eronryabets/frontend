@@ -2,13 +2,19 @@ import {configureStore} from '@reduxjs/toolkit';
 import storage from 'redux-persist/lib/storage'; // локальное хранилище браузера
 import {persistReducer, persistStore} from 'redux-persist';
 import rootReducer from './rootReducer';
-import {useDispatch} from "react-redux";
 
 // Конфигурация для Redux Persist
 const persistConfig: { storage: any; whitelist: string[]; key: string } = {
     key: 'root', // ключ для хранения
     storage, // используем storage из redux-persist
-    whitelist: ['authorization','userInfo', 'theme', 'books','dictionaries'], // массив редюсеров, которые нужно сохранять (например, авторизация)
+    whitelist: [
+        'authorization',
+        'userInfo',
+        'theme',
+        'books',
+        'dictionaries',
+        'wordsProgress'
+    ], // массив редюсеров, которые нужно сохранять (например, авторизация), а blacklist для исключения
 };
 
 
