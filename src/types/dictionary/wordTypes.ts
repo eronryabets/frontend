@@ -52,6 +52,7 @@ export interface UpdateWordPayload {
   translation: string;
   tag_names: string[];
   image_path?: File | null;
+  progress: number;
 }
 
 export interface WordProgress {

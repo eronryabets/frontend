@@ -91,7 +91,8 @@ export const updateWord = createAsyncThunk<
             dictionaryId,
             word, translation,
             tag_names,
-            image_path
+            image_path,
+            progress,
         } = payload;
         const formData = new FormData();
         formData.append('dictionary', dictionaryId);
@@ -101,6 +102,7 @@ export const updateWord = createAsyncThunk<
         if (image_path) {
             formData.append('image_path', image_path);
         }
+        formData.append('progress', progress.toString());
 
         try {
             // обновление слова по URL: /words/{wordId}/

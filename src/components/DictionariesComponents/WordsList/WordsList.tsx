@@ -48,6 +48,7 @@ const WordsList: React.FC = () => {
         translation: string;
         tags: { name: string }[];
         image_path: string | null;
+        progress: number;
     }>(null);
 
     // Вместо boolean храните id говорящего слова или null
@@ -88,7 +89,8 @@ const WordsList: React.FC = () => {
             word: word.word,
             translation: word.translation,
             tags: word.tags,
-            image_path: word.image_path
+            image_path: word.image_path,
+            progress: word.progress,
         });
         setIsEditModalOpen(true);
     };

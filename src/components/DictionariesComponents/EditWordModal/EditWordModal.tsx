@@ -31,6 +31,7 @@ interface EditWordModalProps {
         translation: string;
         tags: { name: string }[];
         image_path: string | null;
+        progress: number; // <-- Предполагаем, что теперь доступно
     }
 }
 
@@ -46,6 +47,8 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
     const [imagePreview, setImagePreview] = useState<string | null>(wordData.image_path || null);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
+    const [progress, setProgress] = useState(wordData.progress);
+
     // Состояние для диалога подтверждения удаления
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -59,6 +62,7 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
             setImagePath(null);
             setImagePreview(wordData.image_path || null);
             setSubmitError(null);
+            setProgress(wordData.progress);
         }
     }, [open, wordData]);
 
@@ -98,12 +102,29 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
         }
     };
 
+    const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = parseInt(e.target.value, 10);
+        if (isNaN(value)) {
+            value = 0;
+        }
+        // Ограничиваем от 0 до 10
+        if (value < 0) value = 0;
+        if (value > 10) value = 10;
+        setProgress(value);
+    };
+
     const handleSave = async () => {
         if (!currentWord || !translation) {
             setSubmitError('Пожалуйста, заполните все обязательные поля.');
             return;
         }
         setSubmitError(null);
+
+        // На всякий случай ещё раз ограничим progress
+        let safeProgress = progress;
+        if (safeProgress < 0) safeProgress = 0;
+        if (safeProgress > 10) safeProgress = 10;
+
         try {
             const resultAction = await dispatch(updateWord({
                 wordId: wordData.id,
@@ -112,6 +133,7 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                 translation,
                 tag_names: tagNames,
                 image_path: imagePath,
+                progress: safeProgress // <-- Передаем progress
             }));
             if (updateWord.fulfilled.match(resultAction)) {
                 onClose();
@@ -196,6 +218,20 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                     required
                     inputProps={{ maxLength: 500 }}
                     helperText={`${translation.length}/500`}
+                />
+
+                {/* Поле ввода прогресса */}
+                <TextField
+                    fullWidth
+                    label="Прогресс (0-10)"
+                    name="progress"
+                    type="number"
+                    value={progress}
+                    onChange={handleProgressChange}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    inputProps={{ min: 0, max: 10 }} // Ограничиваем ввод
+                    helperText="Прогресс изучения слова от 0 до 10"
                 />
 
                 <TextField
