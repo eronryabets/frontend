@@ -1,2 +1,2 @@
 export * from './ProfilePage';
-export * from './UserSettings/UserSettings';
+export * from './UserSettings/UserSettingsPage';

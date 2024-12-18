@@ -38,13 +38,18 @@ export interface ProfileData {
     last_name?: string;
     avatar?: string | File;
     native_language: string;
+    settings?: string;
 }
 
-export interface Settings {
-    theme: string;
-    language: string;
-
-    [key: string]: any;
+export interface UserSettings {
+    theme?: {
+        mode?: string;
+    };
+    current_dictionary?: {
+        dictionary_id: string;
+        dictionary_name: string;
+        dictionary_language: string;
+    };
 }
 
 export interface UserInfoState {
@@ -56,7 +61,7 @@ export interface UserInfoState {
         last_name?: string | null;
         native_language: string | null;
         avatar?: string | null;
-        settings?: Settings | null;
+        settings?: UserSettings | null;
     };
     status: {
         loading: boolean;
@@ -89,3 +94,11 @@ export interface UserInfoResponseData {
     avatar?: string;
     settings?: string;
 }
+
+//DEPRECATED
+// export interface Settings {
+//     theme: string;
+//     language: string;
+//
+//     [key: string]: any;
+// }

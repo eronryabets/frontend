@@ -10,7 +10,7 @@ import {RegistrationPage} from "./components/RegistrationPage";
 import {HelmetProvider} from "react-helmet-async";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import {LoginPage} from "./components/LoginPage";
-import {ProfilePage} from "./components/UserComponents/ProfilePage";
+import {ProfilePage} from "./components/UserComponents";
 import {NotFoundPage} from "./components/NotFoundPage";
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import {BookUpload} from "./components/BookComponents/BookUpload";
@@ -21,6 +21,7 @@ import {PageDetail} from "./components/BookComponents/PageDetail/PageDetail";
 import Layout from "./components/Layout/Layout";
 import DictionariesList from "./components/DictionariesComponents/DictionariesList/DictionariesList";
 import WordsList from "./components/DictionariesComponents/WordsList/WordsList";
+import {UserSettingsPage} from "./components/UserComponents";
 
 const AppContent = () => {
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -34,7 +35,9 @@ const AppContent = () => {
                 {/* Защищенные маршруты */}
                 <Route element={<ProtectedRoute/>}>
                     <Route element={<Layout/>}>
+                        {/*USER*/}
                         <Route path="/profile" element={<ProfilePage/>}/>
+                        <Route path="/settings" element={<UserSettingsPage/>}/>
                         {/*BOOK*/}
                         <Route path="/book" element={<BookUpload/>}/>
                         <Route path="/booklist" element={<BooksList/>}/>
