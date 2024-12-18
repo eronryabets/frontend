@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import {Dictionary} from '../../../types';
 import {SelectChangeEvent} from '@mui/material/Select';
+import {setTheme} from "../../../redux/slices/themeSlice";
 
 
 // Предполагаем, что settings имеет форму:
@@ -66,6 +67,7 @@ export const UserSettingsPage: React.FC = () => {
         if (updateSuccess) {
             setShowSnackbar(true);
             dispatch(getUserInfo());
+            dispatch(setTheme(mode as 'light' | 'dark'))
             dispatch(resetUpdateState());
         }
     }, [updateSuccess, dispatch]);
