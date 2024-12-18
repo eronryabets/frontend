@@ -10,7 +10,7 @@ import {RegistrationPage} from "./components/RegistrationPage";
 import {HelmetProvider} from "react-helmet-async";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import {LoginPage} from "./components/LoginPage";
-import {ProfilePage} from "./components/ProfilePage";
+import {ProfilePage} from "./components/UserComponents/ProfilePage";
 import {NotFoundPage} from "./components/NotFoundPage";
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import {BookUpload} from "./components/BookComponents/BookUpload";

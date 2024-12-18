@@ -190,6 +190,9 @@ export const NavBar = () => {
                         <MenuItem component={Link} to="/profile" onClick={handleUserMenuClose}>
                             My Profile
                         </MenuItem>
+                        <MenuItem component={Link} to="/settings" onClick={handleUserMenuClose}>
+                            Settings
+                        </MenuItem>
                         <MenuItem component={Link} to="/dictionaries" onClick={handleUserMenuClose}>
                             Dictionaries
                         </MenuItem>

@@ -25,7 +25,7 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import StopIcon from '@mui/icons-material/Stop';
 import AddWordModal from "../AddWordModal/AddWordModal";
 import EditWordModal from "../EditWordModal/EditWordModal";
-import {MyIconButton} from "../../utilsComponents";
+import {MyIconButton} from "../../UtilityComponents";
 
 const WordsList: React.FC = () => {
     const {id} = useParams<{ id: string }>();
