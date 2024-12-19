@@ -83,14 +83,15 @@ export const PageDetail: React.FC = () => {
     }, [dispatch, book, chapter, currentPageNumber, navigate, bookId]);
 
     // Загружаем слова с прогрессом при первом заходе, если они не загружены
-    //TODO переделать!
+    const dictionary_id = useSelector((state: RootState) =>
+        state.userInfo.userData.settings?.current_dictionary?.dictionary_id);
+
+    // В useEffect проверяем, что dictionary_id существует
     useEffect(() => {
-        if (bookId && wordsProgress.length === 0) {
-            // bookId TODO -> vocabulary id
-            // @ts-ignore
-            dispatch(fetchWordsProgress({dictionaryId: localStorage.getItem('lastSelectedDictionaryId')}));
+        if (bookId && wordsProgress.length === 0 && dictionary_id) {
+            dispatch(fetchWordsProgress({dictionaryId: dictionary_id}));
         }
-    }, [dispatch, bookId, wordsProgress.length]);
+    }, [dispatch, bookId, wordsProgress.length, dictionary_id]);
 
     const totalPagesInBook = book?.total_pages || 0;
 
