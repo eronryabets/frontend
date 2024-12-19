@@ -23,6 +23,7 @@ import DictionariesList from "./components/DictionariesComponents/DictionariesLi
 import WordsList from "./components/DictionariesComponents/WordsList/WordsList";
 import {UserSettingsPage} from "./components/UserComponents";
 import {setTheme} from "./redux/slices/themeSlice";
+import {fetchDictionaries} from "./redux/slices/dictionarySlice";
 
 const AppContent = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -31,6 +32,10 @@ const AppContent = () => {
 
     const isAuthenticated = useSelector((state: RootState) => state.authorization.isAuthenticated);
     const userData = useSelector((state: RootState) => state.userInfo.userData);
+    const dictionariesState = useSelector((state: RootState) => state.dictionaries.dictionaries);
+
+    //Эффекты для предзагрузке основных данных юзера :
+    //TODO : проблема в том, что эти эффекты будут работать постоянно и чекать условия с isAuthenticated и т.д.
 
     // Эффект, который отслеживает изменения userData и аутентификации - применяет, подгружает наши настройки и т.д.
     React.useEffect(() => {
@@ -42,6 +47,20 @@ const AppContent = () => {
             }
         }
     }, [isAuthenticated, userData, dispatch, themeMode]);
+
+    // Эффект, предзагрузке списка словарей
+    React.useEffect(() => {
+        if (isAuthenticated && userData.id) {
+            // Если пользователь авторизован и у него есть id,
+            // проверяем, загружены ли уже словари.
+            // Если dictionariesState пуст или ещё не загружен, вызываем fetchDictionaries.
+            if (!dictionariesState || dictionariesState.length === 0) {
+                console.log("Загружаем словари пользователя");
+                //берем самый последний словарь с первой страницы.
+                dispatch(fetchDictionaries(1));
+            }
+        }
+    }, [isAuthenticated, userData, dictionariesState, dispatch]);
 
     return (
         <ThemeProvider theme={theme}>
