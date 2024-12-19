@@ -24,6 +24,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { addWord, resetAddWordState } from '../../../redux/slices/wordsSlice';
 import defaultCover from '../../../assets/default_word_image.jpg';
+import {addWordProgress} from "../../../redux/slices/wordsProgressSlice";
 
 interface AddWordModalProps {
     open: boolean;
@@ -138,16 +139,21 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                 tag_names: tagNames,
                 image_path: imagePath,
             }));
-            if (addWord.fulfilled.match(resultAction)) {
-                // Сохраняем выбранный словарь в localStorage
-                localStorage.setItem(LOCAL_STORAGE_KEY, selectedDictionaryId);
+             if (addWord.fulfilled.match(resultAction)) {
+            // Добавленное слово возвращается в resultAction.payload
+            const addedWord = resultAction.payload; // Тип Word
+            // Добавляем это слово в wordsProgress со start progress = 0
+            dispatch(addWordProgress({ word: addedWord.word, progress: 0 }));
 
-                setWord('');
-                setTranslation('');
-                setTagNames([]);
-                setImagePath(null);
-                setImagePreview(null);
-                onClose();
+            // Сохраняем выбранный словарь в localStorage
+            localStorage.setItem(LOCAL_STORAGE_KEY, selectedDictionaryId);
+
+            setWord('');
+            setTranslation('');
+            setTagNames([]);
+            setImagePath(null);
+            setImagePreview(null);
+            onClose()
             } else {
                 setSubmitError(resultAction.payload || 'Не удалось добавить слово.');
             }

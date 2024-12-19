@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from "../../utils/api";
 import {WordProgress, WordsProgressState} from "../../types";
+import {GET_DICTIONARY_API_URL} from "../../config/urls";
 
 const initialState: WordsProgressState = {
     words: [],
@@ -18,7 +19,7 @@ export const fetchWordsProgress = createAsyncThunk<
     async ({ dictionaryId }, thunkAPI) => {
         try {
             const response = await api.get<WordProgress[]>
-            (`http://dictionary.drunar.space/dictionaries/${dictionaryId}/words_progress/`);
+            (`${GET_DICTIONARY_API_URL}${dictionaryId}/words_progress/`);
             return response.data;
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.message || 'Не удалось загрузить слова.');
@@ -38,6 +39,11 @@ const wordsProgressSlice = createSlice({
                 state.words[index].progress = progress;
             }
         },
+    addWordProgress(state, action: PayloadAction<{ word: string; progress: number }>) {
+            const { word, progress } = action.payload;
+            // Добавляем новое слово в массив words (wordsProgress)
+            state.words.push({ word, progress });
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -56,5 +62,5 @@ const wordsProgressSlice = createSlice({
     },
 });
 
-export const { setWordProgress } = wordsProgressSlice.actions;
+export const { setWordProgress, addWordProgress } = wordsProgressSlice.actions;
 export default wordsProgressSlice.reducer;
