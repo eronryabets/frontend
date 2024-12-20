@@ -33,6 +33,14 @@ const AuthListener: React.FC = () => {
         }
     }, [isAuthenticated, userData, dictionariesState, dispatch]);
 
+    useEffect(() => {
+        if (!isAuthenticated) {
+            // Сбрасываем инициализацию при логауте
+            hasInitialized.current = false;
+            console.log("Сброс инициализации в AuthListener после логаута");
+        }
+    }, [isAuthenticated]);
+
     return null; // Этот компонент не рендерит ничего
 };
 
