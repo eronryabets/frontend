@@ -43,7 +43,8 @@ export const LoginPage = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         dispatch(authorizationUser(formData));
-        // dispatch(getUserInfo());
+        // dispatch(initializeUser(formData)); // Используем initializeUser вместо authorizationUser
+
     };
 
     // Редирект после успешного логина
