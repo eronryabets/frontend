@@ -13,8 +13,11 @@ import {
   Pagination,
   Tooltip,
   useMediaQuery,
+  Drawer,
+  Slider,
 } from '@mui/material';
 import { Book } from '@mui/icons-material';
+import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings'; // Импорт иконки настроек
 import { RootState, AppDispatch } from '../../../redux/store';
 import { fetchPageByNumber } from '../../../redux/slices/pageSlice';
 import { fetchBookDetails } from '../../../redux/slices/bookSlice';
@@ -139,6 +142,22 @@ export const PageDetail: React.FC = () => {
     return undefined;
   };
 
+  // State для модального окна настроек и размера шрифта
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [fontSizeValue, setFontSizeValue] = useState(2); // Значение по умолчанию: 1.1rem
+
+  const handleSettingsOpen = () => setIsSettingsOpen(true);
+  const handleSettingsClose = () => setIsSettingsOpen(false);
+
+  const handleFontSizeChange = (event: Event, newValue: number | number[]) => {
+    if (typeof newValue === 'number') {
+      setFontSizeValue(newValue);
+    }
+  };
+
+  // Рассчитываем размер шрифта в rem
+  const fontSizeRem = 1.0 + (fontSizeValue - 1) * 0.1;
+
   if (loading || !book) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="80vh">
@@ -184,7 +203,7 @@ export const PageDetail: React.FC = () => {
     >
       {/* Заголовок и кнопки */}
       <Box
-        data-name="wraperBox1"
+           data-name="wraperBox1"
         display="flex"
         alignItems="center"
         justifyContent="center" //space-between
@@ -197,48 +216,58 @@ export const PageDetail: React.FC = () => {
             </Typography>
           )}
         </Box>
-        <Tooltip title="Вернуться к книге">
-          <IconButton
-            color="primary"
-            component={RouterLink}
-            to={`/book/${bookId}`}
-            aria-label="Вернуться к книге"
-          >
-            <Book />
-          </IconButton>
-        </Tooltip>
+        <Box display="flex" alignItems="center">
+          <Tooltip title="Вернуться к книге">
+            <IconButton
+              color="primary"
+              component={RouterLink}
+              to={`/book/${bookId}`}
+              aria-label="Вернуться к книге"
+            >
+              <Book />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Настройки отображения">
+            <IconButton
+              color="primary"
+              onClick={handleSettingsOpen}
+              aria-label="Настройки отображения"
+            >
+              <DisplaySettingsIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {/* Текст озвучивания */}
+      <Tooltip title="Озвучивание текста">
+        <TextToSpeech text={page.content} bookLanguage={book.language}/>
+      </Tooltip>
       </Box>
-
-        <Tooltip title="Озвучивание текста">
-          <TextToSpeech text={page.content} bookLanguage={book.language} />
-        </Tooltip>
 
       {/* Обёрточный Box для центрирования pageContentBox */}
       <Box display="flex" justifyContent="center" mb={4}>
         <Box
           data-name="pageContentBox"
           sx={{
-          p: 3,
-          background: theme.customBackground.paperGradient,
-          boxShadow: 3,
-          borderRadius: 2,
-          mb: 4,
-          whiteSpace: 'pre-line',
-          // Убираем flexGrow и overflow, чтобы высота и ширина были авто:
-          // flexGrow: 1,
-          // overflowY: 'auto',
-          display: 'inline-block',  //'inline-block', если нужно подстраивать ширину, block - если не нужно
-          width: 'auto',
-          height: 'auto',
-        }}
+            p: 3,
+            background: theme.customBackground.paperGradient,
+            boxShadow: 3,
+            borderRadius: 2,
+            mb: 4,
+            whiteSpace: 'pre-line',
+            display: 'block', // Блочный элемент
+            margin: '0 auto', // Центрирование по горизонтали
+            maxWidth: '800px', // Максимальная ширина
+            width: '100%', // Ширина до максимума
+            textAlign: 'left', // Выравнивание текста внутри по левому краю
+          }}
         >
           <Typography
             variant="body1"
             sx={{
               fontWeight: 350,
-              fontSize: '1.1rem',
+              fontSize: `${fontSizeRem}rem`, // Применение динамического размера шрифта
               lineHeight: 1.8,
-              textAlign: 'left', // Дополнительно убеждаемся, что текст выровнен по левому краю
+              textAlign: 'left',
             }}
           >
             <TextRenderer
@@ -286,6 +315,48 @@ export const PageDetail: React.FC = () => {
         initialWord={selectedWordForModal}
         initialTranslation={selectedTranslationForModal}
       />
+
+      {/* Drawer для настроек отображения */}
+      <Drawer
+        anchor="left"
+        open={isSettingsOpen}
+        onClose={handleSettingsClose}
+      >
+        <Box
+          sx={{
+            width: 250,
+            padding: theme.spacing(2),
+          }}
+          role="presentation"
+        >
+          <Typography variant="h6" gutterBottom>
+            Настройки отображения
+          </Typography>
+          <Typography gutterBottom>
+            Размер текста
+          </Typography>
+          <Slider
+            value={fontSizeValue}
+            min={1}
+            max={7}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+            ]}
+            valueLabelDisplay="on"
+            onChange={handleFontSizeChange}
+          />
+          <Typography variant="body2" sx={{ mt: 2 }}>
+            Текущий размер: {fontSizeRem.toFixed(1)}rem
+          </Typography>
+        </Box>
+      </Drawer>
     </Container>
   );
 };

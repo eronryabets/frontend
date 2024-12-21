@@ -193,10 +193,16 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
             <IconButton
                 color="primary"
                 onClick={() => setIsDrawerOpen(true)}
-                sx={{ position: 'fixed', top: 80, left: 10, zIndex: 1000 }}
+                sx={{
+                    //расскоментировать для фиксированной позиции
+                    // position: 'fixed',
+                    // top: 80,
+                    // left: 10,
+                    // zIndex: 1000
+            }}
             >
-                <VolumeUpIcon fontSize="large" />
-            </IconButton>
+                <VolumeUpIcon fontSize="medium" />
+            </IconButton >
 
             {/* Выдвижная панель */}
             <Drawer
