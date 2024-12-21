@@ -1,9 +1,9 @@
-
-import React, { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, {useEffect, useRef} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from "../../redux/store";
 import {setTheme} from "../../redux/slices/themeSlice";
 import {fetchDictionaries} from "../../redux/slices/dictionarySlice";
+import {fetchWordsProgress} from "../../redux/slices/wordsProgressSlice";
 
 
 const AuthListener: React.FC = () => {
@@ -40,6 +40,17 @@ const AuthListener: React.FC = () => {
             console.log("Сброс инициализации в AuthListener после логаута");
         }
     }, [isAuthenticated]);
+
+    //Смена word progress при смене выбранного словаря :
+    const dictionaryId = useSelector(
+        (state: RootState) => state.userInfo.userData.settings?.current_dictionary?.dictionary_id
+    );
+    useEffect(() => {
+        if (isAuthenticated && dictionaryId) {
+            console.log("Dictionary changed, re-fetch wordsProgress:", dictionaryId);
+            dispatch(fetchWordsProgress({dictionaryId}));
+        }
+    }, [isAuthenticated, dictionaryId, dispatch]);
 
     return null; // Этот компонент не рендерит ничего
 };
