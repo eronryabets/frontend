@@ -65,7 +65,7 @@ const AppContent = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline/>
             <GlobalStyles/>
-            <AuthListener /> {/* Добавляем AuthListener */}
+            <AuthListener />
             <Routes>
                 {/* Защищенные маршруты */}
                 <Route element={<ProtectedRoute/>}>

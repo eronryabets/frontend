@@ -50,42 +50,6 @@ export const authorizationUser = createAsyncThunk(
     }
 );
 
-// Новый thunk для инициализации пользователя после авторизации
-//Заменено на AuthLIstener!
-// export const initializeUser = createAsyncThunk(
-//     'authorization/initializeUser',
-//     async (formData: AuthorizationData, { dispatch, rejectWithValue }) => {
-//         try {
-//             // Выполняем авторизацию
-//             console.log("(!) initializeUser : ")
-//             const authResult = await dispatch(authorizationUser(formData));
-//
-//             if (authorizationUser.fulfilled.match(authResult)) {
-//                 console.log("(!) authorizationUser.fulfilled'");
-//                 // Получаем userData из состояния
-//                 const userData: any = (dispatch as any).getState().userInfo.userData;
-//
-//                 // Устанавливаем тему
-//                 if (userData.settings?.theme?.mode) {
-//                     console.log("(!) Загружаем тему юзера'");
-//                     dispatch(setTheme(userData.settings.theme.mode as 'light' | 'dark'));
-//                 }
-//
-//                 // Загружаем словари
-//                 dispatch(fetchDictionaries(1));
-//                 console.log("(!) Загружаем список словарей пользователя'");
-//
-//                 return authResult.payload;
-//             } else {
-//                 return rejectWithValue(authResult.payload);
-//             }
-//         } catch (error: any) {
-//             return rejectWithValue(error.message || 'Initialization failed');
-//         }
-//     }
-// );
-
-
 // Логаут пользователя
 export const logout = createAsyncThunk(
     'authorization/logout',
