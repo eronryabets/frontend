@@ -39,10 +39,10 @@ const wordsProgressSlice = createSlice({
                 state.words[index].progress = progress;
             }
         },
-    addWordProgress(state, action: PayloadAction<{ word: string; progress: number }>) {
-            const { word, progress } = action.payload;
+    addWordProgress(state, action: PayloadAction<{ id: string; word: string; progress: number }>) {
+            const { id, word, progress } = action.payload;
             // Добавляем новое слово в массив words (wordsProgress)
-            state.words.push({ word, progress });
+            state.words.push({ id, word, progress });
         },
     },
     extraReducers: (builder) => {

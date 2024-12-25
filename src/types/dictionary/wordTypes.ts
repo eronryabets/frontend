@@ -1,4 +1,3 @@
-
 export interface Tag {
     id: string;
     name: string;
@@ -46,16 +45,17 @@ export interface AddWordPayload {
 }
 
 export interface UpdateWordPayload {
-  wordId: string;
-  dictionaryId: string;
-  word: string;
-  translation: string;
-  tag_names: string[];
-  image_path?: File | null;
-  progress: number;
+    wordId: string;
+    dictionaryId: string;
+    word: string;
+    translation: string;
+    tag_names: string[];
+    image_path?: File | null;
+    progress: number;
 }
 
 export interface WordProgress {
+    id: string;
     word: string;
     progress: number; // 0 до 10
 }

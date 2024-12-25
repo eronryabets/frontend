@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -19,10 +18,10 @@ import {
     Select,
     MenuItem
 } from '@mui/material';
-import { PhotoCamera } from '@mui/icons-material';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../../../redux/store';
-import { addWord, resetAddWordState } from '../../../redux/slices/wordsSlice';
+import {PhotoCamera} from '@mui/icons-material';
+import {useSelector, useDispatch} from 'react-redux';
+import {RootState, AppDispatch} from '../../../redux/store';
+import {addWord, resetAddWordState} from '../../../redux/slices/wordsSlice';
 import defaultCover from '../../../assets/default_word_image.jpg';
 import {addWordProgress} from "../../../redux/slices/wordsProgressSlice";
 
@@ -36,10 +35,10 @@ interface AddWordModalProps {
 
 const LOCAL_STORAGE_KEY = 'lastSelectedDictionaryId'; // Ключ для localStorage
 
-const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId, initialWord, initialTranslation }) => {
+const AddWordModal: React.FC<AddWordModalProps> = ({open, onClose, dictionaryId, initialWord, initialTranslation}) => {
     const dispatch = useDispatch<AppDispatch>();
-    const { adding, addError } = useSelector((state: RootState) => state.words);
-    const { dictionaries } = useSelector((state: RootState) => state.dictionaries);
+    const {adding, addError} = useSelector((state: RootState) => state.words);
+    const {dictionaries} = useSelector((state: RootState) => state.dictionaries);
 
     const [word, setWord] = useState('');
     const [translation, setTranslation] = useState('');
@@ -111,7 +110,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { files } = e.target;
+        const {files} = e.target;
         if (files && files.length > 0) {
             const file = files[0];
             setImagePath(file);
@@ -139,21 +138,25 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                 tag_names: tagNames,
                 image_path: imagePath,
             }));
-             if (addWord.fulfilled.match(resultAction)) {
-            // Добавленное слово возвращается в resultAction.payload
-            const addedWord = resultAction.payload; // Тип Word
-            // Добавляем это слово в wordsProgress со start progress = 0
-            dispatch(addWordProgress({ word: addedWord.word, progress: 0 }));
+            if (addWord.fulfilled.match(resultAction)) {
+                // Добавленное слово возвращается в resultAction.payload
+                const addedWord = resultAction.payload; // Тип Word
+                // Добавляем это слово в wordsProgress со start progress = 0
+                dispatch(addWordProgress({
+                    id: addedWord.id,
+                    word: addedWord.word,
+                    progress: 0,
+                }));
 
-            // Сохраняем выбранный словарь в localStorage
-            localStorage.setItem(LOCAL_STORAGE_KEY, selectedDictionaryId);
+                // Сохраняем выбранный словарь в localStorage
+                localStorage.setItem(LOCAL_STORAGE_KEY, selectedDictionaryId);
 
-            setWord('');
-            setTranslation('');
-            setTagNames([]);
-            setImagePath(null);
-            setImagePreview(null);
-            onClose()
+                setWord('');
+                setTranslation('');
+                setTagNames([]);
+                setImagePath(null);
+                setImagePreview(null);
+                onClose()
             } else {
                 setSubmitError(resultAction.payload || 'Не удалось добавить слово.');
             }
@@ -166,7 +169,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>Добавить слово</DialogTitle>
             <DialogContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
                     <Avatar
                         alt="Image Preview"
                         src={imagePreview || defaultCover}
@@ -183,17 +186,17 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                             id="word-image-upload"
                             type="file"
                             name="image_path"
-                            style={{ display: 'none' }}
+                            style={{display: 'none'}}
                             onChange={handleImageChange}
                         />
                         <IconButton color="primary" aria-label="upload image" component="span">
-                            <PhotoCamera />
+                            <PhotoCamera/>
                         </IconButton>
                     </label>
                 </Box>
 
                 {dictionaries && dictionaries.length > 0 ? (
-                    <FormControl fullWidth sx={{ mb: 2 }}>
+                    <FormControl fullWidth sx={{mb: 2}}>
                         <InputLabel id="dictionary-select-label">Словарь</InputLabel>
                         <Select
                             labelId="dictionary-select-label"
@@ -210,7 +213,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                         </Select>
                     </FormControl>
                 ) : (
-                    <Alert severity="warning" sx={{ mb: 2 }}>
+                    <Alert severity="warning" sx={{mb: 2}}>
                         У вас нет словарей, пожалуйста, создайте словарь перед добавлением слов.
                     </Alert>
                 )}
@@ -222,9 +225,9 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     value={word}
                     onChange={handleWordChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     required
-                    inputProps={{ maxLength: 500 }}
+                    inputProps={{maxLength: 500}}
                     helperText={`${word.length}/500`}
                 />
 
@@ -235,9 +238,9 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     value={translation}
                     onChange={handleTranslationChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     required
-                    inputProps={{ maxLength: 500 }}
+                    inputProps={{maxLength: 500}}
                     helperText={`${translation.length}/500`}
                 />
 
@@ -249,12 +252,12 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                     onChange={handleTagInputChange}
                     onKeyDown={handleTagKeyDown}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     placeholder="Введите теги через запятую и нажмите Enter"
                 />
 
                 {tagNames.length > 0 && (
-                    <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }}>
+                    <Stack direction="row" spacing={1} sx={{mb: 2, flexWrap: 'wrap'}}>
                         {tagNames.map((tag) => (
                             <Chip
                                 key={tag}
@@ -267,20 +270,20 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                 )}
 
                 {addError && (
-                    <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                    <Alert severity="error" sx={{width: '100%', mb: 2}}>
                         {addError}
                     </Alert>
                 )}
 
                 {submitError && (
-                    <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                    <Alert severity="error" sx={{width: '100%', mb: 2}}>
                         {submitError}
                     </Alert>
                 )}
 
                 {adding && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                        <CircularProgress />
+                    <Box sx={{display: 'flex', justifyContent: 'center', mt: 2}}>
+                        <CircularProgress/>
                     </Box>
                 )}
             </DialogContent>
@@ -288,7 +291,8 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ open, onClose, dictionaryId
                 <Button onClick={onClose} color="primary" disabled={adding}>
                     Отмена
                 </Button>
-                <Button onClick={handleSubmit} color="primary" variant="contained" disabled={adding || !selectedDictionaryId}>
+                <Button onClick={handleSubmit} color="primary" variant="contained"
+                        disabled={adding || !selectedDictionaryId}>
                     Добавить
                 </Button>
             </DialogActions>
