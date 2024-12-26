@@ -1,3 +1,5 @@
+// PageDetail.tsx
+
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -28,6 +30,7 @@ import { TextRenderer } from '../TextRenderer';
 import { TranslationDialog } from '../TranslationDialog';
 import AddWordModal from '../../DictionariesComponents/AddWordModal/AddWordModal';
 import { getBackgroundColorByProgress } from '../../../utils/getBackgroundColorByProgress';
+import WordDetailModal from "../../DictionariesComponents/WordDetailModal/WordDetailModal";
 
 export const PageDetail: React.FC = () => {
   const { bookId, chapterId, pageNumber } = useParams<{
@@ -95,10 +98,11 @@ export const PageDetail: React.FC = () => {
   );
 
   useEffect(() => {
-    if (bookId && wordsProgress.length === 0 && dictionary_id) {
+    if (bookId && dictionary_id) {
+      // Всегда вызываем fetchWordsProgress при смене dictionary_id
       dispatch(fetchWordsProgress({ dictionaryId: dictionary_id }));
     }
-  }, [dispatch, bookId, wordsProgress.length, dictionary_id]);
+  }, [dispatch, bookId, dictionary_id]);
 
   const totalPagesInBook = book?.total_pages || 0;
 
@@ -144,7 +148,7 @@ export const PageDetail: React.FC = () => {
 
   // State для модального окна настроек и размера шрифта
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [fontSizeValue, setFontSizeValue] = useState(2); // Значение по умолчанию: 1.1rem
+  const [fontSizeValue, setFontSizeValue] = useState(2); // Значение по умолчанию: 1.0 + (2-1)*0.1 = 1.1rem
 
   const handleSettingsOpen = () => setIsSettingsOpen(true);
   const handleSettingsClose = () => setIsSettingsOpen(false);
@@ -157,6 +161,25 @@ export const PageDetail: React.FC = () => {
 
   // Рассчитываем размер шрифта в rem
   const fontSizeRem = 1.0 + (fontSizeValue - 1) * 0.1;
+
+  // Новые состояния для WordDetailModal
+  const [selectedWordId, setSelectedWordId] = useState<string | null>(null);
+  const [isWordDetailOpen, setIsWordDetailOpen] = useState(false);
+
+  // Новый обработчик клика по слову
+  const handleWordClickNew = (event: React.MouseEvent<HTMLSpanElement>, word: string) => {
+    // Находим слово в wordsProgress для получения его id
+    const wordProgress = wordsProgress.find(w => w.word.toLowerCase() === word.toLowerCase());
+
+    if (wordProgress) {
+      // Если слово подсвечено, открываем WordDetailModal
+      setSelectedWordId(wordProgress.id);
+      setIsWordDetailOpen(true);
+    } else {
+      // Если слово не подсвечено, продолжаем с TranslationDialog
+      handleWordClick(event, word);
+    }
+  };
 
   if (loading || !book) {
     return (
@@ -203,10 +226,10 @@ export const PageDetail: React.FC = () => {
     >
       {/* Заголовок и кнопки */}
       <Box
-           data-name="wraperBox1"
+        data-name="wraperBox1"
         display="flex"
         alignItems="center"
-        justifyContent="center" //space-between
+        justifyContent="center" // можно изменить на 'space-between' при необходимости
         mb={2}
       >
         <Box data-name="chapterNameBox" display="flex" alignItems="center">
@@ -238,9 +261,9 @@ export const PageDetail: React.FC = () => {
           </Tooltip>
         </Box>
         {/* Текст озвучивания */}
-      <Tooltip title="Озвучивание текста">
-        <TextToSpeech text={page.content} bookLanguage={book.language}/>
-      </Tooltip>
+        <Tooltip title="Озвучивание текста">
+          <TextToSpeech text={page.content} bookLanguage={book.language} />
+        </Tooltip>
       </Box>
 
       {/* Обёрточный Box для центрирования pageContentBox */}
@@ -272,7 +295,7 @@ export const PageDetail: React.FC = () => {
           >
             <TextRenderer
               content={page.content}
-              onWordClick={handleWordClick}
+              onWordClick={handleWordClickNew} // Используем новый обработчик
               highlightWord={highlightWord}
             />
           </Typography>
@@ -357,6 +380,15 @@ export const PageDetail: React.FC = () => {
           </Typography>
         </Box>
       </Drawer>
+
+      {/* WordDetailModal */}
+      <WordDetailModal
+        open={isWordDetailOpen}
+        onClose={() => setIsWordDetailOpen(false)}
+        wordId={selectedWordId}
+      />
     </Container>
   );
 };
+
+export default PageDetail;
