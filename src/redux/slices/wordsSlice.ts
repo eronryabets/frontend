@@ -14,7 +14,29 @@ const initialState: WordsState = {
     addError: null,
 };
 
-// Асинхронный thunk для получения слов из словаря
+// Асинхронный thunk для получения слова по его ID.
+export const fetchWordById = createAsyncThunk<
+    Word,
+    string, // wordId
+    { rejectValue: string }
+>(
+    'words/fetchWordById',
+    async (wordId, thunkAPI) => {
+        try {
+            const response = await api.get<Word>(
+                `${GET_DICT_WORDS_URL}${wordId}/`
+            );
+            return response.data;
+        } catch (error: any) {
+            if (error.response && error.response.data) {
+                return thunkAPI.rejectWithValue(error.response.data.detail || 'Ошибка при получении слова');
+            }
+            return thunkAPI.rejectWithValue(error.message || 'Ошибка при получении слова');
+        }
+    }
+);
+
+// Асинхронный thunk для получения слов из словаря по страницам.
 export const fetchWords = createAsyncThunk<
     WordsResponse,
     { dictionaryId: string; page: number },
@@ -179,7 +201,6 @@ const wordsSlice = createSlice({
                 state.addError = null;
             })
             .addCase(addWord.fulfilled, (state, action) => {
-                //TODO
                 state.adding = false;
                 // Добавляем новое слово в начало списка
                 state.words.unshift(action.payload);
@@ -200,7 +221,6 @@ const wordsSlice = createSlice({
             .addCase(updateWord.rejected, (state, action) => {
                 state.error = action.payload || 'Ошибка при обновлении слова';
             })
-
             .addCase(deleteWord.fulfilled, (state, action) => {
                 // Удаляем слово из массива words
                 state.words = state.words.filter(w => w.id !== action.payload);
@@ -209,9 +229,33 @@ const wordsSlice = createSlice({
             })
             .addCase(deleteWord.rejected, (state, action) => {
                 state.error = action.payload || 'Ошибка при удалении слова';
+            })
+            // Обработка нового thunk fetchWordById
+            .addCase(fetchWordById.pending, (state) => {
+                // Можно добавить поле loadingWord или другое, если нужно
+            })
+            .addCase(fetchWordById.fulfilled, (state, action) => {
+                // Проверяем, есть ли уже слово с таким id
+                const existingIndex = state.words.findIndex(w => w.id === action.payload.id);
+                if (existingIndex !== -1) {
+                    // Если есть, обновляем его
+                    state.words[existingIndex] = action.payload;
+                } else {
+                    // Иначе добавляем его
+                    state.words.push(action.payload);
+                    // Возможно, обновляем totalPages
+                    state.totalPages = Math.ceil(state.words.length / 50);
+                }
+            })
+            .addCase(fetchWordById.rejected, (state, action) => {
+                state.error = action.payload || 'Ошибка при получении слова';
             });
     },
 });
 
-export const {setCurrentPage, setDictionaryId, resetAddWordState} = wordsSlice.actions;
+export const {
+    setCurrentPage,
+    setDictionaryId,
+    resetAddWordState
+} = wordsSlice.actions;
 export default wordsSlice.reducer;
