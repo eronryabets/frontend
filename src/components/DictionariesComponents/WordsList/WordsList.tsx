@@ -50,9 +50,6 @@ const WordsList: React.FC = () => {
         progress: number;
     }>(null);
 
-    // Вместо boolean храните id говорящего слова или null
-    // const [speakingWordId, setSpeakingWordId] = useState<string | null>(null);
-
     useEffect(() => {
         if (id) {
             if (dictionaryId !== id) {
@@ -98,6 +95,12 @@ const WordsList: React.FC = () => {
         setIsEditModalOpen(false);
         setEditWordData(null);
     };
+
+    // Извлечение языка текущего словаря из состояния Redux
+    const currentDictionary = useSelector((state: RootState) =>
+        state.dictionaries.dictionaries.find((dict) => dict.id === dictionaryId)
+    );
+    const language = currentDictionary?.language || 'en-US'; // Значение по умолчанию
 
     if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
@@ -166,7 +169,7 @@ const WordsList: React.FC = () => {
                                         <Box display="flex" alignItems="center">
                                             <SpeechButton
                                                 text={word.word}
-                                                lang="en-US" //TODO брать значение динамически из словаря
+                                                lang={language} //теперь подставляем динамическое значение.
                                             />
                                             <Typography
                                                 variant="subtitle1"
