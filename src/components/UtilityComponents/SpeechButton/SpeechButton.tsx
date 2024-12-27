@@ -5,12 +5,11 @@ import StopIcon from '@mui/icons-material/Stop';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 interface SpeechButtonProps {
-    wordId: string;
     text: string;
-    lang: string; // Язык для озвучивания, например, 'en-US'
+    lang: string; // Язык звучивания, например, 'en-US'
 }
 
-const SpeechButton: React.FC<SpeechButtonProps> = ({ wordId, text, lang }) => {
+export const SpeechButton: React.FC<SpeechButtonProps> = ({ text, lang }) => {
     const [isSpeaking, setIsSpeaking] = useState(false);
 
     useEffect(() => {

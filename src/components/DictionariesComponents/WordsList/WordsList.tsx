@@ -25,7 +25,8 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import StopIcon from '@mui/icons-material/Stop';
 import AddWordModal from "../AddWordModal/AddWordModal";
 import EditWordModal from "../EditWordModal/EditWordModal";
-import {MyIconButton} from "../../UtilityComponents";
+import {MyIconButton, SpeechButton} from "../../UtilityComponents";
+
 
 const WordsList: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -52,7 +53,7 @@ const WordsList: React.FC = () => {
     }>(null);
 
     // Вместо boolean храните id говорящего слова или null
-    const [speakingWordId, setSpeakingWordId] = useState<string | null>(null);
+    // const [speakingWordId, setSpeakingWordId] = useState<string | null>(null);
 
     useEffect(() => {
         if (id) {
@@ -100,34 +101,34 @@ const WordsList: React.FC = () => {
         setEditWordData(null);
     };
 
-    const handleSpeak = (wordId: string, text: string) => {
-        if (!speakingWordId) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-
-                utterance.onstart = () => {
-                    setSpeakingWordId(wordId);
-                };
-
-                utterance.onend = () => {
-                    setSpeakingWordId(null);
-                };
-
-                utterance.onerror = () => {
-                    setSpeakingWordId(null);
-                };
-
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert('Ваш браузер не поддерживает Web Speech API.');
-            }
-        } else {
-            // Если уже есть звучащее слово, останавливаем его
-            window.speechSynthesis.cancel();
-            setSpeakingWordId(null);
-        }
-    };
+    // const handleSpeak = (wordId: string, text: string) => {
+    //     if (!speakingWordId) {
+    //         if ('speechSynthesis' in window) {
+    //             const utterance = new SpeechSynthesisUtterance(text);
+    //             utterance.lang = 'en-US';
+    //
+    //             utterance.onstart = () => {
+    //                 setSpeakingWordId(wordId);
+    //             };
+    //
+    //             utterance.onend = () => {
+    //                 setSpeakingWordId(null);
+    //             };
+    //
+    //             utterance.onerror = () => {
+    //                 setSpeakingWordId(null);
+    //             };
+    //
+    //             window.speechSynthesis.speak(utterance);
+    //         } else {
+    //             alert('Ваш браузер не поддерживает Web Speech API.');
+    //         }
+    //     } else {
+    //         // Если уже есть звучащее слово, останавливаем его
+    //         window.speechSynthesis.cancel();
+    //         setSpeakingWordId(null);
+    //     }
+    // };
 
     if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
@@ -194,17 +195,10 @@ const WordsList: React.FC = () => {
                                     {/*VolumeUpIcon & WORD*/}
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
-                                            <Tooltip
-                                                title={speakingWordId === word.id ? "Остановить озвучивание" : "Озвучить слово"}>
-                                                <IconButton
-                                                    onClick={() => handleSpeak(word.id, word.word)}
-                                                    color={speakingWordId === word.id ? "secondary" : "primary"}
-                                                    aria-label="speak text"
-                                                    sx={{mr: 1}}
-                                                >
-                                                    {speakingWordId === word.id ? <StopIcon/> : <VolumeUpIcon/>}
-                                                </IconButton>
-                                            </Tooltip>
+                                            <SpeechButton
+                                                text={word.word}
+                                                lang="en-US" //TODO брать значение динамически из словаря
+                                            />
                                             <Typography
                                                 variant="subtitle1"
                                                 sx={{

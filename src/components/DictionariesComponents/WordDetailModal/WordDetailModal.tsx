@@ -15,8 +15,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {RootState, AppDispatch} from '../../../redux/store';
 import {fetchWordById} from '../../../redux/slices/wordsSlice';
 import EditWordModal from '../EditWordModal/EditWordModal';
-import StopIcon from "@mui/icons-material/Stop";
-import VolumeUpIcon from "@mui/icons-material/VolumeUp"; // Предположим, у вас уже есть компонент для редактирования слова
+import {SpeechButton} from '../../UtilityComponents';
 
 interface WordDetailModalProps {
     open: boolean;
@@ -51,36 +50,36 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId}
     };
 
     // Озвучка слова :
-    const [speakingWordId, setSpeakingWordId] = useState<string | null>(null);
-
-    const handleSpeak = (wordId: string, text: string) => {
-        if (!speakingWordId) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US'; //TODO language from books
-
-                utterance.onstart = () => {
-                    setSpeakingWordId(wordId);
-                };
-
-                utterance.onend = () => {
-                    setSpeakingWordId(null);
-                };
-
-                utterance.onerror = () => {
-                    setSpeakingWordId(null);
-                };
-
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert('Ваш браузер не поддерживает Web Speech API.');
-            }
-        } else {
-            // Если уже есть звучащее слово, останавливаем его
-            window.speechSynthesis.cancel();
-            setSpeakingWordId(null);
-        }
-    };
+    // const [speakingWordId, setSpeakingWordId] = useState<string | null>(null);
+    //
+    // const handleSpeak = (wordId: string, text: string) => {
+    //     if (!speakingWordId) {
+    //         if ('speechSynthesis' in window) {
+    //             const utterance = new SpeechSynthesisUtterance(text);
+    //             utterance.lang = 'en-US'; //TODO language from books
+    //
+    //             utterance.onstart = () => {
+    //                 setSpeakingWordId(wordId);
+    //             };
+    //
+    //             utterance.onend = () => {
+    //                 setSpeakingWordId(null);
+    //             };
+    //
+    //             utterance.onerror = () => {
+    //                 setSpeakingWordId(null);
+    //             };
+    //
+    //             window.speechSynthesis.speak(utterance);
+    //         } else {
+    //             alert('Ваш браузер не поддерживает Web Speech API.');
+    //         }
+    //     } else {
+    //         // Если уже есть звучащее слово, останавливаем его
+    //         window.speechSynthesis.cancel();
+    //         setSpeakingWordId(null);
+    //     }
+    // };
 
     if (!open) {
         return null; // Модалка закрыта — ничего не рендерим
@@ -108,17 +107,10 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId}
                         <Box display="flex" alignItems="center">
                             {/*Слово и Озвучка*/}
                             <Typography variant="h6">Слово: {word.word}</Typography>
-                            <Tooltip
-                                title={speakingWordId === word.id ? "Остановить озвучивание" : "Озвучить слово"}>
-                                <IconButton
-                                    onClick={() => handleSpeak(word.id, word.word)}
-                                    color={speakingWordId === word.id ? "secondary" : "primary"}
-                                    aria-label="speak text"
-                                    sx={{mr: 1}}
-                                >
-                                    {speakingWordId === word.id ? <StopIcon/> : <VolumeUpIcon/>}
-                                </IconButton>
-                            </Tooltip>
+                            <SpeechButton
+                                text={word.word}
+                                lang="en-US" //TODO брать значение из книги (или словаря).
+                            />
                         </Box>
 
 
