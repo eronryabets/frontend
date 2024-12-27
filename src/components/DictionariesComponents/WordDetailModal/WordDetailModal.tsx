@@ -9,7 +9,6 @@ import {
     Box,
     CircularProgress,
     Alert,
-    IconButton, Tooltip
 } from '@mui/material';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState, AppDispatch} from '../../../redux/store';
@@ -21,9 +20,10 @@ interface WordDetailModalProps {
     open: boolean;
     onClose: () => void;
     wordId: string | null; // Если слова нет, передаём null
+    language: string;     // Новый проп для динамического языка
 }
 
-const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId}) => {
+const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId, language}) => {
     const dispatch = useDispatch<AppDispatch>();
     const {words, loading, error} = useSelector((state: RootState) => state.words); // или сделайте отдельные поля loadingWord, wordError, если нужно
 
@@ -48,38 +48,6 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId}
     const handleCloseEditModal = () => {
         setIsEditOpen(false);
     };
-
-    // Озвучка слова :
-    // const [speakingWordId, setSpeakingWordId] = useState<string | null>(null);
-    //
-    // const handleSpeak = (wordId: string, text: string) => {
-    //     if (!speakingWordId) {
-    //         if ('speechSynthesis' in window) {
-    //             const utterance = new SpeechSynthesisUtterance(text);
-    //             utterance.lang = 'en-US'; //TODO language from books
-    //
-    //             utterance.onstart = () => {
-    //                 setSpeakingWordId(wordId);
-    //             };
-    //
-    //             utterance.onend = () => {
-    //                 setSpeakingWordId(null);
-    //             };
-    //
-    //             utterance.onerror = () => {
-    //                 setSpeakingWordId(null);
-    //             };
-    //
-    //             window.speechSynthesis.speak(utterance);
-    //         } else {
-    //             alert('Ваш браузер не поддерживает Web Speech API.');
-    //         }
-    //     } else {
-    //         // Если уже есть звучащее слово, останавливаем его
-    //         window.speechSynthesis.cancel();
-    //         setSpeakingWordId(null);
-    //     }
-    // };
 
     if (!open) {
         return null; // Модалка закрыта — ничего не рендерим
@@ -109,7 +77,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId}
                             <Typography variant="h6">Слово: {word.word}</Typography>
                             <SpeechButton
                                 text={word.word}
-                                lang="en-US" //TODO брать значение из книги (или словаря).
+                                lang={language} // Передаём динамический язык
                             />
                         </Box>
 
@@ -149,12 +117,12 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId}
                 <EditWordModal
                     open={isEditOpen}
                     onClose={handleCloseEditModal}
-                    dictionaryId={word.dictionary} // если у вас слово содержит .dictionary
+                    dictionaryId={word.dictionary}
                     wordData={{
                         id: word.id,
                         word: word.word,
                         translation: word.translation,
-                        tags: word.tags,           // нужно убедиться, что у вас это поле есть
+                        tags: word.tags,
                         image_path: word.image_path,
                         progress: word.progress || 0,
                     }}

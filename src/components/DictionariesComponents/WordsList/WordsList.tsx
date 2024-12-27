@@ -21,8 +21,6 @@ import {
 import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 import EditIcon from '@mui/icons-material/Edit';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import StopIcon from '@mui/icons-material/Stop';
 import AddWordModal from "../AddWordModal/AddWordModal";
 import EditWordModal from "../EditWordModal/EditWordModal";
 import {MyIconButton, SpeechButton} from "../../UtilityComponents";
@@ -100,35 +98,6 @@ const WordsList: React.FC = () => {
         setIsEditModalOpen(false);
         setEditWordData(null);
     };
-
-    // const handleSpeak = (wordId: string, text: string) => {
-    //     if (!speakingWordId) {
-    //         if ('speechSynthesis' in window) {
-    //             const utterance = new SpeechSynthesisUtterance(text);
-    //             utterance.lang = 'en-US';
-    //
-    //             utterance.onstart = () => {
-    //                 setSpeakingWordId(wordId);
-    //             };
-    //
-    //             utterance.onend = () => {
-    //                 setSpeakingWordId(null);
-    //             };
-    //
-    //             utterance.onerror = () => {
-    //                 setSpeakingWordId(null);
-    //             };
-    //
-    //             window.speechSynthesis.speak(utterance);
-    //         } else {
-    //             alert('Ваш браузер не поддерживает Web Speech API.');
-    //         }
-    //     } else {
-    //         // Если уже есть звучащее слово, останавливаем его
-    //         window.speechSynthesis.cancel();
-    //         setSpeakingWordId(null);
-    //     }
-    // };
 
     if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;

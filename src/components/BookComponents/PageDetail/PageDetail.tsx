@@ -386,6 +386,7 @@ export const PageDetail: React.FC = () => {
         open={isWordDetailOpen}
         onClose={() => setIsWordDetailOpen(false)}
         wordId={selectedWordId}
+        language={book.language} // Передаём язык книги
       />
     </Container>
   );
