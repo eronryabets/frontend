@@ -21,6 +21,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import {Stack} from '@mui/material';
+import ProgressBar from "../../UtilityComponents/ProgressBar/ProgressBar";
 
 interface WordDetailModalProps {
     open: boolean;
@@ -152,6 +153,12 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId,
                             </Box>
                         )}
 
+                        {/* Визуальная шкала прогресса */}
+                        <Box display="flex" alignItems="center" sx={{ mb: 2, mt: 2 }}>
+                            <CastForEducationIcon sx={{ mr: 1, color: 'action.active' }} />
+                            <ProgressBar progressAmount={10} value={word.progress} />
+                        </Box>
+
                         {/*OTHER - TODO доделать в норм виде*/}
                         <Box data-name="secondData"
                              sx={{
@@ -160,11 +167,11 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId,
                              }}>
                             <Stack direction="row" spacing={3}>
 
-                                {/*Progress*/}
-                                <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                    <CastForEducationIcon sx={{mr: 1, color: 'action.active'}}/>
-                                    <Typography variant="body1">{word.progress}</Typography>
-                                </Box>
+                                {/*OLD Progress*/}
+                                {/*<Box sx={{display: 'flex', alignItems: 'center'}}>*/}
+                                {/*    <CastForEducationIcon sx={{mr: 1, color: 'action.active'}}/>*/}
+                                {/*    <Typography variant="body1">{word.progress}</Typography>*/}
+                                {/*</Box>*/}
 
                                 {/*View*/}
                                 <Box sx={{display: 'flex', alignItems: 'center'}}>
