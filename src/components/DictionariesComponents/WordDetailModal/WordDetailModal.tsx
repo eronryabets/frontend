@@ -8,7 +8,7 @@ import {
     Typography,
     Box,
     CircularProgress,
-    Alert, Chip,
+    Alert, Chip, Tooltip,
 } from '@mui/material';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState, AppDispatch} from '../../../redux/store';
@@ -154,10 +154,17 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId,
                         )}
 
                         {/* Визуальная шкала прогресса */}
+                        {/*<Tooltip title={'Прогресс изучения'}>*/}
                         <Box display="flex" alignItems="center" sx={{ mb: 2, mt: 2 }}>
                             <CastForEducationIcon sx={{ mr: 1, color: 'action.active' }} />
-                            <ProgressBar progressAmount={10} value={word.progress} />
+                            <ProgressBar
+                                progressAmount={10}
+                                value={word.progress}
+                                size={'medium'}
+                                spacing={0}
+                            />
                         </Box>
+                            {/*</Tooltip>*/}
 
                         {/*OTHER - TODO доделать в норм виде*/}
                         <Box data-name="secondData"
