@@ -45,7 +45,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
                         marginRight: index < progressAmount - 1 ? spacing / 2 : 0,
                         marginLeft: index > 0 ? spacing / 2 : 0,
                         transition: 'color 0.3s, transform 0.3s',
-                        transform: clampedValue > 0 ? 'scale(1)' : 'scale(0)', // Плавное появление
+                        // Удаляем условное масштабирование, чтобы иконки всегда были видимы
+                        transform: 'scale(1)',
                     }}
                 >
                     {index < clampedValue ? (
