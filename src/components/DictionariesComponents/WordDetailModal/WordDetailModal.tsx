@@ -8,13 +8,19 @@ import {
     Typography,
     Box,
     CircularProgress,
-    Alert,
+    Alert, Chip,
 } from '@mui/material';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState, AppDispatch} from '../../../redux/store';
 import {fetchWordById} from '../../../redux/slices/wordsSlice';
 import EditWordModal from '../EditWordModal/EditWordModal';
-import {SpeechButton} from '../../UtilityComponents';
+import {MyIconButton, SpeechButton} from '../../UtilityComponents';
+import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import CastForEducationIcon from '@mui/icons-material/CastForEducation';
+import {Stack} from '@mui/material';
 
 interface WordDetailModalProps {
     open: boolean;
@@ -30,7 +36,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId,
     // Состояние для открытия/закрытия окна редактирования
     const [isEditOpen, setIsEditOpen] = React.useState(false);
 
-    // Находим слово в стейте
+    // Находим слово в стейте TODO map?
     const word = words.find((w) => w.id === wordId);
 
     // Загружаем слово по ID, если его нет в стейте
@@ -55,8 +61,20 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId,
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Информация о слове</DialogTitle>
-
+            <Box sx={{
+                // m: 0,
+                // p: 2,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+            }}>
+                <DialogTitle>Информация о слове : </DialogTitle>
+                <MyIconButton
+                    color="secondary"
+                    startIcon={<CloseIcon/>}
+                    onClick={onClose}>
+                </MyIconButton>
+            </Box>
             <DialogContent dividers>
                 {/* Если идёт загрузка или нет данных */}
                 {(!word && loading) && (
@@ -86,10 +104,46 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId,
                             Перевод: {word.translation}
                         </Typography>
 
-                        {/* Можно добавить картинку, теги, прогресс и т.д. */}
+                        {/*ТЕГИ*/}
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                // justifyContent: 'center',
+                                gap: 1, // Отступы между чипами
+                                mt: 1,
+                            }}
+                        >
+                            {word.tags.length > 0 ?
+                                word.tags.slice(0, 3).map((tag) => (
+                                    <Chip
+                                        key={tag.id}
+                                        label={tag.name}
+                                        variant="outlined"
+                                        color="primary"
+                                        size="small"
+                                    />
+                                ))
+                                : '—'
+                            }
+                            {word.tags.length > 3 && (
+                                <Chip
+                                    label={`+${word.tags.length - 3}`}
+                                    variant="outlined"
+                                    color="primary"
+                                    size="small"
+                                />
+                            )}
+                        </Box>
 
+                        {/*IMAGE*/}
                         {word.image_path && (
-                            <Box sx={{display: 'flex', justifyContent: 'center', mb: 2}}>
+                            <Box sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                mb: 2,
+                                mt: 2
+                            }}>
                                 <img
                                     src={word.image_path}
                                     alt={word.word}
@@ -98,15 +152,46 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId,
                             </Box>
                         )}
 
-                        {/* Кнопка для редактирования */}
-                        <Button variant="outlined" onClick={handleOpenEditModal}>
-                            Редактировать
-                        </Button>
+                        {/*OTHER - TODO доделать в норм виде*/}
+                        <Box data-name="secondData"
+                             sx={{
+                                 display: 'flex',
+                                 alignItems: 'center',
+                             }}>
+                            <Stack direction="row" spacing={3}>
+
+                                {/*Progress*/}
+                                <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                    <CastForEducationIcon sx={{mr: 1, color: 'action.active'}}/>
+                                    <Typography variant="body1">{word.progress}</Typography>
+                                </Box>
+
+                                {/*View*/}
+                                <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                    <VisibilityIcon sx={{mr: 1, color: 'action.active'}}/>
+                                    <Typography variant="body1">{word.count}</Typography>
+                                </Box>
+
+                                {/*Added*/}
+                                <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                    <CalendarMonthIcon sx={{mr: 1, color: 'action.active'}}/>
+                                    <Typography
+                                        variant="body1">{new Date(word.created_at).toLocaleDateString()}</Typography>
+                                </Box>
+
+                            </Stack>
+                        </Box>
+
+
                     </>
                 )}
             </DialogContent>
 
             <DialogActions>
+                {/* Кнопка для редактирования */}
+                <Button variant="outlined" onClick={handleOpenEditModal} startIcon={<EditIcon/>}>
+                    Редактировать
+                </Button>
                 <Button onClick={onClose} color="primary">
                     Закрыть
                 </Button>
