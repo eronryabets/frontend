@@ -1,6 +1,13 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import api from "../../utils/api";
-import {WordsResponse, WordsState, DictionaryResponse, Word, AddWordPayload, UpdateWordPayload} from "../../types";
+import {
+    WordsResponse,
+    WordsState,
+    DictionaryResponse,
+    Word,
+    AddWordPayload,
+    PartialUpdateWordPayload
+} from "../../types";
 import {GET_DICTIONARY_API_URL, GET_DICT_WORDS_URL} from "../../config/urls";
 
 const initialState: WordsState = {
@@ -103,32 +110,37 @@ export const addWord = createAsyncThunk<
 // Thunk для обновления слова
 export const updateWord = createAsyncThunk<
     Word,
-    UpdateWordPayload,
+    PartialUpdateWordPayload,
     { rejectValue: string }
 >(
     'words/updateWord',
     async (payload, thunkAPI) => {
-        const {
-            wordId,
+        const { wordId,
             dictionaryId,
-            word, translation,
+            word,
+            translation,
             tag_names,
             image_path,
             progress,
+            count
         } = payload;
         const formData = new FormData();
         formData.append('dictionary', dictionaryId);
-        formData.append('word', word);
-        formData.append('translation', translation);
-        tag_names.forEach(tag => formData.append('tag_names', tag));
-        if (image_path) {
+
+        if (word !== undefined) formData.append('word', word);
+        if (translation !== undefined) formData.append('translation', translation);
+        if (tag_names !== undefined) {
+            tag_names.forEach(tag => formData.append('tag_names', tag));
+        }
+        if (image_path !== undefined && image_path !== null) {
             formData.append('image_path', image_path);
         }
-        formData.append('progress', progress.toString());
+        if (progress !== undefined) formData.append('progress', progress.toString());
+        if (count !== undefined) formData.append('count', count.toString());
 
         try {
-            // обновление слова по URL: /words/{wordId}/
-            const response = await api.put<Word>(
+            // Используем PATCH для частичных обновлений
+            const response = await api.patch<Word>(
                 `${GET_DICT_WORDS_URL}${wordId}/`,
                 formData,
                 {
@@ -212,10 +224,13 @@ const wordsSlice = createSlice({
                 state.addError = action.payload || 'Неизвестная ошибка при добавлении слова';
             })
             .addCase(updateWord.fulfilled, (state, action) => {
-                // Обновляем слово в списке words
+                /// Обновляем слово в списке words
                 const index = state.words.findIndex(w => w.id === action.payload.id);
                 if (index !== -1) {
                     state.words[index] = action.payload;
+                } else {
+                    // Если слова нет в списке, добавляем его
+                    state.words.push(action.payload);
                 }
             })
             .addCase(updateWord.rejected, (state, action) => {

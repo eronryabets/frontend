@@ -65,3 +65,14 @@ export interface WordsProgressState {
     loading: boolean;
     error: string | null;
 }
+
+export interface PartialUpdateWordPayload {
+    wordId: string;
+    dictionaryId: string;
+    word?: string;
+    translation?: string;
+    tag_names?: string[];
+    image_path?: File | null;
+    progress?: number;
+    count?: number;
+}

@@ -1,3 +1,6 @@
+/**
+ * Слайс для загрузки укороченного списка слово - ид - прогресс.
+ */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from "../../utils/api";
