@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -13,12 +13,13 @@ import {
     CircularProgress,
     Chip,
     Stack,
-    Typography
+    Typography,
+    Slider
 } from '@mui/material';
-import { PhotoCamera } from '@mui/icons-material';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../../../redux/store';
-import { updateWord, deleteWord } from '../../../redux/slices/wordsSlice';
+import {PhotoCamera} from '@mui/icons-material';
+import {useSelector, useDispatch} from 'react-redux';
+import {RootState, AppDispatch} from '../../../redux/store';
+import {updateWord, deleteWord} from '../../../redux/slices/wordsSlice';
 import defaultCover from '../../../assets/default_word_image.jpg';
 
 interface EditWordModalProps {
@@ -35,9 +36,9 @@ interface EditWordModalProps {
     }
 }
 
-const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionaryId, wordData }) => {
+const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, dictionaryId, wordData}) => {
     const dispatch = useDispatch<AppDispatch>();
-    const { loading, error } = useSelector((state: RootState) => state.words);
+    const {loading, error} = useSelector((state: RootState) => state.words);
 
     const [currentWord, setCurrentWord] = useState(wordData.word);
     const [translation, setTranslation] = useState(wordData.translation);
@@ -94,23 +95,12 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { files } = e.target;
+        const {files} = e.target;
         if (files && files.length > 0) {
             const file = files[0];
             setImagePath(file);
             setImagePreview(URL.createObjectURL(file));
         }
-    };
-
-    const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let value = parseInt(e.target.value, 10);
-        if (isNaN(value)) {
-            value = 0;
-        }
-        // Ограничиваем от 0 до 10
-        if (value < 0) value = 0;
-        if (value > 10) value = 10;
-        setProgress(value);
     };
 
     const handleSave = async () => {
@@ -153,7 +143,7 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
     const confirmDelete = async () => {
         setOpenDeleteDialog(false);
         try {
-            const resultAction = await dispatch(deleteWord({ wordId: wordData.id }));
+            const resultAction = await dispatch(deleteWord({wordId: wordData.id}));
             if (deleteWord.fulfilled.match(resultAction)) {
                 onClose();
             } else {
@@ -168,7 +158,7 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>Редактировать слово</DialogTitle>
             <DialogContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
                     <Avatar
                         alt="Image Preview"
                         src={imagePreview || defaultCover}
@@ -185,11 +175,11 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                             id="word-image-upload"
                             type="file"
                             name="image_path"
-                            style={{ display: 'none' }}
+                            style={{display: 'none'}}
                             onChange={handleImageChange}
                         />
                         <IconButton color="primary" aria-label="upload image" component="span">
-                            <PhotoCamera />
+                            <PhotoCamera/>
                         </IconButton>
                     </label>
                 </Box>
@@ -201,9 +191,9 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                     value={currentWord}
                     onChange={handleWordChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     required
-                    inputProps={{ maxLength: 500 }}
+                    inputProps={{maxLength: 500}}
                     helperText={`${currentWord.length}/500`}
                 />
 
@@ -214,25 +204,40 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                     value={translation}
                     onChange={handleTranslationChange}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     required
-                    inputProps={{ maxLength: 500 }}
+                    inputProps={{maxLength: 500}}
                     helperText={`${translation.length}/500`}
                 />
 
                 {/* Поле ввода прогресса */}
-                <TextField
-                    fullWidth
-                    label="Прогресс (0-10)"
-                    name="progress"
-                    type="number"
-                    value={progress}
-                    onChange={handleProgressChange}
-                    variant="outlined"
-                    sx={{ mb: 2 }}
-                    inputProps={{ min: 0, max: 10 }} // Ограничиваем ввод
-                    helperText="Прогресс изучения слова от 0 до 10"
-                />
+                <Box data-name="progressSlider" sx={{mb: 4}}>
+                    <Typography id="progress-slider" gutterBottom>
+                        Прогресс изучения слова: {progress}
+                    </Typography>
+                    <Slider
+                        value={progress}
+                        min={0}
+                        max={10}
+                        step={1}
+                        marks={[
+                            {value: 0, label: '0'},
+                            {value: 1, label: '1'},
+                            {value: 2, label: '2'},
+                            {value: 3, label: '3'},
+                            {value: 4, label: '4'},
+                            {value: 5, label: '5'},
+                            {value: 6, label: '6'},
+                            {value: 7, label: '7'},
+                            {value: 8, label: '8'},
+                            {value: 9, label: '9'},
+                            {value: 10, label: '10'},
+                        ]}
+                        valueLabelDisplay="on"
+                        onChange={(_, newValue) => setProgress(newValue as number)}
+                        aria-labelledby="progress-slider"
+                    />
+                </Box>
 
                 <TextField
                     fullWidth
@@ -242,12 +247,12 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                     onChange={handleTagInputChange}
                     onKeyDown={handleTagKeyDown}
                     variant="outlined"
-                    sx={{ mb: 2 }}
+                    sx={{mb: 2}}
                     placeholder="Введите теги через запятую и нажмите Enter"
                 />
 
                 {tagNames.length > 0 && (
-                    <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }}>
+                    <Stack direction="row" spacing={1} sx={{mb: 2, flexWrap: 'wrap'}}>
                         {tagNames.map((tag) => (
                             <Chip
                                 key={tag}
@@ -260,20 +265,20 @@ const EditWordModal: React.FC<EditWordModalProps> = ({ open, onClose, dictionary
                 )}
 
                 {submitError && (
-                    <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                    <Alert severity="error" sx={{width: '100%', mb: 2}}>
                         {submitError}
                     </Alert>
                 )}
 
                 {error && (
-                    <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                    <Alert severity="error" sx={{width: '100%', mb: 2}}>
                         {error}
                     </Alert>
                 )}
 
                 {loading && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                        <CircularProgress />
+                    <Box sx={{display: 'flex', justifyContent: 'center', mt: 2}}>
+                        <CircularProgress/>
                     </Box>
                 )}
             </DialogContent>
