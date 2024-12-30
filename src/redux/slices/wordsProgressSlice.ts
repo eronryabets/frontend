@@ -2,7 +2,7 @@
  * Слайс для загрузки укороченного списка слово - ид - прогресс.
  */
 
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import api from "../../utils/api";
 import {WordProgress, WordsProgressState} from "../../types";
 import {GET_DICTIONARY_API_URL} from "../../config/urls";
@@ -19,7 +19,7 @@ export const fetchWordsProgress = createAsyncThunk<
     { rejectValue: string }
 >(
     'wordsProgress/fetchWordsProgress',
-    async ({ dictionaryId }, thunkAPI) => {
+    async ({dictionaryId}, thunkAPI) => {
         try {
             const response = await api.get<WordProgress[]>
             (`${GET_DICTIONARY_API_URL}${dictionaryId}/words_progress/`);
@@ -35,17 +35,17 @@ const wordsProgressSlice = createSlice({
     initialState,
     reducers: {
         setWordProgress(state, action: PayloadAction<{ word: string; progress: number }>) {
-            const { word, progress } = action.payload;
+            const {word, progress} = action.payload;
             const index = state.words.findIndex((w) => w.word.toLowerCase()
                 === word.toLowerCase());
             if (index !== -1) {
                 state.words[index].progress = progress;
             }
         },
-    addWordProgress(state, action: PayloadAction<{ id: string; word: string; progress: number }>) {
-            const { id, word, progress } = action.payload;
+        addWordProgress(state, action: PayloadAction<{ id: string; word: string; progress: number }>) {
+            const {id, word, progress} = action.payload;
             // Добавляем новое слово в массив words (wordsProgress)
-            state.words.push({ id, word, progress });
+            state.words.push({id, word, progress});
         },
     },
     extraReducers: (builder) => {
@@ -65,5 +65,5 @@ const wordsProgressSlice = createSlice({
     },
 });
 
-export const { setWordProgress, addWordProgress } = wordsProgressSlice.actions;
+export const {setWordProgress, addWordProgress} = wordsProgressSlice.actions;
 export default wordsProgressSlice.reducer;
