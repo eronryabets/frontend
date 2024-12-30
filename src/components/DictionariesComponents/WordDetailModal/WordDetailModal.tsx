@@ -166,19 +166,12 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({open, onClose, wordId,
                         </Box>
                             {/*</Tooltip>*/}
 
-                        {/*OTHER - TODO доделать в норм виде*/}
                         <Box data-name="secondData"
                              sx={{
                                  display: 'flex',
                                  alignItems: 'center',
                              }}>
                             <Stack direction="row" spacing={3}>
-
-                                {/*OLD Progress*/}
-                                {/*<Box sx={{display: 'flex', alignItems: 'center'}}>*/}
-                                {/*    <CastForEducationIcon sx={{mr: 1, color: 'action.active'}}/>*/}
-                                {/*    <Typography variant="body1">{word.progress}</Typography>*/}
-                                {/*</Box>*/}
 
                                 {/*View*/}
                                 <Box sx={{display: 'flex', alignItems: 'center'}}>

@@ -21,6 +21,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {RootState, AppDispatch} from '../../../redux/store';
 import {updateWord, deleteWord} from '../../../redux/slices/wordsSlice';
 import defaultCover from '../../../assets/default_word_image.jpg';
+import progressColors from "../../../utils/constants/progressColors";
 
 interface EditWordModalProps {
     open: boolean;
@@ -100,6 +101,12 @@ const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, dictionaryI
             const file = files[0];
             setImagePath(file);
             setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
+    const handleProgressChange = (event: Event, newValue: number | number[]) => {
+        if (typeof newValue === 'number') {
+            setProgress(newValue);
         }
     };
 
@@ -221,21 +228,34 @@ const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, dictionaryI
                         max={10}
                         step={1}
                         marks={[
-                            {value: 0, label: '0'},
-                            {value: 1, label: '1'},
-                            {value: 2, label: '2'},
-                            {value: 3, label: '3'},
-                            {value: 4, label: '4'},
-                            {value: 5, label: '5'},
-                            {value: 6, label: '6'},
-                            {value: 7, label: '7'},
-                            {value: 8, label: '8'},
-                            {value: 9, label: '9'},
-                            {value: 10, label: '10'},
+                            { value: 0, label: '0' },
+                            { value: 1, label: '1' },
+                            { value: 2, label: '2' },
+                            { value: 3, label: '3' },
+                            { value: 4, label: '4' },
+                            { value: 5, label: '5' },
+                            { value: 6, label: '6' },
+                            { value: 7, label: '7' },
+                            { value: 8, label: '8' },
+                            { value: 9, label: '9' },
+                            { value: 10, label: '10' },
                         ]}
                         valueLabelDisplay="on"
-                        onChange={(_, newValue) => setProgress(newValue as number)}
+                        onChange={handleProgressChange}
                         aria-labelledby="progress-slider"
+                        sx={{
+                            color: progressColors[progress], // Устанавливаем цвет трека
+                            '& .MuiSlider-thumb': {
+                                backgroundColor: progressColors[progress], // Устанавливаем цвет ползунка
+                                border: '2px solid currentColor',
+                            },
+                            '& .MuiSlider-track': {
+                                backgroundColor: progressColors[progress], // Устанавливаем цвет трека
+                            },
+                            '& .MuiSlider-rail': {
+                                backgroundColor: 'rgba(0, 0, 0, 0.12)', // Цвет рельса
+                            },
+                        }}
                     />
                 </Box>
 
