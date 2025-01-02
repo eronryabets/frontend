@@ -6,7 +6,7 @@ import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import api from "../../utils/api";
 import {WordProgress, WordsProgressState} from "../../types";
 import {GET_DICTIONARY_API_URL} from "../../config/urls";
-import { updateWord } from './wordsSlice';
+import {updateWord, deleteWord, addWord} from './wordsSlice';
 
 const initialState: WordsProgressState = {
     words: [],
@@ -73,7 +73,18 @@ const wordsProgressSlice = createSlice({
                 if (index !== -1) {
                     state.words[index].progress = updatedWord.progress;
                 }
-            });
+            })
+            //доп обработка при удалении слова deleteWord.fulfilled - удаляем и с Ворд Прогресса.
+            .addCase(deleteWord.fulfilled, (state, action) => {
+                state.words = state.words.filter(w => w.id !== action.payload);
+                //оставили в списке только те слова которые не наше слово с ид
+            })
+            //доп обработка при добавлении слова addWord.fulfilled - добавляем в  Ворд Прогресса.
+            .addCase(addWord.fulfilled, (state, action) => {
+                const {id, word, progress} = action.payload;
+                state.words.push({id, word, progress});
+                // addWordProgress({id, word, progress});
+            })
 
     },
 });

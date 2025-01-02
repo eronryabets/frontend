@@ -139,15 +139,6 @@ const AddWordModal: React.FC<AddWordModalProps> = ({open, onClose, dictionaryId,
                 image_path: imagePath,
             }));
             if (addWord.fulfilled.match(resultAction)) {
-                // Добавленное слово возвращается в resultAction.payload
-                const addedWord = resultAction.payload; // Тип Word
-                // Добавляем это слово в wordsProgress со start progress = 0
-                dispatch(addWordProgress({
-                    id: addedWord.id,
-                    word: addedWord.word,
-                    progress: 0,
-                }));
-
                 // Сохраняем выбранный словарь в localStorage
                 localStorage.setItem(LOCAL_STORAGE_KEY, selectedDictionaryId);
 
