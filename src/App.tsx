@@ -20,7 +20,7 @@ import {GlobalStyles} from './styles';
 import {PageDetail} from "./components/BookComponents/PageDetail/PageDetail";
 import Layout from "./components/Layout/Layout";
 import DictionariesList from "./components/DictionariesComponents/DictionariesList/DictionariesList";
-import WordsList from "./components/DictionariesComponents/WordsList/WordsList";
+import WordsList from "./components/WordComponents/WordsList/WordsList";
 import {UserSettingsPage} from "./components/UserComponents";
 import AuthListener from "./components/AuthListener/AuthListener";
 

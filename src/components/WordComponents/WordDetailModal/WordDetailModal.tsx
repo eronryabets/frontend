@@ -31,7 +31,6 @@ import { Stack } from '@mui/material';
 import ProgressBar from '../../UtilityComponents/ProgressBar/ProgressBar';
 import progressColors from "../../../utils/constants/progressColors";
 import {PartialUpdateWordPayload} from "../../../types";
-import {addWordProgress, setWordProgress} from "../../../redux/slices/wordsProgressSlice";
 
 interface WordDetailModalProps {
     open: boolean;
@@ -67,10 +66,6 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
         if (word && open) {
             setLocalProgress(word.progress);
             setLocalCount(word.count + 1); // Увеличиваем count на 1 при открытии
-            // dispatch(setWordProgress({
-            //         word: word.word,
-            //         progress: word.progress + 1,
-            //     }));
             setHasProgressChanged(false);
         }
     }, [word, open]);

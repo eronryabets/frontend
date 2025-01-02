@@ -28,9 +28,9 @@ import { TextToSpeech } from '../TextToSpeech';
 import { useTextSelection } from '../../../hooks';
 import { TextRenderer } from '../TextRenderer';
 import { TranslationDialog } from '../TranslationDialog';
-import AddWordModal from '../../DictionariesComponents/AddWordModal/AddWordModal';
+import AddWordModal from '../../WordComponents/AddWordModal/AddWordModal';
 import { getBackgroundColorByProgress } from '../../../utils/getBackgroundColorByProgress';
-import WordDetailModal from "../../DictionariesComponents/WordDetailModal/WordDetailModal";
+import WordDetailModal from "../../WordComponents/WordDetailModal/WordDetailModal";
 
 export const PageDetail: React.FC = () => {
   const { bookId, chapterId, pageNumber } = useParams<{

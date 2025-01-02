@@ -1,5 +1,5 @@
 import React from 'react';
-import {Word} from '../../DictionariesComponents/Word';
+import {Word} from '../../WordComponents/Word';
 
 interface TextRendererProps {
     content: string;
