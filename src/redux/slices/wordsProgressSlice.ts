@@ -6,6 +6,7 @@ import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import api from "../../utils/api";
 import {WordProgress, WordsProgressState} from "../../types";
 import {GET_DICTIONARY_API_URL} from "../../config/urls";
+import { updateWord } from './wordsSlice';
 
 const initialState: WordsProgressState = {
     words: [],
@@ -61,7 +62,19 @@ const wordsProgressSlice = createSlice({
             .addCase(fetchWordsProgress.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || 'Ошибка при загрузке слов.';
+            })
+            // Доп Обработка при fulfilled действия updateWord.
+            //Когда мы на бекенд успешно добавили слова - тогда мы записали изменения и в локал.
+            .addCase(updateWord.fulfilled, (state, action) => {
+                const updatedWord = action.payload;
+                const index = state.words.findIndex(
+                    (w) => w.id === updatedWord.id
+                );
+                if (index !== -1) {
+                    state.words[index].progress = updatedWord.progress;
+                }
             });
+
     },
 });
 
