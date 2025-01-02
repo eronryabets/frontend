@@ -97,12 +97,13 @@ export const PageDetail: React.FC = () => {
     (state: RootState) => state.userInfo.userData.settings?.current_dictionary?.dictionary_id
   );
 
-  useEffect(() => {
-    if (bookId && dictionary_id) {
-      // Всегда вызываем fetchWordsProgress при смене dictionary_id
-      dispatch(fetchWordsProgress({ dictionaryId: dictionary_id }));
-    }
-  }, [dispatch, bookId, dictionary_id]);
+  // Это уже делает AuthListener
+  // useEffect(() => {
+  //   if (bookId && dictionary_id) {
+  //     // Всегда вызываем fetchWordsProgress при смене dictionary_id
+  //     dispatch(fetchWordsProgress({ dictionaryId: dictionary_id }));
+  //   }
+  // }, [dispatch, bookId, dictionary_id]);
 
   const totalPagesInBook = book?.total_pages || 0;
 
