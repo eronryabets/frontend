@@ -26,6 +26,7 @@ import progressColors from "../../../utils/constants/progressColors";
 interface EditWordModalProps {
     open: boolean;
     onClose: () => void;
+    onDeleteSuccess: () => void;
     dictionaryId: string;
     wordData: {
         id: string;
@@ -33,11 +34,11 @@ interface EditWordModalProps {
         translation: string;
         tags: { name: string }[];
         image_path: string | null;
-        progress: number; // <-- Предполагаем, что теперь доступно
+        progress: number;
     }
 }
 
-const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, dictionaryId, wordData}) => {
+const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDeleteSuccess, dictionaryId, wordData}) => {
     const dispatch = useDispatch<AppDispatch>();
     const {loading, error} = useSelector((state: RootState) => state.words);
 
@@ -152,7 +153,7 @@ const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, dictionaryI
         try {
             const resultAction = await dispatch(deleteWord({wordId: wordData.id}));
             if (deleteWord.fulfilled.match(resultAction)) {
-                onClose();
+                onDeleteSuccess(); // Вызываем callback при успешном удалении
             } else {
                 setSubmitError(resultAction.payload || 'Не удалось удалить слово.');
             }

@@ -15,8 +15,7 @@ import {
     Box,
     Avatar,
     Button,
-    IconButton,
-    Tooltip, Chip
+    Chip, Snackbar, Alert
 } from '@mui/material';
 import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
@@ -49,6 +48,10 @@ const WordsList: React.FC = () => {
         image_path: string | null;
         progress: number;
     }>(null);
+
+    // Состояние для Snackbar
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
 
     useEffect(() => {
         if (id) {
@@ -101,6 +104,20 @@ const WordsList: React.FC = () => {
         state.dictionaries.dictionaries.find((dict) => dict.id === dictionaryId)
     );
     const language = currentDictionary?.language || 'en-US'; // Значение по умолчанию
+
+    // Функция, вызываемая при успешном удалении слова
+    const handleDeleteSuccess = () => {
+        handleCloseEditModal();
+        //а теперь выведем сообщение :
+        setSnackbarMessage('Слово успешно удалено.');
+        setSnackbarOpen(true);
+    };
+
+    // Закрытие Snackbar
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
+
 
     if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
@@ -298,10 +315,24 @@ const WordsList: React.FC = () => {
                 <EditWordModal
                     open={isEditModalOpen}
                     onClose={handleCloseEditModal}
+                    onDeleteSuccess={handleDeleteSuccess} // Передаём callback handleDeleteSuccess
                     dictionaryId={id}
                     wordData={editWordData}
                 />
             )}
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={2000}
+                onClose={handleSnackbarClose}
+                // message={snackbarMessage}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}>
+                <Alert severity="success" sx={{width: '100%'}}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
+
+
         </Box>
     );
 };

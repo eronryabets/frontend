@@ -82,7 +82,7 @@ const wordsProgressSlice = createSlice({
             //доп обработка при добавлении слова addWord.fulfilled - добавляем в  Ворд Прогресса.
             .addCase(addWord.fulfilled, (state, action) => {
                 const {id, word, progress} = action.payload;
-                state.words.push({id, word, progress});
+                state.words.push({word, progress, id});
                 // addWordProgress({id, word, progress});
             })
 

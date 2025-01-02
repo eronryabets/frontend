@@ -13,7 +13,7 @@ import {
     Alert,
     Chip,
     Tooltip,
-    IconButton,
+    IconButton, Snackbar,
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../../../redux/store';
@@ -120,6 +120,13 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
         onClose();
     };
 
+     // Функция, вызываемая при успешном удалении слова
+    const handleDeleteSuccess = () => {
+        onClose(); // Закрываем WordDetailModal
+    };
+
+
+
     if (!open) {
         return null; // Модалка закрыта — ничего не рендерим
     }
@@ -134,19 +141,18 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                 <DialogTitle>Информация о слове</DialogTitle>
                 <MyIconButton
                     color="secondary"
-                    startIcon={<CloseIcon />}
-                    onClick={handleClose}
-                />
+                    startIcon={<CloseIcon/>}
+                    onClick={handleClose}/>
             </Box>
             <DialogContent dividers>
                 {/* Если идёт загрузка или нет данных */}
                 {(!word && loading) && (
                     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100px">
-                        <CircularProgress />
+                        <CircularProgress/>
                     </Box>
                 )}
                 {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
+                    <Alert severity="error" sx={{mb: 2}}>
                         {error}
                     </Alert>
                 )}
@@ -162,7 +168,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                             />
                         </Box>
 
-                        <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                        <Typography variant="subtitle1" sx={{mb: 2}}>
                             Перевод: {word.translation}
                         </Typography>
 
@@ -171,7 +177,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                             sx={{
                                 display: 'flex',
                                 flexWrap: 'wrap',
-                                gap: 1, // Отступы между чипами
+                                gap: 1,
                                 mt: 1,
                             }}
                         >
@@ -182,18 +188,15 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                                         label={tag.name}
                                         variant="outlined"
                                         color="primary"
-                                        size="small"
-                                    />
+                                        size="small"/>
                                 ))
-                                : '—'
-                            }
+                                : '—'}
                             {word.tags.length > 3 && (
                                 <Chip
                                     label={`+${word.tags.length - 3}`}
                                     variant="outlined"
                                     color="primary"
-                                    size="small"
-                                />
+                                    size="small"/>
                             )}
                         </Box>
 
@@ -208,13 +211,12 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                                 <img
                                     src={word.image_path}
                                     alt={word.word}
-                                    style={{ maxWidth: '200px', borderRadius: '8px' }}
-                                />
+                                    style={{maxWidth: '200px', borderRadius: '8px'}}/>
                             </Box>
                         )}
 
                         {/* Кнопки для изменения прогресса и счётчика просмотров */}
-                        <Box display="flex" alignItems="center" justifyContent="center" sx={{ mb: 2 }}>
+                        <Box display="flex" alignItems="center" justifyContent="center" sx={{mb: 2}}>
                             <Tooltip title="Уменьшить прогресс и счётчик">
                                 <span>
                                     <IconButton
@@ -223,11 +225,11 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                                         color="primary"
                                         aria-label="Уменьшить прогресс и счётчик"
                                     >
-                                        <ArrowCircleDownIcon />
+                                        <ArrowCircleDownIcon/>
                                     </IconButton>
                                 </span>
                             </Tooltip>
-                            <Typography variant="body1" sx={{ mx: 2, color: progressColors[localProgress] }}>
+                            <Typography variant="body1" sx={{mx: 2, color: progressColors[localProgress]}}>
                                 {localProgress}
                             </Typography>
                             <Tooltip title="Увеличить прогресс и счётчик">
@@ -238,39 +240,38 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                                         color="primary"
                                         aria-label="Увеличить прогресс и счётчик"
                                     >
-                                        <ArrowCircleUpIcon />
+                                        <ArrowCircleUpIcon/>
                                     </IconButton>
                                 </span>
                             </Tooltip>
                         </Box>
 
                         {/* Визуальная шкала прогресса с цветовой индикацией */}
-                        <Box display="flex" alignItems="center" sx={{ mb: 2, mt: 2 }}>
-                            <CastForEducationIcon sx={{ mr: 1, color: 'action.active' }} />
+                        <Box display="flex" alignItems="center" sx={{mb: 2, mt: 2}}>
+                            <CastForEducationIcon sx={{mr: 1, color: 'action.active'}}/>
                             <ProgressBar
                                 progressAmount={10}
                                 value={localProgress}
                                 size={'medium'}
-                                spacing={0}
-                            />
+                                spacing={0}/>
                         </Box>
 
                         <Box data-name="secondData"
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                            }}>
+                             sx={{
+                                 display: 'flex',
+                                 alignItems: 'center',
+                             }}>
                             <Stack direction="row" spacing={3}>
 
                                 {/* View */}
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <VisibilityIcon sx={{ mr: 1, color: 'action.active' }} />
+                                <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                    <VisibilityIcon sx={{mr: 1, color: 'action.active'}}/>
                                     <Typography variant="body1">{localCount}</Typography>
                                 </Box>
 
                                 {/* Added */}
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <CalendarMonthIcon sx={{ mr: 1, color: 'action.active' }} />
+                                <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                    <CalendarMonthIcon sx={{mr: 1, color: 'action.active'}}/>
                                     <Typography
                                         variant="body1">{new Date(word.created_at).toLocaleDateString()}</Typography>
                                 </Box>
@@ -284,7 +285,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
 
             <DialogActions>
                 {/* Кнопка для редактирования */}
-                <Button variant="outlined" onClick={handleOpenEditModal} startIcon={<EditIcon />}>
+                <Button variant="outlined" onClick={handleOpenEditModal} startIcon={<EditIcon/>}>
                     Редактировать
                 </Button>
                 <Button onClick={handleClose} color="primary">
@@ -297,6 +298,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                 <EditWordModal
                     open={isEditOpen}
                     onClose={handleCloseEditModal}
+                    onDeleteSuccess={handleDeleteSuccess} // Передаём callback
                     dictionaryId={word.dictionary}
                     wordData={{
                         id: word.id,
@@ -305,8 +307,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                         tags: word.tags,
                         image_path: word.image_path,
                         progress: word.progress || 0,
-                    }}
-                />
+                    }}/>
             )}
         </Dialog>
     );
