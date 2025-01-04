@@ -16,14 +16,13 @@ import {
   Tooltip,
   useMediaQuery,
   Drawer,
-  Slider,
+  Slider, Snackbar,
 } from '@mui/material';
 import { Book } from '@mui/icons-material';
-import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings'; // Импорт иконки настроек
+import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 import { RootState, AppDispatch } from '../../../redux/store';
 import { fetchPageByNumber } from '../../../redux/slices/pageSlice';
 import { fetchBookDetails } from '../../../redux/slices/bookSlice';
-import { fetchWordsProgress } from '../../../redux/slices/wordsProgressSlice';
 import { TextToSpeech } from '../TextToSpeech';
 import { useTextSelection } from '../../../hooks';
 import { TextRenderer } from '../TextRenderer';
@@ -181,6 +180,30 @@ export const PageDetail: React.FC = () => {
       handleWordClick(event, word);
     }
   };
+
+    // Управление состоянием Snackbar
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  // Обработчик успешного удаления слова
+  const handleDeleteSuccess = () => {
+    setSnackbarMessage('Слово успешно удалено.');
+    setSnackbarOpen(true);
+    setIsWordDetailOpen(false); // Закрываем WordDetailModal
+  };
+
+  // Закрытие Snackbar
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+
 
   if (loading || !book) {
     return (
@@ -388,7 +411,20 @@ export const PageDetail: React.FC = () => {
         onClose={() => setIsWordDetailOpen(false)}
         wordId={selectedWordId}
         language={book.language} // Передаём язык книги
-      />
+       onDeleteSuccess={handleDeleteSuccess}/>
+
+       {/* Snackbar для уведомлений */}
+      <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={2000}
+                onClose={handleSnackbarClose}
+                // message={snackbarMessage}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}>
+                <Alert severity="success" sx={{width: '100%'}}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
+
     </Container>
   );
 };

@@ -1,5 +1,3 @@
-// src/components/WordDetailModal/WordDetailModal.tsx
-
 import React, { useEffect, useState } from 'react';
 import {
     Dialog,
@@ -37,9 +35,10 @@ interface WordDetailModalProps {
     onClose: () => void;
     wordId: string | null; // Если слова нет, передаём null
     language: string;     // Новый проп для динамического языка
+    onDeleteSuccess: () => void; // <-- Проброшен из родителя (PageDetail)
 }
 
-const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId, language }) => {
+const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId, language, onDeleteSuccess }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { words, loading, error } = useSelector((state: RootState) => state.words);
 
@@ -121,8 +120,9 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
     };
 
      // Функция, вызываемая при успешном удалении слова
-    const handleDeleteSuccess = () => {
+    const handleLocalDeleteSuccess  = () => {
         onClose(); // Закрываем WordDetailModal
+        onDeleteSuccess(); // А заодно уведомляем родителя, чтобы он показал Snackbar
     };
 
 
@@ -298,7 +298,7 @@ const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId
                 <EditWordModal
                     open={isEditOpen}
                     onClose={handleCloseEditModal}
-                    onDeleteSuccess={handleDeleteSuccess} // Передаём callback
+                    onDeleteSuccess={handleLocalDeleteSuccess} // Передаём callback //
                     dictionaryId={word.dictionary}
                     wordData={{
                         id: word.id,
