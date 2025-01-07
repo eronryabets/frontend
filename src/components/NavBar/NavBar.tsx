@@ -92,7 +92,7 @@ export const NavBar = () => {
                         cursor: 'pointer',
                     }}
                 >
-                    Smart Reader
+                    ReaderOK
                 </Typography>
 
                 {/* Основные кнопки навигации */}

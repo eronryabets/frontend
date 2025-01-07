@@ -21,7 +21,9 @@ const initialState: WordsState = {
     addError: null,
 };
 
-// Асинхронный thunk для получения слова по его ID.
+/**
+ * Thunk для получения слова по его ID.
+ */
 export const fetchWordById = createAsyncThunk<
     Word,
     string, // wordId
@@ -43,7 +45,9 @@ export const fetchWordById = createAsyncThunk<
     }
 );
 
-// Асинхронный thunk для получения слов из словаря по страницам.
+/**
+ * Thunk для получения слов из словаря по страницам.
+ */
 export const fetchWords = createAsyncThunk<
     WordsResponse,
     { dictionaryId: string; page: number },
@@ -63,7 +67,9 @@ export const fetchWords = createAsyncThunk<
     }
 );
 
-// Асинхронный thunk для добавления нового слова
+/**
+ * Thunk для добавления нового слова.
+ */
 export const addWord = createAsyncThunk<
     Word,
     AddWordPayload,
@@ -107,7 +113,9 @@ export const addWord = createAsyncThunk<
     }
 );
 
-// Thunk для обновления слова
+/**
+ * Thunk для обновления слова.
+ */
 export const updateWord = createAsyncThunk<
     Word,
     PartialUpdateWordPayload,
@@ -115,7 +123,8 @@ export const updateWord = createAsyncThunk<
 >(
     'words/updateWord',
     async (payload, thunkAPI) => {
-        const { wordId,
+        const {
+            wordId,
             dictionaryId,
             word,
             translation,
@@ -159,7 +168,9 @@ export const updateWord = createAsyncThunk<
     }
 );
 
-// Thunk для удаления слова
+/**
+ * Thunk для удаления слова.
+ */
 export const deleteWord = createAsyncThunk<
     string, // возвращаем wordId удалённого слова
     { wordId: string },
@@ -181,13 +192,22 @@ const wordsSlice = createSlice({
     name: 'words',
     initialState,
     reducers: {
+        /**
+         * Устанавливает текущую страницу пагинации.
+         */
         setCurrentPage(state, action: PayloadAction<number>) {
             state.currentPage = action.payload;
         },
+        /**
+         * Устанавливает ID текущего словаря и сбрасывает текущую страницу.
+         */
         setDictionaryId(state, action: PayloadAction<string>) {
             state.dictionaryId = action.payload;
             state.currentPage = 1; // Сбрасываем текущую страницу при смене словаря
         },
+        /**
+         * Сбрасывает состояние добавления слова.
+         */
         resetAddWordState(state) {
             state.adding = false;
             state.addError = null;
@@ -195,6 +215,7 @@ const wordsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            // Обработка fetchWords
             .addCase(fetchWords.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -208,6 +229,7 @@ const wordsSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || 'Неизвестная ошибка';
             })
+            // Обработка addWord
             .addCase(addWord.pending, (state) => {
                 state.adding = true;
                 state.addError = null;
@@ -223,6 +245,7 @@ const wordsSlice = createSlice({
                 state.adding = false;
                 state.addError = action.payload || 'Неизвестная ошибка при добавлении слова';
             })
+            // Обработка updateWord
             .addCase(updateWord.fulfilled, (state, action) => {
                 /// Обновляем слово в списке words
                 const index = state.words.findIndex(w => w.id === action.payload.id);
@@ -236,6 +259,7 @@ const wordsSlice = createSlice({
             .addCase(updateWord.rejected, (state, action) => {
                 state.error = action.payload || 'Ошибка при обновлении слова';
             })
+             // Обработка deleteWord
             .addCase(deleteWord.fulfilled, (state, action) => {
                 // Удаляем слово из массива words
                 state.words = state.words.filter(w => w.id !== action.payload);
@@ -245,7 +269,7 @@ const wordsSlice = createSlice({
             .addCase(deleteWord.rejected, (state, action) => {
                 state.error = action.payload || 'Ошибка при удалении слова';
             })
-            // Обработка нового thunk fetchWordById
+            // Обработка fetchWordById
             .addCase(fetchWordById.pending, (state) => {
                 // Можно добавить поле loadingWord или другое, если нужно
             })
@@ -268,6 +292,7 @@ const wordsSlice = createSlice({
     },
 });
 
+// Экспортируем экшены и редьюсер
 export const {
     setCurrentPage,
     setDictionaryId,

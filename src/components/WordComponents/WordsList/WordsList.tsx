@@ -24,9 +24,11 @@ import AddWordModal from "../AddWordModal/AddWordModal";
 import EditWordModal from "../EditWordModal/EditWordModal";
 import {MyIconButton, SpeechButton} from "../../UtilityComponents";
 
-
+/**
+ * Компонент отображения списка слов в словаре.
+ */
 const WordsList: React.FC = () => {
-    const {id} = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>(); // Получение ID словаря из URL
     const dispatch = useDispatch<AppDispatch>();
     const {
         words,
@@ -38,6 +40,7 @@ const WordsList: React.FC = () => {
     } = useSelector((state: RootState) => state.words);
     const [searchParams, setSearchParams] = useSearchParams();
 
+    // Состояния модальных окон
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editWordData, setEditWordData] = useState<null | {
@@ -49,10 +52,11 @@ const WordsList: React.FC = () => {
         progress: number;
     }>(null);
 
-    // Состояние для Snackbar
+    // Состояния для Snackbar уведомлений
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
 
+    // Эффект для установки ID словаря и текущей страницы при изменении URL
     useEffect(() => {
         if (id) {
             if (dictionaryId !== id) {
@@ -63,6 +67,7 @@ const WordsList: React.FC = () => {
         }
     }, [dispatch, id, searchParams, dictionaryId]);
 
+    // Эффект для загрузки слов при изменении ID словаря или страницы
     useEffect(() => {
         if (id && dictionaryId) {
             dispatch(fetchWords({dictionaryId: id, page: currentPage}));
@@ -70,18 +75,30 @@ const WordsList: React.FC = () => {
         }
     }, [dispatch, id, dictionaryId, currentPage, setSearchParams]);
 
+    /**
+     * Обработчик смены страницы пагинации.
+     */
     const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         dispatch(setCurrentPage(value));
     };
 
+    /**
+     * Открывает модальное окно добавления слова.
+     */
     const handleOpenAddModal = () => {
         setIsAddModalOpen(true);
     };
 
+    /**
+     * Закрывает модальное окно добавления слова.
+     */
     const handleCloseAddModal = () => {
         setIsAddModalOpen(false);
     };
 
+    /**
+     * Открывает модальное окно редактирования слова с данными выбранного слова.
+     */
     const handleOpenEditModal = (word: any) => {
         setEditWordData({
             id: word.id,
@@ -94,18 +111,23 @@ const WordsList: React.FC = () => {
         setIsEditModalOpen(true);
     };
 
+     /**
+     * Закрывает модальное окно редактирования слова и сбрасывает данные.
+     */
     const handleCloseEditModal = () => {
         setIsEditModalOpen(false);
         setEditWordData(null);
     };
 
-    // Извлечение языка текущего словаря из состояния Redux
+    // Получение текущего языка словаря из состояния Redux
     const currentDictionary = useSelector((state: RootState) =>
         state.dictionaries.dictionaries.find((dict) => dict.id === dictionaryId)
     );
     const language = currentDictionary?.language || 'en-US'; // Значение по умолчанию
 
-    // Функция, вызываемая при успешном удалении слова
+    /**
+     * Обработчик успешного удаления слова.
+     */
     const handleDeleteSuccess = () => {
         handleCloseEditModal();
         //а теперь выведем сообщение :
@@ -113,13 +135,17 @@ const WordsList: React.FC = () => {
         setSnackbarOpen(true);
     };
 
-    // Закрытие Snackbar
+    /**
+     * Закрывает Snackbar уведомление.
+     */
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
     };
 
 
+    // Отображение индикатора загрузки
     if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
+    // Отображение ошибки
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
 
     return (
@@ -150,7 +176,6 @@ const WordsList: React.FC = () => {
                                 <TableCell><strong>Progress</strong></TableCell>
                                 <TableCell><strong>Теги</strong></TableCell>
                                 <TableCell><strong>Added</strong></TableCell>
-                                {/*<TableCell><strong>Edit</strong></TableCell>*/}
                             </TableRow>
                         </TableHead>
                         <TableBody>
