@@ -1,14 +1,15 @@
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
+// wordsSlice.ts
+
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from "../../utils/api";
 import {
     WordsResponse,
     WordsState,
-    DictionaryResponse,
     Word,
     AddWordPayload,
     PartialUpdateWordPayload
 } from "../../types";
-import {GET_DICTIONARY_API_URL, GET_DICT_WORDS_URL} from "../../config/urls";
+import { GET_DICT_WORDS_URL } from "../../config/urls";
 
 const initialState: WordsState = {
     words: [],
@@ -19,14 +20,44 @@ const initialState: WordsState = {
     dictionaryId: null,
     adding: false,
     addError: null,
+    search: '', // Добавлено поле для поиска
 };
+
+/**
+ * Thunk для получения слов из словаря по страницам с опциональным поиском.
+ */
+export const fetchWords = createAsyncThunk<
+    WordsResponse,
+    { dictionaryId: string; page: number; search?: string }, // Добавлен search
+    { rejectValue: string }
+>(
+    'words/fetchWords',
+    async ({ dictionaryId, page, search }, thunkAPI) => {
+        try {
+            // Построение параметров запроса
+            const params = new URLSearchParams();
+            params.append('dictionary', dictionaryId);
+            params.append('page', page.toString());
+            if (search) {
+                params.append('search', search);
+            }
+
+            const response = await api.get<WordsResponse>(
+                `${GET_DICT_WORDS_URL}?${params.toString()}`
+            );
+            return response.data; // Возвращаем весь ответ
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(error.message || 'Ошибка при загрузке слов');
+        }
+    }
+);
 
 /**
  * Thunk для получения слова по его ID.
  */
 export const fetchWordById = createAsyncThunk<
     Word,
-    string, // wordId
+    string,
     { rejectValue: string }
 >(
     'words/fetchWordById',
@@ -41,28 +72,6 @@ export const fetchWordById = createAsyncThunk<
                 return thunkAPI.rejectWithValue(error.response.data.detail || 'Ошибка при получении слова');
             }
             return thunkAPI.rejectWithValue(error.message || 'Ошибка при получении слова');
-        }
-    }
-);
-
-/**
- * Thunk для получения слов из словаря по страницам.
- */
-export const fetchWords = createAsyncThunk<
-    WordsResponse,
-    { dictionaryId: string; page: number },
-    { rejectValue: string }
->(
-    'words/fetchWords',
-    async ({dictionaryId, page}, thunkAPI) => {
-        try {
-            const response = await api.get<DictionaryResponse>(
-                `${GET_DICTIONARY_API_URL}${dictionaryId}/?page=${page}`
-            );
-            console.log('fetchWords fulfilled:', response.data.words);
-            return response.data.words; // Возвращаем только раздел words
-        } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.message || 'Ошибка при загрузке слов');
         }
     }
 );
@@ -177,7 +186,7 @@ export const deleteWord = createAsyncThunk<
     { rejectValue: string }
 >(
     'words/deleteWord',
-    async ({wordId}, thunkAPI) => {
+    async ({ wordId }, thunkAPI) => {
         try {
             // удаление слова по URL: /words/{wordId}/, метод DELETE
             await api.delete(`${GET_DICT_WORDS_URL}${wordId}/`);
@@ -204,6 +213,14 @@ const wordsSlice = createSlice({
         setDictionaryId(state, action: PayloadAction<string>) {
             state.dictionaryId = action.payload;
             state.currentPage = 1; // Сбрасываем текущую страницу при смене словаря
+            state.search = ''; // Сбрасываем поиск при смене словаря
+        },
+        /**
+         * Устанавливает поисковый запрос и сбрасывает текущую страницу.
+         */
+        setSearchTerm(state, action: PayloadAction<string>) {
+            state.search = action.payload;
+            state.currentPage = 1; // Сбрасываем страницу при новом поиске
         },
         /**
          * Сбрасывает состояние добавления слова.
@@ -223,7 +240,7 @@ const wordsSlice = createSlice({
             .addCase(fetchWords.fulfilled, (state, action) => {
                 state.loading = false;
                 state.words = action.payload.results;
-                state.totalPages = Math.ceil(action.payload.count / 50); //TODO пока что захардил под 50
+                state.totalPages = Math.ceil(action.payload.count / 50); // TODO: захардить под 50
             })
             .addCase(fetchWords.rejected, (state, action) => {
                 state.loading = false;
@@ -239,7 +256,7 @@ const wordsSlice = createSlice({
                 // Добавляем новое слово в начало списка
                 state.words.unshift(action.payload);
                 // Увеличиваем счетчик слов и, возможно, количество страниц
-                state.totalPages = Math.ceil((state.words.length + 1) / 50); //TODO пока что захардил под 50
+                state.totalPages = Math.ceil((state.words.length + 1) / 50); // TODO: захардить под 50
             })
             .addCase(addWord.rejected, (state, action) => {
                 state.adding = false;
@@ -296,6 +313,7 @@ const wordsSlice = createSlice({
 export const {
     setCurrentPage,
     setDictionaryId,
+    setSearchTerm,
     resetAddWordState
 } = wordsSlice.actions;
 export default wordsSlice.reducer;

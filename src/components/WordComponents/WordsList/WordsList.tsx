@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState, AppDispatch} from '../../../redux/store';
-import {fetchWords, setCurrentPage, setDictionaryId} from '../../../redux/slices/wordsSlice';
-import {useParams, useSearchParams} from 'react-router-dom';
+
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../../../redux/store';
+import { fetchWords, setCurrentPage, setDictionaryId, setSearchTerm } from '../../../redux/slices/wordsSlice';
+import { useParams, useSearchParams } from 'react-router-dom';
 import {
     Pagination,
     CircularProgress,
@@ -15,20 +16,23 @@ import {
     Box,
     Avatar,
     Button,
-    Chip, Snackbar, Alert
+    Chip,
+    Snackbar,
+    Alert,
+    TextField,
 } from '@mui/material';
 import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 import EditIcon from '@mui/icons-material/Edit';
 import AddWordModal from "../AddWordModal/AddWordModal";
 import EditWordModal from "../EditWordModal/EditWordModal";
-import {MyIconButton, SpeechButton} from "../../UtilityComponents";
+import { MyIconButton, SpeechButton } from "../../UtilityComponents";
 
 /**
- * Компонент отображения списка слов в словаре.
+ * Компонент отображения списка слов в словаре с поиском.
  */
 const WordsList: React.FC = () => {
-    const {id} = useParams<{ id: string }>(); // Получение ID словаря из URL
+    const { id } = useParams<{ id: string }>(); // Получение ID словаря из URL
     const dispatch = useDispatch<AppDispatch>();
     const {
         words,
@@ -36,9 +40,13 @@ const WordsList: React.FC = () => {
         error,
         currentPage,
         totalPages,
-        dictionaryId
+        dictionaryId,
+        search,
     } = useSelector((state: RootState) => state.words);
     const [searchParams, setSearchParams] = useSearchParams();
+
+    // Локальное состояние для ввода поиска
+    const [searchInput, setSearchInput] = useState(search || '');
 
     // Состояния модальных окон
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -47,7 +55,7 @@ const WordsList: React.FC = () => {
         id: string;
         word: string;
         translation: string;
-        tags: { name: string }[];
+        tags: { id: string; name: string }[]; // Убедись, что теги содержат id
         image_path: string | null;
         progress: number;
     }>(null);
@@ -64,16 +72,24 @@ const WordsList: React.FC = () => {
             }
             const page = parseInt(searchParams.get('page') || '1', 10);
             dispatch(setCurrentPage(page));
+            const searchTerm = searchParams.get('search') || '';
+            dispatch(setSearchTerm(searchTerm));
+            setSearchInput(searchTerm);
         }
     }, [dispatch, id, searchParams, dictionaryId]);
 
-    // Эффект для загрузки слов при изменении ID словаря или страницы
+    // Эффект для загрузки слов при изменении ID словаря, страницы или поиска
     useEffect(() => {
         if (id && dictionaryId) {
-            dispatch(fetchWords({dictionaryId: id, page: currentPage}));
-            setSearchParams({page: currentPage.toString()});
+            dispatch(fetchWords({ dictionaryId: id, page: currentPage, search }));
+            // Обновление параметров URL
+            const params: any = { page: currentPage.toString() };
+            if (search) {
+                params.search = search;
+            }
+            setSearchParams(params);
         }
-    }, [dispatch, id, dictionaryId, currentPage, setSearchParams]);
+    }, [dispatch, id, dictionaryId, currentPage, search, setSearchParams]);
 
     /**
      * Обработчик смены страницы пагинации.
@@ -111,7 +127,7 @@ const WordsList: React.FC = () => {
         setIsEditModalOpen(true);
     };
 
-     /**
+    /**
      * Закрывает модальное окно редактирования слова и сбрасывает данные.
      */
     const handleCloseEditModal = () => {
@@ -130,7 +146,7 @@ const WordsList: React.FC = () => {
      */
     const handleDeleteSuccess = () => {
         handleCloseEditModal();
-        //а теперь выведем сообщение :
+        // Отображение сообщения об успешном удалении
         setSnackbarMessage('Слово успешно удалено.');
         setSnackbarOpen(true);
     };
@@ -142,9 +158,32 @@ const WordsList: React.FC = () => {
         setSnackbarOpen(false);
     };
 
+    /**
+     * Обработчик изменения значения в поле поиска.
+     */
+    const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchInput(event.target.value);
+    };
+
+    /**
+     * Обработчик отправки поиска.
+     */
+    const handleSearch = () => {
+        // Отправляем действие установки поискового запроса
+        dispatch(setSearchTerm(searchInput.trim()));
+    };
+
+    /**
+     * Обработчик нажатия Enter в поле поиска.
+     */
+    const handleSearchKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     // Отображение индикатора загрузки
-    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
+    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;
     // Отображение ошибки
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
 
@@ -153,20 +192,38 @@ const WordsList: React.FC = () => {
             <Typography variant="h4" gutterBottom>
                 Слова в словаре
             </Typography>
-            <Box sx={{pl: 2, pb: 2}}>
+            <Box sx={{ pl: 2, pb: 2, display: 'flex', alignItems: 'center' }}>
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<MapsUgcIcon/>}
-                    sx={{mr: 2}}
+                    startIcon={<MapsUgcIcon />}
+                    sx={{ mr: 2 }}
                     onClick={handleOpenAddModal}
                 >
                     Добавить слово
                 </Button>
+
+                {/* Поле ввода поиска */}
+                <TextField
+                    label="Поиск слов"
+                    variant="outlined"
+                    size="small"
+                    value={searchInput}
+                    onChange={handleSearchInputChange}
+                    onKeyPress={handleSearchKeyPress}
+                    sx={{ mr: 2, width: '300px' }}
+                />
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleSearch}
+                >
+                    Поиск
+                </Button>
             </Box>
             {words && words.length > 0 ? (
                 <Box>
-                    <Table sx={{minWidth: 650}} aria-label="words table">
+                    <Table sx={{ minWidth: 650 }} aria-label="words table">
                         <TableHead>
                             <TableRow>
                                 <TableCell><strong></strong></TableCell>
@@ -184,34 +241,33 @@ const WordsList: React.FC = () => {
                                     key={word.id}
                                     sx={{
                                         transition: 'background-color 0.3s, box-shadow 0.3s',
-                                        // cursor: 'pointer',
                                         '&:hover': {
-                                            backgroundColor: 'rgba(0, 0, 255, 0.05)', // легкий синий оттенок
+                                            backgroundColor: 'rgba(0, 0, 255, 0.05)', // Легкий синий оттенок
                                             boxShadow: '0px 4px 20px rgba(0, 0, 255, 0.1)',
                                         },
-                                        // Добавим плавный эффект для картинки при наведении на строку
+                                        // Плавный эффект для картинки при наведении на строку
                                         '&:hover img': {
-                                            transform: 'scale(1.05)', // увеличиваем картинку
+                                            transform: 'scale(1.05)', // Увеличиваем картинку
                                             boxShadow: '0 0 20px rgba(0, 0, 255, 0.5)',
                                             filter: 'brightness(1.1) contrast(1.1)',
                                         }
                                     }}
                                 >
-                                    {/*WORD'S IMAGE*/}
+                                    {/* Изображение слова */}
                                     <TableCell>
                                         <Avatar
                                             src={word.image_path ? word.image_path : defaultCover}
                                             alt={word.word}
-                                            sx={{width: 60, height: 60, borderRadius: 4}}
+                                            sx={{ width: 60, height: 60, borderRadius: 4 }}
                                         />
                                     </TableCell>
 
-                                    {/*VolumeUpIcon & WORD*/}
+                                    {/* Название слова с кнопкой воспроизведения */}
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
                                             <SpeechButton
                                                 text={word.word}
-                                                lang={language} //теперь подставляем динамическое значение.
+                                                lang={language} // Динамическое значение
                                             />
                                             <Typography
                                                 variant="subtitle1"
@@ -226,12 +282,12 @@ const WordsList: React.FC = () => {
                                         </Box>
                                     </TableCell>
 
-                                    {/*translation*/}
+                                    {/* Перевод слова */}
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
                                             <MyIconButton
                                                 color="primary"
-                                                startIcon={<EditIcon/>}
+                                                startIcon={<EditIcon />}
                                                 onClick={() => handleOpenEditModal(word)}>
                                             </MyIconButton>
                                             <Typography
@@ -247,27 +303,22 @@ const WordsList: React.FC = () => {
                                         </Box>
                                     </TableCell>
 
-                                    {/*count*/}
+                                    {/* Количество повторений */}
                                     <TableCell>
                                         <Typography variant="body2">{word.count}</Typography>
                                     </TableCell>
 
-                                    {/*progress*/}
+                                    {/* Прогресс */}
                                     <TableCell>
                                         <Typography variant="body2">{word.progress}</Typography>
                                     </TableCell>
 
-                                    {/*TAGS*/}
+                                    {/* Теги */}
                                     <TableCell>
-                                        {/*<Typography variant="body2">*/}
-                                        {/*    {word.tags.length > 0 ? word.tags.map(tag => tag.name).join(', ') : '—'}*/}
-                                        {/*</Typography>*/}
-
                                         <Box
                                             sx={{
                                                 display: 'flex',
                                                 flexWrap: 'wrap',
-                                                // justifyContent: 'center',
                                                 gap: 1, // Отступы между чипами
                                                 mt: 1,
                                             }}
@@ -295,20 +346,10 @@ const WordsList: React.FC = () => {
                                         </Box>
                                     </TableCell>
 
-                                    {/*created_at*/}
+                                    {/* Дата добавления */}
                                     <TableCell>
                                         <Typography variant="body2">{word.created_at.substring(0, 10)}</Typography>
                                     </TableCell>
-
-                                    {/*edit*/}
-                                    {/*<TableCell>*/}
-                                    {/*    <MyIconButton*/}
-                                    {/*        color="primary"*/}
-                                    {/*        startIcon={<EditIcon/>}*/}
-                                    {/*        onClick={() => handleOpenEditModal(word)}>*/}
-                                    {/*    </MyIconButton>*/}
-                                    {/*</TableCell>*/}
-
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -346,20 +387,19 @@ const WordsList: React.FC = () => {
                 />
             )}
 
+            {/* Snackbar уведомление */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={2000}
                 onClose={handleSnackbarClose}
-                // message={snackbarMessage}
-                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}>
-                <Alert severity="success" sx={{width: '100%'}}>
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+                <Alert severity="success" sx={{ width: '100%' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
-
-
         </Box>
     );
+
 };
 
 export default WordsList;
