@@ -1,4 +1,3 @@
-// wordsSlice.ts
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from "../../utils/api";
@@ -9,6 +8,7 @@ import {
     AddWordPayload,
     PartialUpdateWordPayload
 } from "../../types";
+import { PAGE_SIZE } from "../../utils/constants/constants";
 import { GET_DICT_WORDS_URL } from "../../config/urls";
 
 const initialState: WordsState = {
@@ -240,7 +240,7 @@ const wordsSlice = createSlice({
             .addCase(fetchWords.fulfilled, (state, action) => {
                 state.loading = false;
                 state.words = action.payload.results;
-                state.totalPages = Math.ceil(action.payload.count / 50); // TODO: захардить под 50
+                state.totalPages = Math.ceil(action.payload.count / PAGE_SIZE); // TODO: захардить под 50
             })
             .addCase(fetchWords.rejected, (state, action) => {
                 state.loading = false;
@@ -255,8 +255,8 @@ const wordsSlice = createSlice({
                 state.adding = false;
                 // Добавляем новое слово в начало списка
                 state.words.unshift(action.payload);
-                // Увеличиваем счетчик слов и, возможно, количество страниц
-                state.totalPages = Math.ceil((state.words.length + 1) / 50); // TODO: захардить под 50
+                 // Пересчитываем totalPages исходя из нового количества слов
+                 state.totalPages = Math.ceil((state.words.length) / PAGE_SIZE); // TODO: захардить под 50
             })
             .addCase(addWord.rejected, (state, action) => {
                 state.adding = false;
@@ -281,7 +281,7 @@ const wordsSlice = createSlice({
                 // Удаляем слово из массива words
                 state.words = state.words.filter(w => w.id !== action.payload);
                 // Пересчитываем totalPages, если нужно
-                state.totalPages = Math.ceil(state.words.length / 50);
+                state.totalPages = Math.ceil(state.words.length / PAGE_SIZE);
             })
             .addCase(deleteWord.rejected, (state, action) => {
                 state.error = action.payload || 'Ошибка при удалении слова';
@@ -300,7 +300,7 @@ const wordsSlice = createSlice({
                     // Иначе добавляем его
                     state.words.push(action.payload);
                     // Возможно, обновляем totalPages
-                    state.totalPages = Math.ceil(state.words.length / 50);
+                    state.totalPages = Math.ceil(state.words.length / PAGE_SIZE);
                 }
             })
             .addCase(fetchWordById.rejected, (state, action) => {
