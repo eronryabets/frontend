@@ -1,9 +1,10 @@
+// WordsList.tsx
 
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../../redux/store';
-import { fetchWords, setCurrentPage, setDictionaryId, setSearchTerm } from '../../../redux/slices/wordsSlice';
-import { useParams, useSearchParams } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState, AppDispatch} from '../../../redux/store';
+import {fetchWords, setCurrentPage, setDictionaryId, setSearchTerm} from '../../../redux/slices/wordsSlice';
+import {useParams, useSearchParams} from 'react-router-dom';
 import {
     Pagination,
     CircularProgress,
@@ -19,20 +20,20 @@ import {
     Chip,
     Snackbar,
     Alert,
-    TextField,
+    TextField, Tooltip,
 } from '@mui/material';
 import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 import EditIcon from '@mui/icons-material/Edit';
 import AddWordModal from "../AddWordModal/AddWordModal";
 import EditWordModal from "../EditWordModal/EditWordModal";
-import { MyIconButton, SpeechButton } from "../../UtilityComponents";
+import {MyIconButton, SpeechButton} from "../../UtilityComponents";
 
 /**
  * Компонент отображения списка слов в словаре с поиском.
  */
 const WordsList: React.FC = () => {
-    const { id } = useParams<{ id: string }>(); // Получение ID словаря из URL
+    const {id} = useParams<{ id: string }>(); // Получение ID словаря из URL
     const dispatch = useDispatch<AppDispatch>();
     const {
         words,
@@ -81,9 +82,9 @@ const WordsList: React.FC = () => {
     // Эффект для загрузки слов при изменении ID словаря, страницы или поиска
     useEffect(() => {
         if (id && dictionaryId) {
-            dispatch(fetchWords({ dictionaryId: id, page: currentPage, search }));
+            dispatch(fetchWords({dictionaryId: id, page: currentPage, search}));
             // Обновление параметров URL
-            const params: any = { page: currentPage.toString() };
+            const params: any = {page: currentPage.toString()};
             if (search) {
                 params.search = search;
             }
@@ -182,8 +183,16 @@ const WordsList: React.FC = () => {
         }
     };
 
+    /**
+     * Обработчик сброса поиска.
+     */
+    const handleResetSearch = () => {
+        setSearchInput('');
+        dispatch(setSearchTerm(''));
+    };
+
     // Отображение индикатора загрузки
-    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;
+    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
     // Отображение ошибки
     if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
 
@@ -192,12 +201,12 @@ const WordsList: React.FC = () => {
             <Typography variant="h4" gutterBottom>
                 Слова в словаре
             </Typography>
-            <Box sx={{ pl: 2, pb: 2, display: 'flex', alignItems: 'center' }}>
+            <Box sx={{pl: 2, pb: 2, display: 'flex', alignItems: 'center', flexWrap: 'wrap'}}>
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<MapsUgcIcon />}
-                    sx={{ mr: 2 }}
+                    startIcon={<MapsUgcIcon/>}
+                    sx={{mr: 2, mb: {xs: 2, sm: 0}}}
                     onClick={handleOpenAddModal}
                 >
                     Добавить слово
@@ -211,19 +220,34 @@ const WordsList: React.FC = () => {
                     value={searchInput}
                     onChange={handleSearchInputChange}
                     onKeyPress={handleSearchKeyPress}
-                    sx={{ mr: 2, width: '300px' }}
+                    sx={{mr: 2, width: '300px', mb: {xs: 2, sm: 0}}}
+                    InputProps={{
+                        endAdornment: search && (
+                            <Tooltip title="Очистить поиск" arrow>
+                                <Button
+                                    onClick={handleResetSearch}
+                                    size="small"
+                                    sx={{minWidth: 'auto', p: 0, ml: 1}}
+                                >
+                                    ✕
+                                </Button>
+                            </Tooltip>
+                        ),
+                    }}
                 />
                 <Button
                     variant="contained"
                     color="secondary"
                     onClick={handleSearch}
+                    sx={{mr: 2, mb: {xs: 2, sm: 0}}}
                 >
-                    Поиск
+                    {/* индикатор загрузки рядом с кнопкой "Поиск" */}
+                    {loading ? <CircularProgress size={24}/> : 'Поиск'}
                 </Button>
             </Box>
             {words && words.length > 0 ? (
                 <Box>
-                    <Table sx={{ minWidth: 650 }} aria-label="words table">
+                    <Table sx={{minWidth: 650}} aria-label="words table">
                         <TableHead>
                             <TableRow>
                                 <TableCell><strong></strong></TableCell>
@@ -258,7 +282,7 @@ const WordsList: React.FC = () => {
                                         <Avatar
                                             src={word.image_path ? word.image_path : defaultCover}
                                             alt={word.word}
-                                            sx={{ width: 60, height: 60, borderRadius: 4 }}
+                                            sx={{width: 60, height: 60, borderRadius: 4}}
                                         />
                                     </TableCell>
 
@@ -287,7 +311,7 @@ const WordsList: React.FC = () => {
                                         <Box display="flex" alignItems="center">
                                             <MyIconButton
                                                 color="primary"
-                                                startIcon={<EditIcon />}
+                                                startIcon={<EditIcon/>}
                                                 onClick={() => handleOpenEditModal(word)}>
                                             </MyIconButton>
                                             <Typography
@@ -357,7 +381,7 @@ const WordsList: React.FC = () => {
                 </Box>
             ) : (
                 <Typography variant="h6" align="center" mt={4}>
-                    В этом словаре пока нет слов.
+                    {search ? 'Нет слов, соответствующих поиску.' : 'В этом словаре пока нет слов.'}
                 </Typography>
             )}
             {totalPages > 1 && (
@@ -392,8 +416,8 @@ const WordsList: React.FC = () => {
                 open={snackbarOpen}
                 autoHideDuration={2000}
                 onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
-                <Alert severity="success" sx={{ width: '100%' }}>
+                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}>
+                <Alert severity="success" sx={{width: '100%'}}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
