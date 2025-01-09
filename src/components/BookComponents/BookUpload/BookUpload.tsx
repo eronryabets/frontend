@@ -22,7 +22,7 @@ import { PhotoCamera } from "@mui/icons-material";
 import { resetState, uploadBook } from "../../../redux/slices/uploadBookSlice";
 import { fetchGenres } from "../../../redux/slices/genresSlice";
 import { BookFormState, BookData } from '../../../types';
-import { GenreSelect } from '../GenreSelect';
+import { GenreSelect } from '@/components';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { languageOptions } from '../../../config/languageOptions'; // Импорт списка языков
 

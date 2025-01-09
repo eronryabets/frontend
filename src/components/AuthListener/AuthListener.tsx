@@ -1,12 +1,12 @@
 import React, {useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from "../../redux/store";
-import {setTheme} from "../../redux/slices/themeSlice";
-import {fetchDictionaries} from "../../redux/slices/dictionarySlice";
-import {fetchWordsProgress} from "../../redux/slices/wordsProgressSlice";
+import {AppDispatch, RootState} from "@/redux/store.ts";
+import {setTheme} from "@/redux/slices/themeSlice.ts";
+import {fetchDictionaries} from "@/redux/slices/dictionarySlice.ts";
+import {fetchWordsProgress} from "@/redux/slices/wordsProgressSlice.ts";
 
 
-const AuthListener: React.FC = () => {
+export const AuthListener: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
     const isAuthenticated = useSelector((state: RootState) => state.authorization.isAuthenticated);
     const userData = useSelector((state: RootState) => state.userInfo.userData);

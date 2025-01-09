@@ -20,15 +20,15 @@ import {
 } from '@mui/material';
 import { Book } from '@mui/icons-material';
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
-import { RootState, AppDispatch } from '../../../redux/store';
-import { fetchPageByNumber } from '../../../redux/slices/pageSlice';
-import { fetchBookDetails } from '../../../redux/slices/bookSlice';
-import { TextToSpeech } from '../TextToSpeech';
+import { RootState, AppDispatch } from '@/redux/store.ts';
+import { fetchPageByNumber } from '@/redux/slices/pageSlice.ts';
+import { fetchBookDetails } from '@/redux/slices/bookSlice.ts';
+import { TextToSpeech } from '@/components/BookComponents';
 import { useTextSelection } from '../../../hooks';
-import { TextRenderer } from '../TextRenderer';
-import { TranslationDialog } from '../TranslationDialog';
+import { TextRenderer } from '@/components/BookComponents';
+import { TranslationDialog } from '@/components/BookComponents';
 import AddWordModal from '../../WordComponents/AddWordModal/AddWordModal';
-import { getBackgroundColorByProgress } from '../../../utils/getBackgroundColorByProgress';
+import { getBackgroundColorByProgress } from '@/utils/getBackgroundColorByProgress.ts';
 import WordDetailModal from "../../WordComponents/WordDetailModal/WordDetailModal";
 
 export const PageDetail: React.FC = () => {

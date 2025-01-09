@@ -16,7 +16,7 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import StopIcon from '@mui/icons-material/Stop';
-import {languageOptions} from "../../../config/languageOptions";
+import {languageOptions} from "@/config/languageOptions.ts";
 
 interface TextToSpeechProps {
     text: string;

@@ -30,12 +30,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { RootState, AppDispatch } from '../../../redux/store';
+import { RootState, AppDispatch } from '@/redux/store.ts';
 import defaultCover from '../../../assets/default_cover.png';
-import { deleteBook, fetchBookDetails } from '../../../redux/slices/bookSlice';
-import { EditBookModal } from "../EditBookModal";
+import { deleteBook, fetchBookDetails } from '@/redux/slices/bookSlice.ts';
+import { EditBookModal } from "@/components";
 import { Link as RouterLink } from 'react-router-dom';
-import { generatePageNumbers } from "../../../utils/generatePageNumbers";
+import { generatePageNumbers } from "@/utils/generatePageNumbers.ts";
 
 export const BookDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -70,7 +70,7 @@ export const BookDetail: React.FC = () => {
         if (!book) return null;
         return book.chapters.map((chapter, index) => (
             <Accordion
-                sx={{ background: theme.customBackground.gradient }}
+                sx={{ background: theme.customBackground.gradient}}
                 key={chapter.id}
                 expanded={expandedChapters.has(chapter.id)}
                 onChange={(event, isExpanded) => handleToggleChapter(chapter.id, isExpanded)}
