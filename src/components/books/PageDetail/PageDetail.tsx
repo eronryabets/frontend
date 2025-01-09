@@ -11,10 +11,11 @@ import { useTextSelection } from '../../../hooks';
 import {
   TextToSpeech,
   TextRenderer,
-  TranslationDialog
+  TranslationDialog,
+  AddWordModal,
+  WordDetailModal
 } from '@/components';
-import AddWordModal from '@/components/WordComponents/AddWordModal/AddWordModal';
-import WordDetailModal from '@/components/WordComponents/WordDetailModal/WordDetailModal';
+
 
 import { getBackgroundColorByProgress } from '@/utils/getBackgroundColorByProgress.ts';
 

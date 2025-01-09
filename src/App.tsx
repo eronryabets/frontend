@@ -22,7 +22,7 @@ import {
 import {GlobalStyles} from './styles';
 import Layout from "./components/Layout/Layout";
 import DictionariesList from "./components/DictionariesComponents/DictionariesList/DictionariesList";
-import WordsList from "./components/WordComponents/WordsList/WordsList.tsx";
+import {WordsList} from "./components";
 import {UserSettingsPage} from "./components/UserComponents";
 import {AuthListener} from "./components";
 

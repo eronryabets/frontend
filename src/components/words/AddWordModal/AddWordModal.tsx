@@ -20,10 +20,10 @@ import {
 } from '@mui/material';
 import {PhotoCamera} from '@mui/icons-material';
 import {useSelector, useDispatch} from 'react-redux';
-import {RootState, AppDispatch} from '../../../redux/store';
-import {addWord, resetAddWordState} from '../../../redux/slices/wordsSlice';
+import {RootState, AppDispatch} from '@/redux/store.ts';
+import {addWord, resetAddWordState} from '@/redux/slices/wordsSlice.ts';
 import defaultCover from '../../../assets/default_word_image.jpg';
-import {addWordProgress} from "../../../redux/slices/wordsProgressSlice";
+
 
 interface AddWordModalProps {
     open: boolean;
@@ -35,7 +35,7 @@ interface AddWordModalProps {
 
 const LOCAL_STORAGE_KEY = 'lastSelectedDictionaryId'; // Ключ для localStorage
 
-const AddWordModal: React.FC<AddWordModalProps> = ({open, onClose, dictionaryId, initialWord, initialTranslation}) => {
+export const AddWordModal: React.FC<AddWordModalProps> = ({open, onClose, dictionaryId, initialWord, initialTranslation}) => {
     const dispatch = useDispatch<AppDispatch>();
     const {adding, addError} = useSelector((state: RootState) => state.words);
     const {dictionaries} = useSelector((state: RootState) => state.dictionaries);

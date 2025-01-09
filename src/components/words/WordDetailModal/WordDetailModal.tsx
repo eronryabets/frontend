@@ -14,9 +14,9 @@ import {
     IconButton, Snackbar,
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../../../redux/store';
-import { fetchWordById, updateWord, deleteWord } from '../../../redux/slices/wordsSlice';
-import EditWordModal from '../EditWordModal/EditWordModal';
+import { RootState, AppDispatch } from '@/redux/store.ts';
+import { fetchWordById, updateWord, deleteWord } from '@/redux/slices/wordsSlice.ts';
+import {EditWordModal} from '@/components';
 import { MyIconButton, SpeechButton } from '../../UtilityComponents';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
@@ -26,9 +26,9 @@ import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import { Stack } from '@mui/material';
-import ProgressBar from '../../UtilityComponents/ProgressBar/ProgressBar';
-import progressColors from "../../../utils/constants/progressColors";
-import {PartialUpdateWordPayload} from "../../../types";
+import ProgressBar from '../../UtilityComponents/ProgressBar/ProgressBar.tsx';
+import progressColors from "../../../utils/constants/progressColors.ts";
+import {PartialUpdateWordPayload} from "@/types";
 
 interface WordDetailModalProps {
     open: boolean;
@@ -38,7 +38,7 @@ interface WordDetailModalProps {
     onDeleteSuccess: () => void; // <-- Проброшен из родителя (PageDetail)
 }
 
-const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId, language, onDeleteSuccess }) => {
+export const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId, language, onDeleteSuccess }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { words, loading, error } = useSelector((state: RootState) => state.words);
 

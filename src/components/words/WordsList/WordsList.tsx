@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../../redux/store';
-import { fetchWords, setCurrentPage, setDictionaryId, setSearchTerm } from '../../../redux/slices/wordsSlice';
+import { RootState, AppDispatch } from '../../../redux/store.ts';
+import { fetchWords, setCurrentPage, setDictionaryId, setSearchTerm } from '../../../redux/slices/wordsSlice.ts';
 import { useParams, useSearchParams } from 'react-router-dom';
 import {
     Pagination,
@@ -27,14 +27,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 import EditIcon from '@mui/icons-material/Edit';
-import AddWordModal from "../AddWordModal/AddWordModal";
-import EditWordModal from "../EditWordModal/EditWordModal";
+import {AddWordModal, EditWordModal }from "@/components";
 import { MyIconButton, SpeechButton } from "../../UtilityComponents";
 
 /**
  * Компонент отображения списка слов в словаре с поиском.
  */
-const WordsList: React.FC = () => {
+export const WordsList: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // Получение ID словаря из URL
     const dispatch = useDispatch<AppDispatch>();
     const {

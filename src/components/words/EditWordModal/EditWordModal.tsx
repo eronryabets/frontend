@@ -18,10 +18,10 @@ import {
 } from '@mui/material';
 import {PhotoCamera} from '@mui/icons-material';
 import {useSelector, useDispatch} from 'react-redux';
-import {RootState, AppDispatch} from '../../../redux/store';
-import {updateWord, deleteWord} from '../../../redux/slices/wordsSlice';
+import {RootState, AppDispatch} from '../../../redux/store.ts';
+import {updateWord, deleteWord} from '../../../redux/slices/wordsSlice.ts';
 import defaultCover from '../../../assets/default_word_image.jpg';
-import progressColors from "../../../utils/constants/progressColors";
+import progressColors from "../../../utils/constants/progressColors.ts";
 
 interface EditWordModalProps {
     open: boolean;
@@ -38,7 +38,7 @@ interface EditWordModalProps {
     }
 }
 
-const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDeleteSuccess, dictionaryId, wordData}) => {
+export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDeleteSuccess, dictionaryId, wordData}) => {
     const dispatch = useDispatch<AppDispatch>();
     const {loading, error} = useSelector((state: RootState) => state.words);
 
