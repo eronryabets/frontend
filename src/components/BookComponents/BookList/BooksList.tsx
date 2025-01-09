@@ -1,5 +1,10 @@
-import React, {useEffect} from 'react';
-import {useSelector} from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+
+import { useAppDispatch } from '@/redux/hooks.ts';
+import { fetchBooks, setCurrentPage } from '@/redux/slices/bookSlice.ts';
+import { RootState } from '@/redux/store.ts';
 
 import {
     Card,
@@ -7,13 +12,16 @@ import {
     CardContent,
     Typography,
     CircularProgress,
-    Alert, Container, Box, Pagination, Chip, CardActionArea, useTheme,
+    Alert,
+    Container,
+    Box,
+    Pagination,
+    Chip,
+    CardActionArea,
+    useTheme,
 } from '@mui/material';
-import defaultCover from '../../../assets/default_cover.png';
-import {fetchBooks, setCurrentPage} from "../../../redux/slices/bookSlice";
-import {RootState} from "../../../redux/store";
-import {useAppDispatch} from '../../../redux/hooks';
-import {Link} from "react-router-dom";
+
+import defaultCover from '@/assets/default_cover.png';
 
 export const BooksList: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -127,7 +135,7 @@ export const BooksList: React.FC = () => {
                                                 transition: 'transform 0.3s', // Плавный переход для трансформаций
                                             }}
                                             onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                                                e.currentTarget.src = defaultCover;
+                                                e.currentTarget.src = defaultCover as string;
                                             }}
                                         />
                                     </Box>

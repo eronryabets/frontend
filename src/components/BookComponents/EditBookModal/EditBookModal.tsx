@@ -1,4 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/redux/store.ts';
+
+import { fetchGenres } from '@/redux/slices/genresSlice.ts';
+import { updateBook } from '@/redux/slices/bookSlice.ts';
+
+import { Book } from '@/types';
+import { languageOptions } from '@/config/languageOptions.ts';
+import { GenreSelect } from '@/components';
+
 import {
     Dialog,
     DialogTitle,
@@ -16,15 +26,9 @@ import {
     Select,
     MenuItem,
 } from '@mui/material';
+
 import { PhotoCamera } from '@mui/icons-material';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '../../../redux/store';
-import { Book } from "../../../types";
-import { fetchGenres } from "../../../redux/slices/genresSlice";
-import { updateBook } from "../../../redux/slices/bookSlice";
-import { GenreSelect } from "@/components";
-import { SelectChangeEvent } from '@mui/material/Select'; // Импортируем SelectChangeEvent
-import { languageOptions } from '../../../config/languageOptions'; // Импортируем список языков
+import { SelectChangeEvent } from '@mui/material/Select';
 
 interface EditBookModalProps {
     open: boolean;

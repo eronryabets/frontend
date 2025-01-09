@@ -1,8 +1,23 @@
-// PageDetail.tsx
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+
+import { RootState, AppDispatch } from '@/redux/store.ts';
+import { fetchPageByNumber } from '@/redux/slices/pageSlice.ts';
+import { fetchBookDetails } from '@/redux/slices/bookSlice.ts';
+
+import { useTextSelection } from '../../../hooks';
+
+import {
+  TextToSpeech,
+  TextRenderer,
+  TranslationDialog
+} from '@/components/BookComponents';
+import AddWordModal from '@/components/WordComponents/AddWordModal/AddWordModal';
+import WordDetailModal from '@/components/WordComponents/WordDetailModal/WordDetailModal';
+
+import { getBackgroundColorByProgress } from '@/utils/getBackgroundColorByProgress.ts';
+
 import {
   Container,
   Typography,
@@ -16,20 +31,14 @@ import {
   Tooltip,
   useMediaQuery,
   Drawer,
-  Slider, Snackbar,
+  Slider,
+  Snackbar,
 } from '@mui/material';
-import { Book } from '@mui/icons-material';
-import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
-import { RootState, AppDispatch } from '@/redux/store.ts';
-import { fetchPageByNumber } from '@/redux/slices/pageSlice.ts';
-import { fetchBookDetails } from '@/redux/slices/bookSlice.ts';
-import { TextToSpeech } from '@/components/BookComponents';
-import { useTextSelection } from '../../../hooks';
-import { TextRenderer } from '@/components/BookComponents';
-import { TranslationDialog } from '@/components/BookComponents';
-import AddWordModal from '../../WordComponents/AddWordModal/AddWordModal';
-import { getBackgroundColorByProgress } from '@/utils/getBackgroundColorByProgress.ts';
-import WordDetailModal from "../../WordComponents/WordDetailModal/WordDetailModal";
+
+import {
+  Book,
+  DisplaySettings as DisplaySettingsIcon
+} from '@mui/icons-material';
 
 export const PageDetail: React.FC = () => {
   const { bookId, chapterId, pageNumber } = useParams<{

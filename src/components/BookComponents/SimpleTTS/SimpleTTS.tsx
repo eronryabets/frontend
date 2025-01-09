@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {IconButton, Tooltip, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+
+import {
+    IconButton,
+    Tooltip,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+} from '@mui/material';
+
+import { PlayArrow as PlayArrowIcon } from '@mui/icons-material';
 
 
 const SimpleTTS: React.FC = () => {

@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
+
 import {
     Dialog,
     DialogTitle,
     DialogContent,
+    DialogActions,
     Typography,
     CircularProgress,
     Alert,
     IconButton,
     Tooltip,
-    Box, Button, DialogActions,
+    Box,
+    Button,
 } from '@mui/material';
-import { VolumeUp as VolumeUpIcon, Stop as StopIcon, Close as CloseIcon } from '@mui/icons-material';
+
+import {
+    VolumeUp as VolumeUpIcon,
+    Stop as StopIcon,
+    Close as CloseIcon,
+} from '@mui/icons-material';
 
 interface TranslationDialogProps {
     open: boolean;

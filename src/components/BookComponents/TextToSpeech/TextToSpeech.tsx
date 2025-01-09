@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+
 import {
     Box,
     FormControl,
@@ -10,13 +11,17 @@ import {
     IconButton,
     Drawer,
     Stack,
-    Tooltip
+    Tooltip,
 } from '@mui/material';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
-import StopIcon from '@mui/icons-material/Stop';
-import {languageOptions} from "@/config/languageOptions.ts";
+
+import {
+    VolumeUp as VolumeUpIcon,
+    PlayArrow as PlayArrowIcon,
+    Pause as PauseIcon,
+    Stop as StopIcon,
+} from '@mui/icons-material';
+
+import { languageOptions } from '@/config/languageOptions.ts';
 
 interface TextToSpeechProps {
     text: string;

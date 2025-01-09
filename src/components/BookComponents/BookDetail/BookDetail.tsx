@@ -1,6 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/redux/store.ts';
+import { deleteBook, fetchBookDetails } from '@/redux/slices/bookSlice.ts';
+
 import {
     Card,
     CardMedia,
@@ -26,16 +29,13 @@ import {
     Tooltip,
     IconButton,
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { RootState, AppDispatch } from '@/redux/store.ts';
-import defaultCover from '../../../assets/default_cover.png';
-import { deleteBook, fetchBookDetails } from '@/redux/slices/bookSlice.ts';
-import { EditBookModal } from "@/components";
-import { Link as RouterLink } from 'react-router-dom';
-import { generatePageNumbers } from "@/utils/generatePageNumbers.ts";
+
+import {
+    ExpandMore as ExpandMoreIcon,
+    ExpandLess as ExpandLessIcon,
+    Edit as EditIcon,
+    Delete as DeleteIcon,
+} from '@mui/icons-material';
 
 export const BookDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();

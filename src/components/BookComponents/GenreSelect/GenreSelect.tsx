@@ -1,9 +1,19 @@
 
 import React from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
-import {FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Box, Chip} from "@mui/material";
-import { Genre } from "../../../types";
+import { RootState } from "@/redux/store.ts";
+
+import { Genre } from "@/types";
+
+import {
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    SelectChangeEvent,
+    Box,
+    Chip,
+} from "@mui/material";
 
 interface GenreSelectProps {
     values: number[]; // Массив выбранных жанров
