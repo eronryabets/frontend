@@ -12,7 +12,7 @@ import {
   TextToSpeech,
   TextRenderer,
   TranslationDialog
-} from '@/components/BookComponents';
+} from '@/components';
 import AddWordModal from '@/components/WordComponents/AddWordModal/AddWordModal';
 import WordDetailModal from '@/components/WordComponents/WordDetailModal/WordDetailModal';
 
