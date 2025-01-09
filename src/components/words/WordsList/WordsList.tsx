@@ -28,7 +28,7 @@ import defaultCover from '../../../assets/default_word_image.jpg';
 import MapsUgcIcon from '@mui/icons-material/MapsUgc';
 import EditIcon from '@mui/icons-material/Edit';
 import {AddWordModal, EditWordModal }from "@/components";
-import { MyIconButton, SpeechButton } from "../../UtilityComponents";
+import { MyIconButton, SpeechButton } from "@/components";
 
 /**
  * Компонент отображения списка слов в словаре с поиском.

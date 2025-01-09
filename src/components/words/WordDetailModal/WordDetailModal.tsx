@@ -17,7 +17,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/redux/store.ts';
 import { fetchWordById, updateWord, deleteWord } from '@/redux/slices/wordsSlice.ts';
 import {EditWordModal} from '@/components';
-import { MyIconButton, SpeechButton } from '../../UtilityComponents';
+import { MyIconButton, SpeechButton } from '@/components';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -26,7 +26,7 @@ import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import { Stack } from '@mui/material';
-import ProgressBar from '../../UtilityComponents/ProgressBar/ProgressBar.tsx';
+import {ProgressBar} from '@/components';
 import progressColors from "../../../utils/constants/progressColors.ts";
 import {PartialUpdateWordPayload} from "@/types";
 

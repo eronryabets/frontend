@@ -37,6 +37,10 @@ import {
     Delete as DeleteIcon,
 } from '@mui/icons-material';
 
+import { EditBookModal } from '@/components';
+import { generatePageNumbers } from '@/utils/generatePageNumbers.ts';
+import defaultCover from '../../../assets/default_cover.png';
+
 export const BookDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { books, loading, error } = useSelector((state: RootState) => state.books);

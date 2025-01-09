@@ -7,7 +7,7 @@ import React from 'react';
 import { Box } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import progressColors from "../../../utils/constants/progressColors";
+import progressColors from "../../../utils/constants/progressColors.ts";
 
 
 interface ProgressBarProps {
@@ -17,7 +17,7 @@ interface ProgressBarProps {
     spacing?: number;      // Отступ между иконками в пикселях
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({
+export const ProgressBar: React.FC<ProgressBarProps> = ({
     progressAmount,
     value,
     size = 'medium',
