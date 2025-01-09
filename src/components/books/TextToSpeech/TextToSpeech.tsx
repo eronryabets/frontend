@@ -270,7 +270,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                             min={0}
                             max={2}
                             step={0.1}
-                            onChange={(e, newValue) => setPitch(newValue as number)}
+                            onChange={(_e, newValue) => setPitch(newValue as number)}
                             aria-labelledby="tts-pitch-slider"
                         />
                     </Box>
@@ -282,7 +282,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                             min={0.1}
                             max={10}
                             step={0.1}
-                            onChange={(e, newValue) => setRate(newValue as number)}
+                            onChange={(_e, newValue) => setRate(newValue as number)}
                             aria-labelledby="tts-rate-slider"
                         />
                     </Box>
@@ -294,7 +294,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                             min={0}
                             max={1}
                             step={0.1}
-                            onChange={(e, newValue) => setVolume(newValue as number)}
+                            onChange={(_e, newValue) => setVolume(newValue as number)}
                             aria-labelledby="tts-volume-slider"
                         />
                     </Box>

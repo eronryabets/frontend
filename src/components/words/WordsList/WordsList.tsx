@@ -96,7 +96,7 @@ export const WordsList: React.FC = () => {
     /**
      * Обработчик смены страницы пагинации.
      */
-    const handlePageChange = useCallback((event: React.ChangeEvent<unknown>, value: number) => {
+    const handlePageChange = useCallback((_event: React.ChangeEvent<unknown>, value: number) => {
         dispatch(setCurrentPage(value));
     }, [dispatch]);
 

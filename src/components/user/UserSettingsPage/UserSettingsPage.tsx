@@ -78,11 +78,6 @@ export const UserSettingsPage: React.FC = () => {
             setOpenErrorSnackbar(true);
         }
     }, [error, updateError]);
-
-    const handleModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setMode(event.target.value);
-    };
-
     const handleDictionaryChange = (event: SelectChangeEvent<string>) => {
     setSelectedDictionaryId(event.target.value as string);
 };

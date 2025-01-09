@@ -287,7 +287,7 @@ const wordsSlice = createSlice({
                 state.error = action.payload || 'Ошибка при удалении слова';
             })
             // Обработка fetchWordById
-            .addCase(fetchWordById.pending, (state) => {
+            .addCase(fetchWordById.pending, () => {
                 // Можно добавить поле loadingWord или другое, если нужно
             })
             .addCase(fetchWordById.fulfilled, (state, action) => {

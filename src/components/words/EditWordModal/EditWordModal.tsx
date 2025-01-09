@@ -105,7 +105,7 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
         }
     };
 
-    const handleProgressChange = (event: Event, newValue: number | number[]) => {
+    const handleProgressChange = (_event: Event, newValue: number | number[]) => {
         if (typeof newValue === 'number') {
             setProgress(newValue);
         }

@@ -30,7 +30,6 @@ import {
   useTheme,
   Pagination,
   Tooltip,
-  useMediaQuery,
   Drawer,
   Slider,
   Snackbar,
@@ -42,7 +41,7 @@ import {
 } from '@mui/icons-material';
 
 export const PageDetail: React.FC = () => {
-  const { bookId, chapterId, pageNumber } = useParams<{
+  const { bookId, pageNumber } = useParams<{
     bookId: string;
     chapterId: string;
     pageNumber: string;
@@ -65,7 +64,7 @@ export const PageDetail: React.FC = () => {
 
   const currentPageNumber = Number(pageNumber);
   const book = books.find((b) => b.id === bookId);
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  // const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const {
     selectedText,
@@ -102,9 +101,9 @@ export const PageDetail: React.FC = () => {
   }, [dispatch, book, chapter, currentPageNumber, navigate, bookId]);
 
   // Загружаем слова с прогрессом при первом заходе, если они не загружены
-  const dictionary_id = useSelector(
-    (state: RootState) => state.userInfo.userData.settings?.current_dictionary?.dictionary_id
-  );
+  // const dictionary_id = useSelector(
+  //   (state: RootState) => state.userInfo.userData.settings?.current_dictionary?.dictionary_id
+  // );
 
   // Это уже делает AuthListener
   // useEffect(() => {
@@ -116,7 +115,7 @@ export const PageDetail: React.FC = () => {
 
   const totalPagesInBook = book?.total_pages || 0;
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     const newPageNumber = value;
     const newChapter = findChapterByPageNumber(newPageNumber);
 
@@ -163,7 +162,7 @@ export const PageDetail: React.FC = () => {
   const handleSettingsOpen = () => setIsSettingsOpen(true);
   const handleSettingsClose = () => setIsSettingsOpen(false);
 
-  const handleFontSizeChange = (event: Event, newValue: number | number[]) => {
+  const handleFontSizeChange = (_event: Event, newValue: number | number[]) => {
     if (typeof newValue === 'number') {
       setFontSizeValue(newValue);
     }
@@ -204,7 +203,7 @@ export const PageDetail: React.FC = () => {
 
   // Закрытие Snackbar
   const handleSnackbarClose = (
-    event?: React.SyntheticEvent | Event,
+      _event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
     if (reason === 'clickaway') {

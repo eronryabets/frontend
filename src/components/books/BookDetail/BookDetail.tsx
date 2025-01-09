@@ -72,12 +72,12 @@ export const BookDetail: React.FC = () => {
     // Мемоизируем список глав с отображением страниц
     const memoizedChapters = useMemo(() => {
         if (!book) return null;
-        return book.chapters.map((chapter, index) => (
+        return book.chapters.map((chapter) => (
             <Accordion
                 sx={{ background: theme.customBackground.gradient}}
                 key={chapter.id}
                 expanded={expandedChapters.has(chapter.id)}
-                onChange={(event, isExpanded) => handleToggleChapter(chapter.id, isExpanded)}
+                onChange={(_event, isExpanded) => handleToggleChapter(chapter.id, isExpanded)}
             >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Typography>{`${chapter.chapter_title}`}</Typography>

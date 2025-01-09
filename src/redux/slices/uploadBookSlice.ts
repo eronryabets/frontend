@@ -1,4 +1,4 @@
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {BOOK_API_URL} from "../../config/urls";
 import api from "../../utils/api";
 
@@ -89,7 +89,7 @@ const uploadBookSlice = createSlice({
                 state.success = false;
                 state.error = null;
             })
-            .addCase(uploadBook.fulfilled, (state, action: PayloadAction<BookResponseData>) => {
+            .addCase(uploadBook.fulfilled, (state) => {
                 state.loading = false;
                 state.success = true;
                 state.responseMessage = { general: ["BookComponents uploaded successfully."] };
