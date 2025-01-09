@@ -2,11 +2,14 @@
  * Слайс для загрузки укороченного списка слово - ид - прогресс.
  */
 
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
-import api from "../../utils/api";
-import {WordProgress, WordsProgressState} from "../../types";
-import {GET_DICTIONARY_API_URL} from "../../config/urls";
-import {updateWord, deleteWord, addWord} from './wordsSlice';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+
+import api from '@/utils/api';
+import { GET_DICTIONARY_API_URL } from '@/config/urls.ts';
+
+import { WordProgress, WordsProgressState } from '@/types';
+import { updateWord, deleteWord, addWord } from './wordsSlice';
+
 
 const initialState: WordsProgressState = {
     words: [],

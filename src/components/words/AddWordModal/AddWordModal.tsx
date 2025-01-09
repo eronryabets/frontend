@@ -1,4 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { RootState, AppDispatch } from '@/redux/store.ts';
+import { addWord, resetAddWordState } from '@/redux/slices/wordsSlice.ts';
+
 import {
     Dialog,
     DialogTitle,
@@ -16,13 +21,12 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem
+    MenuItem,
 } from '@mui/material';
-import {PhotoCamera} from '@mui/icons-material';
-import {useSelector, useDispatch} from 'react-redux';
-import {RootState, AppDispatch} from '@/redux/store.ts';
-import {addWord, resetAddWordState} from '@/redux/slices/wordsSlice.ts';
-import defaultCover from '../../../assets/default_word_image.jpg';
+import { PhotoCamera } from '@mui/icons-material';
+
+import defaultCover from '@/assets/default_word_image.jpg';
+
 
 
 interface AddWordModalProps {

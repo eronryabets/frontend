@@ -1,9 +1,10 @@
-import React, {useEffect, useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from "@/redux/store.ts";
-import {setTheme} from "@/redux/slices/themeSlice.ts";
-import {fetchDictionaries} from "@/redux/slices/dictionarySlice.ts";
-import {fetchWordsProgress} from "@/redux/slices/wordsProgressSlice.ts";
+import React, { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { AppDispatch, RootState } from '@/redux/store.ts';
+import { setTheme } from '@/redux/slices/themeSlice.ts';
+import { fetchDictionaries } from '@/redux/slices/dictionarySlice.ts';
+import { fetchWordsProgress } from '@/redux/slices/wordsProgressSlice.ts';
 
 
 export const AuthListener: React.FC = () => {

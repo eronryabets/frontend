@@ -1,8 +1,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { Page, PageState } from '../../types';
-import api from '../../utils/api';
-import {BOOK_PAGE_API_URL} from "../../config/urls";
+
+import { Page, PageState } from '@/types';
+import api from '@/utils/api';
+import { BOOK_PAGE_API_URL } from '@/config/urls.ts';
+
 
 const initialState: PageState = {
     page: null,

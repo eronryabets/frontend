@@ -1,8 +1,10 @@
 
-import {AUTH_API_URL} from "../config/urls";
 import axios from 'axios';
-import store from "../redux/store";
-import {logout} from "../redux/slices/authorizationSlice";
+
+import { AUTH_API_URL } from '../config/urls';
+import store from '../redux/store';
+import { logout } from '../redux/slices/authorizationSlice';
+
 
 const api = axios.create({
     baseURL: AUTH_API_URL,

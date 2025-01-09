@@ -1,30 +1,35 @@
 import React from 'react';
-import {Provider, useSelector} from 'react-redux';
-import {PersistGate} from 'redux-persist/integration/react';
-import {store, persistor, RootState} from './redux/store';
+import { Provider, useSelector } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor, RootState } from './redux/store';
 
-import {ThemeProvider} from '@mui/material/styles';
-import {MuiTheme} from "@/components";
-import {CssBaseline} from "@mui/material";
-import {RegistrationPage} from "@/components";
-import {HelmetProvider} from "react-helmet-async";
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
-import {LoginPage} from "@/components";
-import {ProfilePage} from "@/components";
-import {NotFoundPage} from "@/components";
-import {ProtectedRoute} from "@/components";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
+
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import { GlobalStyles } from './styles';
+
+import {
+    MuiTheme,
+    Layout,
+    RegistrationPage,
+    LoginPage,
+    ProfilePage,
+    NotFoundPage,
+    ProtectedRoute,
+    DictionariesList,
+    UserSettingsPage,
+} from '@/components';
+
 import {
     BookUpload,
     BooksList,
     BookDetail,
-    PageDetail
-} from "./components";
-import {GlobalStyles} from './styles';
-import {Layout} from "@/components";
-import {DictionariesList} from "@/components";
-import {WordsList} from "./components";
-import {UserSettingsPage} from "@/components";
-import {AuthListener} from "./components";
+    PageDetail,
+    WordsList,
+    AuthListener,
+} from './components';
+
 
 const AppContent = () => {
 

@@ -1,5 +1,3 @@
-import { getGradient } from "@/utils/getGradient";
-
 declare module '@mui/material/styles' {
     interface Theme {
         customBackground: {

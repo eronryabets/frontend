@@ -1,5 +1,6 @@
 import {createTheme} from '@mui/material/styles';
 import {blue, red} from '@mui/material/colors';
+
 import {getGradient} from "@/utils/getGradient.ts";
 
 export const MuiTheme = (themeMode: 'light' | 'dark') => {

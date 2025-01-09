@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { AppDispatch, RootState } from '../redux/store';
 import { fetchTranslation, clearTranslation } from '../redux/slices/translationSlice';
-import {AppDispatch, RootState} from '../redux/store';
+
 
 interface UseTextSelectionReturn {
     anchorEl: HTMLElement | null;

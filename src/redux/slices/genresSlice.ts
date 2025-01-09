@@ -1,9 +1,10 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { Genre, GenresState } from '../../types';
-import { BOOK_GENRES_API_URL } from '../../config/urls';
-import api from "../../utils/api"; // Убедитесь, что у вас есть соответствующая конфигурация
+
+import { Genre, GenresState } from '@/types';
+import { BOOK_GENRES_API_URL } from '@/config/urls.ts';
+import api from '@/utils/api';
 
 // Изначальное состояние для слайса
 const initialState: GenresState = {

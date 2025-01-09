@@ -1,7 +1,9 @@
-import {configureStore} from '@reduxjs/toolkit';
-import storage from 'redux-persist/lib/storage'; // локальное хранилище браузера
-import {persistReducer, persistStore} from 'redux-persist';
+import { configureStore } from '@reduxjs/toolkit';
+import { persistReducer, persistStore } from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; // Локальное хранилище браузера
+
 import rootReducer from './rootReducer';
+
 
 // Конфигурация для Redux Persist
 const persistConfig: { storage: any; whitelist: string[]; key: string } = {

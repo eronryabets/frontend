@@ -1,7 +1,8 @@
-import React, {useState} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../../redux/store.ts";
-import {registerUser} from "../../../redux/slices/registrationSlice.ts";
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
+
+import { AppDispatch, RootState } from "@/redux/store.ts";
+import { registerUser } from "@/redux/slices/registrationSlice.ts";
 
 import {
     TextField,
@@ -13,12 +14,15 @@ import {
     useTheme,
     FormControl,
     InputLabel,
-    Select, MenuItem
+    Select,
+    MenuItem,
 } from '@mui/material';
-import {PhotoCamera} from "@mui/icons-material";
-import {v4 as uuidv4} from 'uuid';
-import {languageOptions} from "../../../config/languageOptions.ts";
-import {SelectChangeEvent} from "@mui/material/Select";
+import { PhotoCamera } from "@mui/icons-material";
+
+import { v4 as uuidv4 } from 'uuid';
+
+import { languageOptions } from "@/config/languageOptions.ts";
+import { SelectChangeEvent } from "@mui/material/Select";
 
 export const RegistrationPage: React.FC = () => {
 

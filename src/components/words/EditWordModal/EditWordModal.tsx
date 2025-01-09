@@ -1,4 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { RootState, AppDispatch } from '@/redux/store.ts';
+import { updateWord, deleteWord } from '@/redux/slices/wordsSlice.ts';
+
 import {
     Dialog,
     DialogTitle,
@@ -14,14 +19,13 @@ import {
     Chip,
     Stack,
     Typography,
-    Slider
+    Slider,
 } from '@mui/material';
-import {PhotoCamera} from '@mui/icons-material';
-import {useSelector, useDispatch} from 'react-redux';
-import {RootState, AppDispatch} from '../../../redux/store.ts';
-import {updateWord, deleteWord} from '../../../redux/slices/wordsSlice.ts';
-import defaultCover from '../../../assets/default_word_image.jpg';
-import progressColors from "../../../utils/constants/progressColors.ts";
+import { PhotoCamera } from '@mui/icons-material';
+
+import defaultCover from '@/assets/default_word_image.jpg';
+import progressColors from '@/utils/constants/progressColors.ts';
+
 
 interface EditWordModalProps {
     open: boolean;

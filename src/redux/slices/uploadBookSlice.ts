@@ -1,10 +1,12 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {BOOK_API_URL} from "../../config/urls";
-import api from "../../utils/api";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-import {BookData, UploadBookState, BookResponseData} from '../../types';
-import axios from "axios";
-import normalizeAndLimitErrors from "../../utils/normalizeAndLimitErrors";
+import { BOOK_API_URL } from '@/config/urls.ts';
+import api from '../../utils/api';
+import normalizeAndLimitErrors from '@/utils/normalizeAndLimitErrors';
+
+import { BookData, UploadBookState, BookResponseData } from '@/types';
+
 
 // Изначальное состояние для слайса
 const initialState: UploadBookState = {

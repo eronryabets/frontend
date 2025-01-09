@@ -1,9 +1,10 @@
-
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks.ts';
-import { fetchDictionaries, setCurrentPage } from '../../../redux/slices/dictionarySlice.ts';
-import { RootState } from '../../../redux/store.ts';
 import { Link } from 'react-router-dom';
+
+import { useAppDispatch, useAppSelector } from '@/redux/hooks.ts';
+import { fetchDictionaries, setCurrentPage } from '@/redux/slices/dictionarySlice.ts';
+import { RootState } from '@/redux/store.ts';
+
 import {
     Card,
     CardMedia,
@@ -17,7 +18,8 @@ import {
     CardActionArea,
     useTheme,
 } from '@mui/material';
-import defaultCover from '../../../assets/default_cover.png'; // ПОСТАВИТЬ ПОТОМ ДРУГУЮ ЗАГЛУШКУ
+
+import defaultCover from '@/assets/default_cover.png'; // ПОСТАВИТЬ ПОТОМ ДРУГУЮ ЗАГЛУШКУ
 
 export const DictionariesList: React.FC = () => {
     const dispatch = useAppDispatch();

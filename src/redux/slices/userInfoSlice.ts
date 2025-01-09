@@ -1,7 +1,9 @@
-import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
-import api from "../../utils/api";
-import {AUTH_API_URL, USER_API_URL} from "../../config/urls";
-import {ProfileData, UserInfoResponseData, UserInfoState} from "../../types";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+import api from "@/utils/api";
+import { AUTH_API_URL, USER_API_URL } from "@/config/urls.ts";
+
+import { ProfileData, UserInfoResponseData, UserInfoState } from "@/types";
 
 // Изначальное состояние
 const initialState: UserInfoState = {

@@ -1,11 +1,13 @@
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import api from "../../utils/api";
-import {AUTH_API_URL} from "../../config/urls";
-import {clearUserInfo, getUserInfo} from "./userInfoSlice";
-import {AuthorizationData, AuthorizationState} from "../../types";
-import {persistor} from "../store";
 
+import api from '@/utils/api';
+import { AUTH_API_URL } from '@/config/urls.ts';
+
+import { clearUserInfo, getUserInfo } from './userInfoSlice';
+import { AuthorizationData, AuthorizationState } from '@/types';
+
+import { persistor } from '../store';
 
 // Изначальное состояние авторизации
 const initialState: AuthorizationState = {

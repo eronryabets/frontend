@@ -1,8 +1,15 @@
-import React, {useEffect, useState} from "react";
-import {useSelector} from 'react-redux';
-import {RootState} from '../../../redux/store.ts';
-import {useAppDispatch} from '../../../redux/hooks.ts';
-import {getUserInfo, patchUserAuthInfo, patchUserProfileInfo, resetUpdateState} from '../../../redux/slices/userInfoSlice.ts';
+import React, { useEffect, useState } from "react";
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '@/redux/hooks.ts';
+
+import { RootState } from '@/redux/store.ts';
+import {
+    getUserInfo,
+    patchUserAuthInfo,
+    patchUserProfileInfo,
+    resetUpdateState
+} from '@/redux/slices/userInfoSlice.ts';
+
 import {
     Avatar,
     Box,
@@ -11,13 +18,23 @@ import {
     TextField,
     Button,
     IconButton,
-    useTheme, Alert, Snackbar, CircularProgress, FormControl, InputLabel, Select, MenuItem,
+    useTheme,
+    Alert,
+    Snackbar,
+    CircularProgress,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
 } from '@mui/material';
+
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import {v4 as uuidv4} from 'uuid';
-import {USER_API_MEDIA_URL} from "../../../config/urls.ts";
-import {languageOptions} from "../../../config/languageOptions.ts";
-import {SelectChangeEvent} from "@mui/material/Select";
+
+import { v4 as uuidv4 } from 'uuid';
+
+import { USER_API_MEDIA_URL } from "@/config/urls.ts";
+import { languageOptions } from "@/config/languageOptions.ts";
+import { SelectChangeEvent } from "@mui/material/Select";
 
 export const ProfilePage: React.FC = () => {
     const dispatch = useAppDispatch();

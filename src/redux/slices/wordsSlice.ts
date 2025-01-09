@@ -1,15 +1,19 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import api from "../../utils/api";
+
+import api from '../../utils/api';
+
 import {
     WordsResponse,
     WordsState,
     Word,
     AddWordPayload,
-    PartialUpdateWordPayload
-} from "../../types";
-import { PAGE_SIZE } from "../../utils/constants/constants";
-import { GET_DICT_WORDS_URL } from "../../config/urls";
+    PartialUpdateWordPayload,
+} from '@/types';
+
+import { PAGE_SIZE } from '@/utils/constants/constants.ts';
+import { GET_DICT_WORDS_URL } from '@/config/urls.ts';
+
 
 const initialState: WordsState = {
     words: [],

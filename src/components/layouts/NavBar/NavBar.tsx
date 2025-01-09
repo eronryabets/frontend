@@ -1,4 +1,12 @@
 import React from 'react';
+import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useAppDispatch } from '@/redux/hooks.ts';
+
+import { RootState } from "@/redux/store.ts";
+import { toggleTheme } from "@/redux/slices/themeSlice.ts";
+import { logout } from "@/redux/slices/authorizationSlice.ts";
+
 import {
     AppBar,
     Toolbar,
@@ -10,18 +18,15 @@ import {
     Tooltip,
     Button,
     Box,
-    Fade
+    Fade,
 } from '@mui/material';
-import {toggleTheme} from "../../../redux/slices/themeSlice.ts";
-import {useSelector} from "react-redux";
-import {RootState} from "../../../redux/store.ts";
-import {useAppDispatch} from '../../../redux/hooks.ts';
 
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import {logout} from "../../../redux/slices/authorizationSlice.ts";
-import {Link, useLocation} from "react-router-dom";
-import {USER_API_MEDIA_URL} from "../../../config/urls.ts";
+import {
+    Brightness7 as Brightness7Icon,
+    Brightness4 as Brightness4Icon,
+} from '@mui/icons-material';
+
+import {USER_API_MEDIA_URL} from "@/config/urls.ts";
 
 
 export const NavBar = () => {

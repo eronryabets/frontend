@@ -1,9 +1,16 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../../redux/store.ts';
-import { fetchWords, setCurrentPage, setDictionaryId, setSearchTerm } from '../../../redux/slices/wordsSlice.ts';
 import { useParams, useSearchParams } from 'react-router-dom';
+
+import { RootState, AppDispatch } from '@/redux/store.ts';
+import {
+    fetchWords,
+    setCurrentPage,
+    setDictionaryId,
+    setSearchTerm,
+} from '@/redux/slices/wordsSlice.ts';
+
 import {
     Pagination,
     CircularProgress,
@@ -23,12 +30,16 @@ import {
     Tooltip,
     IconButton,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import defaultCover from '../../../assets/default_word_image.jpg';
-import MapsUgcIcon from '@mui/icons-material/MapsUgc';
-import EditIcon from '@mui/icons-material/Edit';
-import {AddWordModal, EditWordModal }from "@/components";
-import { MyIconButton, SpeechButton } from "@/components";
+
+import {
+    Close as CloseIcon,
+    MapsUgc as MapsUgcIcon,
+    Edit as EditIcon,
+} from '@mui/icons-material';
+
+import { AddWordModal, EditWordModal, MyIconButton, SpeechButton } from '@/components';
+import defaultCover from '@/assets/default_word_image.jpg';
+
 
 /**
  * Компонент отображения списка слов в словаре с поиском.

@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
+
 import { IconButton, Tooltip } from '@mui/material';
-import StopIcon from '@mui/icons-material/Stop';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import { Stop as StopIcon, VolumeUp as VolumeUpIcon } from '@mui/icons-material';
+
 
 interface SpeechButtonProps {
     text: string;

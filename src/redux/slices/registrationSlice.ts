@@ -1,8 +1,11 @@
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import {AUTH_API_URL, USER_API_URL} from "../../config/urls";
-import api from "../../utils/api";
-import {RegistrationData, RegistrationState, RegistrationResponseData} from "../../types";
+
+import { AUTH_API_URL, USER_API_URL } from '@/config/urls.ts';
+import api from '@/utils/api';
+
+import { RegistrationData, RegistrationState, RegistrationResponseData } from '@/types';
+
 
 
 

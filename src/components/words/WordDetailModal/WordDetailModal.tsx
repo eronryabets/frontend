@@ -1,4 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { RootState, AppDispatch } from '@/redux/store.ts';
+import { fetchWordById, updateWord } from '@/redux/slices/wordsSlice.ts';
+
 import {
     Dialog,
     DialogTitle,
@@ -12,23 +17,23 @@ import {
     Chip,
     Tooltip,
     IconButton,
+    Stack,
 } from '@mui/material';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState, AppDispatch } from '@/redux/store.ts';
-import { fetchWordById, updateWord } from '@/redux/slices/wordsSlice.ts';
-import {EditWordModal} from '@/components';
-import { MyIconButton, SpeechButton } from '@/components';
-import EditIcon from '@mui/icons-material/Edit';
-import CloseIcon from '@mui/icons-material/Close';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import CastForEducationIcon from '@mui/icons-material/CastForEducation';
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
-import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
-import { Stack } from '@mui/material';
-import {ProgressBar} from '@/components';
-import progressColors from "../../../utils/constants/progressColors.ts";
-import {PartialUpdateWordPayload} from "@/types";
+
+import {
+    Edit as EditIcon,
+    Close as CloseIcon,
+    Visibility as VisibilityIcon,
+    CalendarMonth as CalendarMonthIcon,
+    CastForEducation as CastForEducationIcon,
+    ArrowCircleUp as ArrowCircleUpIcon,
+    ArrowCircleDown as ArrowCircleDownIcon,
+} from '@mui/icons-material';
+
+import { EditWordModal, MyIconButton, SpeechButton, ProgressBar } from '@/components';
+import progressColors from '@/utils/constants/progressColors.ts';
+import { PartialUpdateWordPayload } from '@/types';
+
 
 interface WordDetailModalProps {
     open: boolean;

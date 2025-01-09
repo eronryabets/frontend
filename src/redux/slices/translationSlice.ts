@@ -1,7 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import {TRANSLATE_API_URL} from "../../config/urls";
-import { TranslationRequest, TranslationResponse, TranslationState } from '../../types/translationTypes';
-import api from "../../utils/api";
+
+import { TRANSLATE_API_URL } from '@/config/urls.ts';
+import api from '@/utils/api';
+
+import {
+    TranslationRequest,
+    TranslationResponse,
+    TranslationState,
+} from '@/types/translationTypes.ts';
+
 
 const initialState: TranslationState = {
     translation: '',
