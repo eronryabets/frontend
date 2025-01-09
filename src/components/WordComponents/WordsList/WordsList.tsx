@@ -1,4 +1,3 @@
-// WordsList.tsx
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
