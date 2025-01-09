@@ -1,9 +1,9 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Box, Toolbar } from '@mui/material';
-import {NavBar} from "../NavBar";
+import {NavBar} from "@/components";
 
-const Layout: React.FC = () => {
+export const Layout: React.FC = () => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <NavBar />
@@ -15,4 +15,3 @@ const Layout: React.FC = () => {
     );
 };
 
-export default Layout;

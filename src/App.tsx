@@ -4,15 +4,15 @@ import {PersistGate} from 'redux-persist/integration/react';
 import {store, persistor, RootState} from './redux/store';
 
 import {ThemeProvider} from '@mui/material/styles';
-import {MuiTheme} from "./components/MuiTheme";
+import {MuiTheme} from "@/components";
 import {CssBaseline} from "@mui/material";
-import {RegistrationPage} from "./components/RegistrationPage";
+import {RegistrationPage} from "@/components";
 import {HelmetProvider} from "react-helmet-async";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
-import {LoginPage} from "./components/LoginPage";
-import {ProfilePage} from "./components/UserComponents";
-import {NotFoundPage} from "./components/NotFoundPage";
-import {ProtectedRoute} from "./components/ProtectedRoute";
+import {LoginPage} from "@/components";
+import {ProfilePage} from "@/components";
+import {NotFoundPage} from "@/components";
+import {ProtectedRoute} from "@/components";
 import {
     BookUpload,
     BooksList,
@@ -20,10 +20,10 @@ import {
     PageDetail
 } from "./components";
 import {GlobalStyles} from './styles';
-import Layout from "./components/Layout/Layout";
-import DictionariesList from "./components/DictionariesComponents/DictionariesList/DictionariesList";
+import {Layout} from "@/components";
+import {DictionariesList} from "@/components";
 import {WordsList} from "./components";
-import {UserSettingsPage} from "./components/UserComponents";
+import {UserSettingsPage} from "@/components";
 import {AuthListener} from "./components";
 
 const AppContent = () => {

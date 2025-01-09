@@ -1,8 +1,8 @@
 
 import React, { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { fetchDictionaries, setCurrentPage } from '../../../redux/slices/dictionarySlice';
-import { RootState } from '../../../redux/store';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks.ts';
+import { fetchDictionaries, setCurrentPage } from '../../../redux/slices/dictionarySlice.ts';
+import { RootState } from '../../../redux/store.ts';
 import { Link } from 'react-router-dom';
 import {
     Card,
@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import defaultCover from '../../../assets/default_cover.png'; // ПОСТАВИТЬ ПОТОМ ДРУГУЮ ЗАГЛУШКУ
 
-const DictionariesList: React.FC = () => {
+export const DictionariesList: React.FC = () => {
     const dispatch = useAppDispatch();
     const { dictionaries, loading, error, currentPage, totalPages } = useAppSelector(
         (state: RootState) => state.dictionaries
@@ -162,4 +162,3 @@ const DictionariesList: React.FC = () => {
     );
 };
 
-export default DictionariesList;

@@ -12,16 +12,16 @@ import {
     Box,
     Fade
 } from '@mui/material';
-import {toggleTheme} from "../../redux/slices/themeSlice";
+import {toggleTheme} from "../../../redux/slices/themeSlice.ts";
 import {useSelector} from "react-redux";
-import {RootState} from "../../redux/store";
-import {useAppDispatch} from '../../redux/hooks';
+import {RootState} from "../../../redux/store.ts";
+import {useAppDispatch} from '../../../redux/hooks.ts';
 
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
-import {logout} from "../../redux/slices/authorizationSlice";
+import {logout} from "../../../redux/slices/authorizationSlice.ts";
 import {Link, useLocation} from "react-router-dom";
-import {USER_API_MEDIA_URL} from "../../config/urls";
+import {USER_API_MEDIA_URL} from "../../../config/urls.ts";
 
 
 export const NavBar = () => {

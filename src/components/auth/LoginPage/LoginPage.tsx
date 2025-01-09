@@ -1,8 +1,8 @@
 import {TextField, Button, Box, Typography, Alert, useTheme} from '@mui/material';
 import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../redux/store";
+import {AppDispatch, RootState} from "../../../redux/store.ts";
 import React, {useEffect, useState} from "react";
-import {authorizationUser, resetState} from "../../redux/slices/authorizationSlice";
+import {authorizationUser, resetState} from "../../../redux/slices/authorizationSlice.ts";
 import {useNavigate} from "react-router-dom";
 
 

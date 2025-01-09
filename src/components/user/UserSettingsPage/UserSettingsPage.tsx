@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {useSelector} from 'react-redux';
-import {RootState} from '../../../redux/store';
-import {useAppDispatch} from '../../../redux/hooks';
-import {getUserInfo, patchUserProfileInfo, resetUpdateState} from '../../../redux/slices/userInfoSlice';
+import {RootState} from '../../../redux/store.ts';
+import {useAppDispatch} from '../../../redux/hooks.ts';
+import {getUserInfo, patchUserProfileInfo, resetUpdateState} from '../../../redux/slices/userInfoSlice.ts';
 import {
     Box,
     Typography,
@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import {Dictionary} from '../../../types';
 import {SelectChangeEvent} from '@mui/material/Select';
-import {setTheme} from "../../../redux/slices/themeSlice";
+import {setTheme} from "../../../redux/slices/themeSlice.ts";
 
 
 // Предполагаем, что settings имеет форму:
