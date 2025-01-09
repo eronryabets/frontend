@@ -5,8 +5,7 @@ import {AUTH_API_URL} from "../../config/urls";
 import {clearUserInfo, getUserInfo} from "./userInfoSlice";
 import {AuthorizationData, AuthorizationState} from "../../types";
 import {persistor} from "../store";
-import {setTheme} from "./themeSlice";
-import {fetchDictionaries} from "./dictionarySlice";
+
 
 // Изначальное состояние авторизации
 const initialState: AuthorizationState = {

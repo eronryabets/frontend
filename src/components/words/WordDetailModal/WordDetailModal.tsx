@@ -11,11 +11,11 @@ import {
     Alert,
     Chip,
     Tooltip,
-    IconButton, Snackbar,
+    IconButton,
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/redux/store.ts';
-import { fetchWordById, updateWord, deleteWord } from '@/redux/slices/wordsSlice.ts';
+import { fetchWordById, updateWord } from '@/redux/slices/wordsSlice.ts';
 import {EditWordModal} from '@/components';
 import { MyIconButton, SpeechButton } from '@/components';
 import EditIcon from '@mui/icons-material/Edit';
