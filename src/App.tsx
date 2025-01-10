@@ -19,16 +19,14 @@ import {
     ProtectedRoute,
     DictionariesList,
     UserSettingsPage,
-} from '@/components';
-
-import {
     BookUpload,
     BooksList,
     BookDetail,
     PageDetail,
     WordsList,
     AuthListener,
-} from './components';
+} from '@/components';
+
 
 
 const AppContent = () => {

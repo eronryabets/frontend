@@ -3,6 +3,34 @@ import {blue, red} from '@mui/material/colors';
 
 import {getGradient} from "@/utils/getGradient.ts";
 
+declare module '@mui/material/styles' {
+    interface Theme {
+        customBackground: {
+            gradient: string;
+            paperGradient: string;
+        };
+        customColors: {
+            gradientStart: string;
+            gradientEnd: string;
+            paperGradientStart: string;
+            paperGradientEnd: string;
+        };
+    }
+
+    interface ThemeOptions {
+        customBackground?: {
+            gradient?: string;
+            paperGradient?: string;
+        };
+        customColors?: {
+            gradientStart?: string;
+            gradientEnd?: string;
+            paperGradientStart?: string;
+            paperGradientEnd?: string;
+        }
+    }
+}
+
 export const MuiTheme = (themeMode: 'light' | 'dark') => {
     const isLight = themeMode === 'light';
 
