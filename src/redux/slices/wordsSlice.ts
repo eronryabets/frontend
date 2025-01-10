@@ -24,7 +24,16 @@ const initialState: WordsState = {
     dictionaryId: null,
     adding: false,
     addError: null,
-    search: '', // Добавлено поле для поиска
+    search: '',
+     filters: {
+        tags: [] as string[], // Массив названий тегов
+        progress_min: null as number | null,
+        progress_max: null as number | null,
+        count_min: null as number | null,
+        count_max: null as number | null,
+        created_at_after: null as string | null, // ISO строка даты
+        created_at_before: null as string | null, // ISO строка даты
+    },
 };
 
 /**
@@ -32,11 +41,11 @@ const initialState: WordsState = {
  */
 export const fetchWords = createAsyncThunk<
     WordsResponse,
-    { dictionaryId: string; page: number; search?: string }, // Добавлен search
+    { dictionaryId: string; page: number; search?: string; filters?: WordsState['filters'] }, // Добавлен filters
     { rejectValue: string }
 >(
     'words/fetchWords',
-    async ({ dictionaryId, page, search }, thunkAPI) => {
+    async ({ dictionaryId, page, search, filters }, thunkAPI) => {
         try {
             // Построение параметров запроса
             const params = new URLSearchParams();
@@ -44,6 +53,29 @@ export const fetchWords = createAsyncThunk<
             params.append('page', page.toString());
             if (search) {
                 params.append('search', search);
+            }
+            if (filters) {
+                if (filters.tags.length > 0) {
+                    filters.tags.forEach(tag => params.append('tags', tag));
+                }
+                if (filters.progress_min !== null) {
+                    params.append('progress_min', filters.progress_min.toString());
+                }
+                if (filters.progress_max !== null) {
+                    params.append('progress_max', filters.progress_max.toString());
+                }
+                if (filters.count_min !== null) {
+                    params.append('count_min', filters.count_min.toString());
+                }
+                if (filters.count_max !== null) {
+                    params.append('count_max', filters.count_max.toString());
+                }
+                if (filters.created_at_after) {
+                    params.append('created_at_after', filters.created_at_after);
+                }
+                if (filters.created_at_before) {
+                    params.append('created_at_before', filters.created_at_before);
+                }
             }
 
             const response = await api.get<WordsResponse>(
@@ -218,6 +250,15 @@ const wordsSlice = createSlice({
             state.dictionaryId = action.payload;
             state.currentPage = 1; // Сбрасываем текущую страницу при смене словаря
             state.search = ''; // Сбрасываем поиск при смене словаря
+            state.filters = {
+                tags: [],
+                progress_min: null,
+                progress_max: null,
+                count_min: null,
+                count_max: null,
+                created_at_after: null,
+                created_at_before: null,
+            };
         },
         /**
          * Устанавливает поисковый запрос и сбрасывает текущую страницу.
@@ -225,6 +266,13 @@ const wordsSlice = createSlice({
         setSearchTerm(state, action: PayloadAction<string>) {
             state.search = action.payload;
             state.currentPage = 1; // Сбрасываем страницу при новом поиске
+        },
+        /**
+         * Устанавливает значения фильтров и сбрасывает текущую страницу.
+         */
+        setFilters(state, action: PayloadAction<WordsState['filters']>) {
+            state.filters = action.payload;
+            state.currentPage = 1; // Сбрасываем страницу при изменении фильтров
         },
         /**
          * Сбрасывает состояние добавления слова.
@@ -318,6 +366,7 @@ export const {
     setCurrentPage,
     setDictionaryId,
     setSearchTerm,
+    setFilters,
     resetAddWordState
 } = wordsSlice.actions;
 export default wordsSlice.reducer;

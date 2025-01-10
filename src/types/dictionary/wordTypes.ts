@@ -35,6 +35,15 @@ export interface WordsState {
     search: string;
     adding: boolean;
     addError: string | null;
+    filters: {
+        tags: string[];
+        progress_min: number | null;
+        progress_max: number | null;
+        count_min: number | null;
+        count_max: number | null;
+        created_at_after: string | null;
+        created_at_before: string | null;
+    };
 }
 
 export interface AddWordPayload {

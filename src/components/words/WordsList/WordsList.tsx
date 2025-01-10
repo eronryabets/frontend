@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -9,6 +8,7 @@ import {
     setCurrentPage,
     setDictionaryId,
     setSearchTerm,
+    setFilters,
 } from '@/redux/slices/wordsSlice.ts';
 
 import {
@@ -29,6 +29,7 @@ import {
     TextField,
     Tooltip,
     IconButton,
+    Stack,
 } from '@mui/material';
 
 import {
@@ -37,16 +38,26 @@ import {
     Edit as EditIcon,
 } from '@mui/icons-material';
 
-import { AddWordModal, EditWordModal, MyIconButton, SpeechButton } from '@/components';
+import {
+    AddWordModal,
+    EditWordModal,
+    MyIconButton,
+    SpeechButton
+} from '@/components';
 import defaultCover from '@/assets/default_word_image.jpg';
 
+function formatDate(dateStr: string | null): string {
+    if (!dateStr) return '';
+    return dateStr.substring(0, 10); // или любая другая логика форматирования
+}
 
 /**
- * Компонент отображения списка слов в словаре с поиском.
+ * Компонент отображения списка слов в словаре с поиском и фильтрами.
  */
 export const WordsList: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // Получение ID словаря из URL
     const dispatch = useDispatch<AppDispatch>();
+
     const {
         words,
         loading,
@@ -55,13 +66,113 @@ export const WordsList: React.FC = () => {
         totalPages,
         dictionaryId,
         search,
+        filters, // <-- обратите внимание, что в стейте уже есть filters
     } = useSelector((state: RootState) => state.words);
+
     const [searchParams, setSearchParams] = useSearchParams();
 
     // Локальное состояние для ввода поиска
     const [searchInput, setSearchInput] = useState(search || '');
 
+    // ------------------------------------------------
+    // 1. Локальные состояния для фильтра тегов (множественный ввод)
+    // ------------------------------------------------
+    const [tagInput, setTagInput] = useState<string>('');
+    const [tagNames, setTagNames] = useState<string[]>(filters.tags || []);
+
+    // Обработчик изменения поля ввода тегов (для "ручного" ввода)
+    const handleTagInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        setTagInput(event.target.value);
+    }, []);
+
+    // Обработчик нажатия Enter или запятой для добавления нового тега в список
+    const handleTagKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
+        // Например, Enter или запятая
+        if (event.key === 'Enter' || event.key === ',') {
+            event.preventDefault();
+            const newTag = tagInput.trim();
+            if (newTag && !tagNames.includes(newTag)) {
+                setTagNames([...tagNames, newTag]);
+            }
+            setTagInput('');
+        }
+    }, [tagInput, tagNames]);
+
+    // Удаление тега
+    const handleRemoveTag = useCallback((tag: string) => {
+        setTagNames((prev) => prev.filter((t) => t !== tag));
+    }, []);
+
+    // ------------------------------------------------
+    // 2. Локальные состояния для фильтров по прогрессу, count, дате
+    // ------------------------------------------------
+    const [progressMin, setProgressMin] = useState<string>(filters.progress_min?.toString() || '');
+    const [progressMax, setProgressMax] = useState<string>(filters.progress_max?.toString() || '');
+
+    const [countMin, setCountMin] = useState<string>(filters.count_min?.toString() || '');
+    const [countMax, setCountMax] = useState<string>(filters.count_max?.toString() || '');
+
+    // Для дат можно использовать DatePicker из MUI или просто текстовые поля в формате YYYY-MM-DD
+    const [createdAtAfter, setCreatedAtAfter] = useState<string>(filters.created_at_after || '');
+    const [createdAtBefore, setCreatedAtBefore] = useState<string>(filters.created_at_before || '');
+
+    // ------------------------------------------------
+    // Обработчик "Применить фильтры"
+    // ------------------------------------------------
+    const handleApplyFilters = useCallback(() => {
+        dispatch(
+            setFilters({
+                tags: tagNames,
+                progress_min: progressMin ? Number(progressMin) : null,
+                progress_max: progressMax ? Number(progressMax) : null,
+                count_min: countMin ? Number(countMin) : null,
+                count_max: countMax ? Number(countMax) : null,
+                created_at_after: createdAtAfter || null,
+                created_at_before: createdAtBefore || null,
+            })
+        );
+        // При желании здесь же можно сбросить текущую страницу на 1,
+        // но это уже по вашему желанию (или внутри редьюсера).
+    }, [
+        dispatch,
+        tagNames,
+        progressMin,
+        progressMax,
+        countMin,
+        countMax,
+        createdAtAfter,
+        createdAtBefore
+    ]);
+
+    // ------------------------------------------------
+    // Обработчик "Сбросить фильтры"
+    // ------------------------------------------------
+    const handleResetFilters = useCallback(() => {
+        setTagInput('');
+        setTagNames([]);
+        setProgressMin('');
+        setProgressMax('');
+        setCountMin('');
+        setCountMax('');
+        setCreatedAtAfter('');
+        setCreatedAtBefore('');
+        // Сбрасываем в Redux:
+        dispatch(
+            setFilters({
+                tags: [],
+                progress_min: null,
+                progress_max: null,
+                count_min: null,
+                count_max: null,
+                created_at_after: null,
+                created_at_before: null,
+            })
+        );
+    }, [dispatch]);
+
+    // ------------------------------------------------
     // Состояния модальных окон
+    // ------------------------------------------------
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editWordData, setEditWordData] = useState<null | {
@@ -91,18 +202,25 @@ export const WordsList: React.FC = () => {
         }
     }, [dispatch, id, searchParams, dictionaryId]);
 
-    // Эффект для загрузки слов при изменении ID словаря, страницы или поиска
+    // Эффект для загрузки слов при изменении ID словаря, страницы, поиска или filters
     useEffect(() => {
         if (id && dictionaryId) {
-            dispatch(fetchWords({ dictionaryId: id, page: currentPage, search }));
-            // Обновление параметров URL
+            dispatch(
+                fetchWords({
+                    dictionaryId: id,
+                    page: currentPage,
+                    search,
+                    filters, // <-- обязательно передаём filters
+                })
+            );
+            // Обновление параметров URL (примерно как раньше)
             const params: any = { page: currentPage.toString() };
             if (search) {
                 params.search = search;
             }
             setSearchParams(params);
         }
-    }, [dispatch, id, dictionaryId, currentPage, search, setSearchParams]);
+    }, [dispatch, id, dictionaryId, currentPage, search, filters, setSearchParams]);
 
     /**
      * Обработчик смены страницы пагинации.
@@ -111,23 +229,15 @@ export const WordsList: React.FC = () => {
         dispatch(setCurrentPage(value));
     }, [dispatch]);
 
-    /**
-     * Открывает модальное окно добавления слова.
-     */
+    // ---- работа с модалками далее ----
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);
     }, []);
 
-    /**
-     * Закрывает модальное окно добавления слова.
-     */
     const handleCloseAddModal = useCallback(() => {
         setIsAddModalOpen(false);
     }, []);
 
-    /**
-     * Открывает модальное окно редактирования слова с данными выбранного слова.
-     */
     const handleOpenEditModal = useCallback((word: any) => {
         setEditWordData({
             id: word.id,
@@ -140,9 +250,6 @@ export const WordsList: React.FC = () => {
         setIsEditModalOpen(true);
     }, []);
 
-    /**
-     * Закрывает модальное окно редактирования слова и сбрасывает данные.
-     */
     const handleCloseEditModal = useCallback(() => {
         setIsEditModalOpen(false);
         setEditWordData(null);
@@ -152,67 +259,66 @@ export const WordsList: React.FC = () => {
     const currentDictionary = useSelector((state: RootState) =>
         state.dictionaries.dictionaries.find((dict) => dict.id === dictionaryId)
     );
-    const language = currentDictionary?.language || 'en-US'; // Значение по умолчанию
+    const language = currentDictionary?.language || 'en-US';
 
-    /**
-     * Обработчик успешного удаления слова.
-     */
     const handleDeleteSuccess = useCallback(() => {
         handleCloseEditModal();
-        // Отображение сообщения об успешном удалении
         setSnackbarMessage('Слово успешно удалено.');
         setSnackbarOpen(true);
     }, [handleCloseEditModal]);
 
-    /**
-     * Закрывает Snackbar уведомление.
-     */
     const handleSnackbarClose = useCallback(() => {
         setSnackbarOpen(false);
     }, []);
 
-    /**
-     * Обработчик изменения значения в поле поиска.
-     */
     const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchInput(event.target.value);
     }, []);
 
-    /**
-     * Обработчик отправки поиска.
-     */
     const handleSearch = useCallback(() => {
         dispatch(setSearchTerm(searchInput.trim()));
     }, [dispatch, searchInput]);
 
-    /**
-     * Обработчик нажатия Enter в поле поиска.
-     */
     const handleSearchKeyPress = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             handleSearch();
         }
     }, [handleSearch]);
 
-    /**
-     * Обработчик сброса поиска.
-     */
     const handleResetSearch = useCallback(() => {
         setSearchInput('');
         dispatch(setSearchTerm(''));
     }, [dispatch]);
 
     // Отображение индикатора загрузки
-    if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress/></Box>;
+    if (loading) {
+        return (
+            <Box display="flex" justifyContent="center" mt={4}>
+                <CircularProgress/>
+            </Box>
+        );
+    }
     // Отображение ошибки
-    if (error) return <Typography color="error" align="center" mt={4}>{error}</Typography>;
+    if (error) {
+        return (
+            <Typography color="error" align="center" mt={4}>
+                {error}
+            </Typography>
+        );
+    }
 
     return (
         <Box p={3}>
             <Typography variant="h4" gutterBottom>
                 Слова в словаре
             </Typography>
-            <Box sx={{ pl: 2, pb: 2, display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+
+            {/* -----------------------------
+                Блок с кнопкой "Добавить слово" и поиском
+            ----------------------------- */}
+            <Box
+                sx={{ pl: 2, pb: 2, display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}
+            >
                 <Button
                     variant="contained"
                     color="primary"
@@ -223,7 +329,6 @@ export const WordsList: React.FC = () => {
                     Добавить слово
                 </Button>
 
-                {/* Поле ввода поиска */}
                 <TextField
                     label="Поиск слов"
                     variant="outlined"
@@ -252,13 +357,135 @@ export const WordsList: React.FC = () => {
                     color="secondary"
                     onClick={handleSearch}
                     sx={{ mr: 2, mb: { xs: 2, sm: 0 } }}
-                    disabled={loading} // Отключить кнопку во время загрузки
+                    disabled={loading}
                 >
                     {loading ? <CircularProgress size={24} /> : 'Поиск'}
                 </Button>
             </Box>
+
+            {/* -----------------------------
+                Блок ФИЛЬТРОВ
+            ----------------------------- */}
+            <Box
+                sx={{
+                    pl: 2,
+                    pb: 2,
+                    mt: 2,
+                    border: '1px solid #ccc',
+                    borderRadius: 2,
+                    p: 2
+                }}
+            >
+                <Typography variant="h6" gutterBottom>
+                    Фильтры
+                </Typography>
+
+                {/* Теги */}
+                <TextField
+                    fullWidth
+                    label="Теги (введите через запятую/Enter)"
+                    name="tags"
+                    value={tagInput}
+                    onChange={handleTagInputChange}
+                    onKeyDown={handleTagKeyDown}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    placeholder="Введите тег и нажмите Enter или запятую"
+                />
+                {tagNames.length > 0 && (
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{ mb: 2, flexWrap: 'wrap' }}
+                    >
+                        {tagNames.map((tag) => (
+                            <Chip
+                                key={tag}
+                                label={tag}
+                                onDelete={() => handleRemoveTag(tag)}
+                                variant="outlined"
+                            />
+                        ))}
+                    </Stack>
+                )}
+
+                {/* Progress От и До */}
+                <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+                    <TextField
+                        type="number"
+                        label="Progress min"
+                        value={progressMin}
+                        onChange={(e) => setProgressMin(e.target.value)}
+                        sx={{ width: 150 }}
+                    />
+                    <TextField
+                        type="number"
+                        label="Progress max"
+                        value={progressMax}
+                        onChange={(e) => setProgressMax(e.target.value)}
+                        sx={{ width: 150 }}
+                    />
+                </Box>
+
+                {/* Count От и До */}
+                <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+                    <TextField
+                        type="number"
+                        label="Count min"
+                        value={countMin}
+                        onChange={(e) => setCountMin(e.target.value)}
+                        sx={{ width: 150 }}
+                    />
+                    <TextField
+                        type="number"
+                        label="Count max"
+                        value={countMax}
+                        onChange={(e) => setCountMax(e.target.value)}
+                        sx={{ width: 150 }}
+                    />
+                </Box>
+
+                {/* Дата добавления От и До */}
+                <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+                    <TextField
+                        label="Дата от (YYYY-MM-DD)"
+                        placeholder="2023-01-01"
+                        value={createdAtAfter}
+                        onChange={(e) => setCreatedAtAfter(e.target.value)}
+                        sx={{ width: 200 }}
+                    />
+                    <TextField
+                        label="Дата до (YYYY-MM-DD)"
+                        placeholder="2023-12-31"
+                        value={createdAtBefore}
+                        onChange={(e) => setCreatedAtBefore(e.target.value)}
+                        sx={{ width: 200 }}
+                    />
+                </Box>
+
+                {/* Кнопки Применить / Сбросить */}
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleApplyFilters}
+                    >
+                        Применить фильтры
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={handleResetFilters}
+                    >
+                        Сбросить фильтры
+                    </Button>
+                </Box>
+            </Box>
+
+            {/* -----------------------------
+                Таблица слов
+            ----------------------------- */}
             {words && words.length > 0 ? (
-                <Box>
+                <Box mt={2}>
                     <Table sx={{ minWidth: 650 }} aria-label="words table">
                         <TableHead>
                             <TableRow>
@@ -278,18 +505,16 @@ export const WordsList: React.FC = () => {
                                     sx={{
                                         transition: 'background-color 0.3s, box-shadow 0.3s',
                                         '&:hover': {
-                                            backgroundColor: 'rgba(0, 0, 255, 0.05)', // Легкий синий оттенок
+                                            backgroundColor: 'rgba(0, 0, 255, 0.05)',
                                             boxShadow: '0px 4px 20px rgba(0, 0, 255, 0.1)',
                                         },
-                                        // Плавный эффект для картинки при наведении на строку
                                         '&:hover img': {
-                                            transform: 'scale(1.05)', // Увеличиваем картинку
+                                            transform: 'scale(1.05)',
                                             boxShadow: '0 0 20px rgba(0, 0, 255, 0.5)',
                                             filter: 'brightness(1.1) contrast(1.1)',
                                         }
                                     }}
                                 >
-                                    {/* Изображение слова */}
                                     <TableCell>
                                         <Avatar
                                             src={word.image_path ? word.image_path : defaultCover}
@@ -297,13 +522,11 @@ export const WordsList: React.FC = () => {
                                             sx={{ width: 60, height: 60, borderRadius: 4 }}
                                         />
                                     </TableCell>
-
-                                    {/* Название слова с кнопкой воспроизведения */}
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
                                             <SpeechButton
                                                 text={word.word}
-                                                lang={language} // Динамическое значение
+                                                lang={language}
                                             />
                                             <Typography
                                                 variant="subtitle1"
@@ -317,49 +540,41 @@ export const WordsList: React.FC = () => {
                                             </Typography>
                                         </Box>
                                     </TableCell>
-
-                                    {/* Перевод слова */}
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
                                             <MyIconButton
                                                 color="primary"
                                                 startIcon={<EditIcon />}
-                                                onClick={() => handleOpenEditModal(word)}>
-                                            </MyIconButton>
+                                                onClick={() => handleOpenEditModal(word)}
+                                            />
                                             <Typography
                                                 variant="subtitle1"
                                                 sx={{
-                                                    maxWidth: '50ch',          // Примерно 50 символов в ширину
-                                                    whiteSpace: 'normal',      // Разрешаем перенос на новую строку
-                                                    overflowWrap: 'break-word' // Переносим слова, если не помещаются
+                                                    maxWidth: '50ch',
+                                                    whiteSpace: 'normal',
+                                                    overflowWrap: 'break-word'
                                                 }}
                                             >
                                                 {word.translation}
                                             </Typography>
                                         </Box>
                                     </TableCell>
-
-                                    {/* Количество повторений */}
                                     <TableCell>
                                         <Typography variant="body2">{word.count}</Typography>
                                     </TableCell>
-
-                                    {/* Прогресс */}
                                     <TableCell>
                                         <Typography variant="body2">{word.progress}</Typography>
                                     </TableCell>
-
-                                    {/* Теги */}
                                     <TableCell>
                                         <Box
                                             sx={{
                                                 display: 'flex',
                                                 flexWrap: 'wrap',
-                                                gap: 1, // Отступы между чипами
+                                                gap: 1,
                                                 mt: 1,
                                             }}
                                         >
-                                            {word.tags.length > 0 ?
+                                            {word.tags.length > 0 ? (
                                                 word.tags.slice(0, 3).map((tag) => (
                                                     <Chip
                                                         key={tag.id}
@@ -369,8 +584,9 @@ export const WordsList: React.FC = () => {
                                                         size="small"
                                                     />
                                                 ))
-                                                : '—'
-                                            }
+                                            ) : (
+                                                '—'
+                                            )}
                                             {word.tags.length > 3 && (
                                                 <Chip
                                                     label={`+${word.tags.length - 3}`}
@@ -381,10 +597,11 @@ export const WordsList: React.FC = () => {
                                             )}
                                         </Box>
                                     </TableCell>
-
-                                    {/* Дата добавления */}
                                     <TableCell>
-                                        <Typography variant="body2">{word.created_at.substring(0, 10)}</Typography>
+                                        {/* обрезаем до года-месяца-дня */}
+                                        <Typography variant="body2">
+                                            {formatDate(word.created_at)}
+                                        </Typography>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -396,6 +613,7 @@ export const WordsList: React.FC = () => {
                     {search ? 'Нет слов, соответствующих поиску.' : 'В этом словаре пока нет слов.'}
                 </Typography>
             )}
+
             {totalPages > 1 && (
                 <Box display="flex" justifyContent="center" mt={4}>
                     <Pagination
@@ -417,25 +635,24 @@ export const WordsList: React.FC = () => {
                 <EditWordModal
                     open={isEditModalOpen}
                     onClose={handleCloseEditModal}
-                    onDeleteSuccess={handleDeleteSuccess} // Передаём callback handleDeleteSuccess
+                    onDeleteSuccess={handleDeleteSuccess}
                     dictionaryId={id}
                     wordData={editWordData}
                 />
             )}
 
-            {/* Snackbar уведомление */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={2000}
                 onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
                 <Alert severity="success" sx={{ width: '100%' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
         </Box>
     );
-
 };
 
 export default WordsList;
