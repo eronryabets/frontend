@@ -162,6 +162,7 @@ export const WordsList: React.FC = () => {
         created_at_before: null
       })
     );
+    dispatch(setCurrentPage(1)); // Сбрасываем страницу при сбросе фильтров
   }, [dispatch]);
 
   // ===== Модалки и Snackbar =====
@@ -291,6 +292,7 @@ export const WordsList: React.FC = () => {
 
   const handleSearch = useCallback(() => {
     dispatch(setSearchTerm(searchInput.trim()));
+     dispatch(setCurrentPage(1)); // Сбрасываем страницу при новом поиске
   }, [dispatch, searchInput]);
 
   const handleSearchKeyPress = useCallback(
