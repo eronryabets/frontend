@@ -501,7 +501,7 @@ export const WordsList: React.FC = () => {
                         p: 2,
                         mt: 1,
                         mb: 2,
-                        maxWidth: '800px',
+                        maxWidth: '350px',
                     }}
                 >
                     <Typography variant="h6" gutterBottom>
@@ -615,7 +615,14 @@ export const WordsList: React.FC = () => {
 
                     {/* Даты (DatePicker) */}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Box sx={{display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap'}}>
+                        <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column', // Элементы располагаются друг под другом
+                            gap: 2,
+                            mb: 2,
+                            flexWrap: 'wrap',
+                            maxWidth: '315px', // Устанавливаем максимальную ширину
+                        }}>
                             <DatePicker
                                 label="Дата от"
                                 value={createdAtAfter}
@@ -632,14 +639,14 @@ export const WordsList: React.FC = () => {
                     </LocalizationProvider>
 
                     {/* Кнопки "Применить" / "Сбросить" */}
-                    <Box sx={{display: 'flex', gap: 2}}>
+                    <Box sx={{display: 'flex', gap: 4.6}}>
                         <Button
                             variant="contained"
                             color="primary"
                             onClick={handleApplyFilters}
                             disabled={isApplyFiltersDisabled}
                         >
-                            Применить фильтры
+                            Применить
                         </Button>
                         <Button
                             variant="outlined"
