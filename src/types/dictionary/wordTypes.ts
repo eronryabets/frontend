@@ -33,6 +33,7 @@ export interface WordsState {
     totalPages: number;
     dictionaryId: string | null;
     search: string;
+    ordering: string;
     adding: boolean;
     addError: string | null;
     filters: {

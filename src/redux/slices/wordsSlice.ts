@@ -25,6 +25,7 @@ const initialState: WordsState = {
     adding: false,
     addError: null,
     search: '',
+     ordering: '',
      filters: {
         tags: [] as string[], // Массив названий тегов
         progress_min: null as number | null,
@@ -41,13 +42,23 @@ const initialState: WordsState = {
  */
 export const fetchWords = createAsyncThunk<
     WordsResponse,
-    { dictionaryId: string; page: number; search?: string; filters?: WordsState['filters'] }, // Добавлен filters
+    {
+      dictionaryId: string;
+      page: number;
+      search?: string;
+      filters?: WordsState['filters'];
+      ordering?: string; // Новое поле
+    },
     { rejectValue: string }
 >(
     'words/fetchWords',
-    async ({ dictionaryId, page, search, filters }, thunkAPI) => {
+    async ({ dictionaryId,
+               page,
+               search,
+               filters,
+               ordering
+           }, thunkAPI) => {
         try {
-            // Построение параметров запроса
             const params = new URLSearchParams();
             params.append('dictionary', dictionaryId);
             params.append('page', page.toString());
@@ -76,6 +87,9 @@ export const fetchWords = createAsyncThunk<
                 if (filters.created_at_before) {
                     params.append('created_at_before', filters.created_at_before);
                 }
+            }
+            if (ordering && ordering.trim() !== '') {
+                params.append('ordering', ordering);
             }
 
             const response = await api.get<WordsResponse>(
@@ -261,7 +275,7 @@ const wordsSlice = createSlice({
             };
         },
         /**
-         * Устанавливает поисковый запрос и сбрасывает текущую страницу.
+         * Устанавливает поисковый запрос (и НЕ сбрасывает текущую страницу.)
          */
         setSearchTerm(state, action: PayloadAction<string>) {
             state.search = action.payload;
@@ -274,6 +288,13 @@ const wordsSlice = createSlice({
             state.filters = action.payload;
             state.currentPage = 1; // Сбрасываем страницу при изменении фильтров
         },
+        /**
+         * Устанавливает значения фильтров и сбрасывает текущую страницу.
+         */
+        setOrdering(state, action: PayloadAction<string>) {
+             state.ordering = action.payload;
+             state.currentPage = 1; // При смене сортировки перейдём на первую страницу
+    },
         /**
          * Сбрасывает состояние добавления слова.
          */
@@ -367,6 +388,7 @@ export const {
     setDictionaryId,
     setSearchTerm,
     setFilters,
+    setOrdering,
     resetAddWordState
 } = wordsSlice.actions;
 export default wordsSlice.reducer;
