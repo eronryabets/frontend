@@ -2,16 +2,32 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import dayjs, { Dayjs } from 'dayjs';
+// Пакеты MUI
+import {
+  Box, Button, IconButton, TextField, Tooltip,
+  Chip, Stack, Typography, Collapse // Collapse для анимированного сворачивания
+} from '@mui/material';
+import { Close as CloseIcon, MapsUgc as MapsUgcIcon, Edit as EditIcon } from '@mui/icons-material';
 
+// DatePicker, Dayjs и адаптер:
+import dayjs, { Dayjs } from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
+// Остальные компоненты и Redux
 import {
-  RootState,
-  AppDispatch
-} from '@/redux/store.ts';
+  Pagination,
+  CircularProgress,
+  Snackbar,
+  Alert,
+  Avatar,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody
+} from '@mui/material';
 
 import {
   fetchWords,
@@ -20,43 +36,12 @@ import {
   setSearchTerm,
   setFilters
 } from '@/redux/slices/wordsSlice.ts';
+import { RootState, AppDispatch } from '@/redux/store.ts';
 
-import {
-  Pagination,
-  CircularProgress,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Typography,
-  Box,
-  Avatar,
-  Button,
-  Chip,
-  Snackbar,
-  Alert,
-  TextField,
-  Tooltip,
-  IconButton,
-  Stack
-} from '@mui/material';
-
-import {
-  Close as CloseIcon,
-  MapsUgc as MapsUgcIcon,
-  Edit as EditIcon
-} from '@mui/icons-material';
-
-import {
-  AddWordModal,
-  EditWordModal,
-  MyIconButton,
-  SpeechButton
-} from '@/components';
-
+import { AddWordModal, EditWordModal, MyIconButton, SpeechButton } from '@/components';
 import defaultCover from '@/assets/default_word_image.jpg';
 
+/** Хелпер для форматирования даты (обрезаем до "yyyy-mm-dd") */
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '';
   return dateStr.substring(0, 10);
@@ -65,7 +50,9 @@ function formatDate(dateStr: string | null): string {
 export const WordsList: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  // Достаём данные из Redux
   const {
     words,
     loading,
@@ -77,23 +64,19 @@ export const WordsList: React.FC = () => {
     filters
   } = useSelector((state: RootState) => state.words);
 
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // Поле поиска
+  // Локальное состояние для поля поиска
   const [searchInput, setSearchInput] = useState(search || '');
 
-  // -----------------------------
-  //  Фильтр по тегам
-  // -----------------------------
+  // ===== 1. Состояние для показа/скрытия фильтров =====
+  const [isFilterOpen, setFilterOpen] = useState<boolean>(false);
+
+  // ===== 2. Состояния для тегов =====
   const [tagInput, setTagInput] = useState<string>('');
   const [tagNames, setTagNames] = useState<string[]>(filters.tags || []);
 
-  const handleTagInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setTagInput(event.target.value);
-    },
-    []
-  );
+  const handleTagInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setTagInput(event.target.value);
+  }, []);
 
   const handleTagKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -113,9 +96,7 @@ export const WordsList: React.FC = () => {
     setTagNames((prev) => prev.filter((t) => t !== tag));
   }, []);
 
-  // -----------------------------
-  //  Фильтр по прогрессу / count
-  // -----------------------------
+  // ===== 3. Прогресс и count =====
   const [progressMin, setProgressMin] = useState<string>(
     filters.progress_min?.toString() || ''
   );
@@ -130,21 +111,15 @@ export const WordsList: React.FC = () => {
     filters.count_max?.toString() || ''
   );
 
-  // -----------------------------
-  //  Фильтр по датам (DatePicker)
-  // -----------------------------
-  // Храним Dayjs-объекты, чтобы DatePicker с ними работал
+  // ===== 4. Даты (DatePicker) =====
   const [createdAtAfter, setCreatedAtAfter] = useState<Dayjs | null>(
-    // Преобразуем из фильтров, если есть
     filters.created_at_after ? dayjs(filters.created_at_after) : null
   );
   const [createdAtBefore, setCreatedAtBefore] = useState<Dayjs | null>(
     filters.created_at_before ? dayjs(filters.created_at_before) : null
   );
 
-  // -----------------------------
-  // Применяем фильтры
-  // -----------------------------
+  // ===== 5. Применение и сброс =====
   const handleApplyFilters = useCallback(() => {
     dispatch(
       setFilters({
@@ -153,13 +128,10 @@ export const WordsList: React.FC = () => {
         progress_max: progressMax ? Number(progressMax) : null,
         count_min: countMin ? Number(countMin) : null,
         count_max: countMax ? Number(countMax) : null,
-        // Преобразуем Dayjs в строку 'YYYY-MM-DD'
         created_at_after: createdAtAfter ? createdAtAfter.format('YYYY-MM-DD') : null,
         created_at_before: createdAtBefore ? createdAtBefore.format('YYYY-MM-DD') : null
       })
     );
-    // Также можно сбрасывать страницу на 1, если нужно
-    // dispatch(setCurrentPage(1));
   }, [
     dispatch,
     tagNames,
@@ -171,9 +143,6 @@ export const WordsList: React.FC = () => {
     createdAtBefore
   ]);
 
-  // -----------------------------
-  // Сброс фильтров
-  // -----------------------------
   const handleResetFilters = useCallback(() => {
     setTagInput('');
     setTagNames([]);
@@ -197,9 +166,7 @@ export const WordsList: React.FC = () => {
     );
   }, [dispatch]);
 
-  // -----------------------------
-  // Модалки и т.д.
-  // -----------------------------
+  // ===== Модалки и Snackbar =====
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editWordData, setEditWordData] = useState<null | {
@@ -214,9 +181,7 @@ export const WordsList: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
-  // -----------------------------
-  //  useEffect: при загрузке/изменениях
-  // -----------------------------
+  // ===== useEffect для подгрузки слов =====
   useEffect(() => {
     if (id) {
       if (dictionaryId !== id) {
@@ -248,9 +213,7 @@ export const WordsList: React.FC = () => {
     }
   }, [dispatch, id, dictionaryId, currentPage, search, filters, setSearchParams]);
 
-  // -----------------------------
-  //  Пагинация
-  // -----------------------------
+  // ===== Пагинация =====
   const handlePageChange = useCallback(
     (_event: React.ChangeEvent<unknown>, value: number) => {
       dispatch(setCurrentPage(value));
@@ -258,9 +221,7 @@ export const WordsList: React.FC = () => {
     [dispatch]
   );
 
-  // -----------------------------
-  //  Работа с модалками
-  // -----------------------------
+  // ===== Модалки (Add/Edit) =====
   const handleOpenAddModal = useCallback(() => {
     setIsAddModalOpen(true);
   }, []);
@@ -301,15 +262,10 @@ export const WordsList: React.FC = () => {
     setSnackbarOpen(false);
   }, []);
 
-  // -----------------------------
-  //  Поиск
-  // -----------------------------
-  const handleSearchInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchInput(event.target.value);
-    },
-    []
-  );
+  // ===== Обработка поиска =====
+  const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(event.target.value);
+  }, []);
 
   const handleSearch = useCallback(() => {
     dispatch(setSearchTerm(searchInput.trim()));
@@ -329,9 +285,8 @@ export const WordsList: React.FC = () => {
     dispatch(setSearchTerm(''));
   }, [dispatch]);
 
-  // -----------------------------
-  //  Рендер
-  // -----------------------------
+  // ===== Отрисовка =====
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={4}>
@@ -339,6 +294,7 @@ export const WordsList: React.FC = () => {
       </Box>
     );
   }
+
   if (error) {
     return (
       <Typography color="error" align="center" mt={4}>
@@ -353,20 +309,28 @@ export const WordsList: React.FC = () => {
         Слова в словаре
       </Typography>
 
-      {/* Блок "Добавить слово" и поиск */}
+      {/* --- Блок с кнопками: Добавить слово, Поиск, Фильтр --- */}
       <Box
-        sx={{ pl: 2, pb: 2, display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}
+        sx={{
+          pl: 2,
+          pb: 2,
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 2
+        }}
       >
+        {/* Добавить слово */}
         <Button
           variant="contained"
           color="primary"
           startIcon={<MapsUgcIcon />}
-          sx={{ mr: 2, mb: { xs: 2, sm: 0 } }}
           onClick={handleOpenAddModal}
         >
           Добавить слово
         </Button>
 
+        {/* Поле поиска */}
         <TextField
           label="Поиск слов"
           variant="outlined"
@@ -374,7 +338,7 @@ export const WordsList: React.FC = () => {
           value={searchInput}
           onChange={handleSearchInputChange}
           onKeyPress={handleSearchKeyPress}
-          sx={{ mr: 2, width: '300px', mb: { xs: 2, sm: 0 } }}
+          sx={{ width: '300px' }}
           InputProps={{
             endAdornment: search && (
               <Tooltip title="Очистить поиск" arrow>
@@ -390,161 +354,145 @@ export const WordsList: React.FC = () => {
             )
           }}
         />
+        {/* Кнопка Поиск */}
         <Button
           variant="contained"
           color="secondary"
           onClick={handleSearch}
-          sx={{ mr: 2, mb: { xs: 2, sm: 0 } }}
           disabled={loading}
         >
           {loading ? <CircularProgress size={24} /> : 'Поиск'}
         </Button>
+
+        {/* Кнопка показать/скрыть фильтр */}
+        <Button
+          variant="contained"
+          color={isFilterOpen ? 'warning' : 'info'}
+          onClick={() => setFilterOpen(!isFilterOpen)}
+        >
+          {isFilterOpen ? 'Свернуть фильтр' : 'Показать фильтр'}
+        </Button>
       </Box>
 
-      {/* Блок ФИЛЬТРОВ */}
-      <Box
-        sx={{
-          pl: 2,
-          pb: 2,
-          mt: 2,
-          border: '1px solid #ccc',
-          borderRadius: 2,
-          p: 2
-        }}
-      >
-        <Typography variant="h6" gutterBottom>
-          Фильтры
-        </Typography>
+      {/* --- Блок ФИЛЬТРОВ (свертываемый) --- */}
+      <Collapse in={isFilterOpen}>
+        <Box
+          sx={{
+            border: '1px solid #ccc',
+            borderRadius: 2,
+            p: 2,
+            mt: 1,
+            mb: 2
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            Фильтры
+          </Typography>
 
-        {/* Теги */}
-        <TextField
-          fullWidth
-          label="Теги (введите через запятую/Enter)"
-          name="tags"
-          value={tagInput}
-          onChange={handleTagInputChange}
-          onKeyDown={handleTagKeyDown}
-          variant="outlined"
-          sx={{ mb: 2 }}
-          placeholder="Введите тег и нажмите Enter или запятую"
-        />
-        {tagNames.length > 0 && (
-          <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }}>
-            {tagNames.map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                onDelete={() => handleRemoveTag(tag)}
-                variant="outlined"
-              />
-            ))}
-          </Stack>
-        )}
+          {/* Теги */}
+          <TextField
+            fullWidth
+            label="Теги (введите через запятую/Enter)"
+            name="tags"
+            value={tagInput}
+            onChange={handleTagInputChange}
+            onKeyDown={handleTagKeyDown}
+            variant="outlined"
+            sx={{ mb: 2 }}
+            placeholder="Введите тег и нажмите Enter или запятую"
+          />
+          {tagNames.length > 0 && (
+            <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap' }}>
+              {tagNames.map((tag) => (
+                <Chip
+                  key={tag}
+                  label={tag}
+                  onDelete={() => handleRemoveTag(tag)}
+                  variant="outlined"
+                />
+              ))}
+            </Stack>
+          )}
 
-        {/* Progress От и До */}
-        <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-          <TextField
-            type="number"
-            label="Progress min"
-            value={progressMin}
-            onChange={(e) => setProgressMin(e.target.value)}
-            sx={{ width: 150 }}
-          />
-          <TextField
-            type="number"
-            label="Progress max"
-            value={progressMax}
-            onChange={(e) => setProgressMax(e.target.value)}
-            sx={{ width: 150 }}
-          />
-        </Box>
-
-        {/* Count От и До */}
-        <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-          <TextField
-            type="number"
-            label="Count min"
-            value={countMin}
-            onChange={(e) => setCountMin(e.target.value)}
-            sx={{ width: 150 }}
-          />
-          <TextField
-            type="number"
-            label="Count max"
-            value={countMax}
-            onChange={(e) => setCountMax(e.target.value)}
-            sx={{ width: 150 }}
-          />
-        </Box>
-
-        {/* Даты: заменяем 2 TextField на DatePicker */}
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          {/* Progress От и До */}
           <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
-            <DatePicker
-              label="Дата от"
-              value={createdAtAfter}
-              // Пример формата:
-              format="YYYY-MM-DD"
-              onChange={(newValue) => setCreatedAtAfter(newValue)}
-              // Для MUI v6+ (x-date-pickers) можно использовать slotProps:
-              slotProps={{
-                textField: {
-                  helperText: 'Выберите дату, начиная с которой искать'
-                }
-              }}
+            <TextField
+              type="number"
+              label="Progress min"
+              value={progressMin}
+              onChange={(e) => setProgressMin(e.target.value)}
+              sx={{ width: 150 }}
             />
-            <DatePicker
-              label="Дата до"
-              value={createdAtBefore}
-              format="YYYY-MM-DD"
-              onChange={(newValue) => setCreatedAtBefore(newValue)}
-              slotProps={{
-                textField: {
-                  helperText: 'Выберите дату, до которой искать'
-                }
-              }}
+            <TextField
+              type="number"
+              label="Progress max"
+              value={progressMax}
+              onChange={(e) => setProgressMax(e.target.value)}
+              sx={{ width: 150 }}
             />
           </Box>
-        </LocalizationProvider>
 
-        {/* Кнопки Применить / Сбросить */}
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button variant="contained" color="primary" onClick={handleApplyFilters}>
-            Применить фильтры
-          </Button>
-          <Button variant="outlined" onClick={handleResetFilters}>
-            Сбросить фильтры
-          </Button>
+          {/* Count От и До */}
+          <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+            <TextField
+              type="number"
+              label="Count min"
+              value={countMin}
+              onChange={(e) => setCountMin(e.target.value)}
+              sx={{ width: 150 }}
+            />
+            <TextField
+              type="number"
+              label="Count max"
+              value={countMax}
+              onChange={(e) => setCountMax(e.target.value)}
+              sx={{ width: 150 }}
+            />
+          </Box>
+
+          {/* Даты (DatePicker) */}
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+              <DatePicker
+                label="Дата от"
+                value={createdAtAfter}
+                format="YYYY-MM-DD"
+                onChange={(newValue) => setCreatedAtAfter(newValue)}
+              />
+              <DatePicker
+                label="Дата до"
+                value={createdAtBefore}
+                format="YYYY-MM-DD"
+                onChange={(newValue) => setCreatedAtBefore(newValue)}
+              />
+            </Box>
+          </LocalizationProvider>
+
+          {/* Кнопки "Применить" / "Сбросить" */}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button variant="contained" color="primary" onClick={handleApplyFilters}>
+              Применить фильтры
+            </Button>
+            <Button variant="outlined" onClick={handleResetFilters}>
+              Сбросить фильтры
+            </Button>
+          </Box>
         </Box>
-      </Box>
+      </Collapse>
 
-      {/* Таблица слов */}
+      {/* --- Таблица слов --- */}
       {words && words.length > 0 ? (
         <Box mt={2}>
           <Table sx={{ minWidth: 650 }} aria-label="words table">
             <TableHead>
               <TableRow>
-                <TableCell>
-                  <strong></strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Termin</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Translate</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Count</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Progress</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Теги</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>Added</strong>
-                </TableCell>
+                <TableCell><strong></strong></TableCell>
+                <TableCell><strong>Termin</strong></TableCell>
+                <TableCell><strong>Translate</strong></TableCell>
+                <TableCell><strong>Count</strong></TableCell>
+                <TableCell><strong>Progress</strong></TableCell>
+                <TableCell><strong>Теги</strong></TableCell>
+                <TableCell><strong>Added</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -612,27 +560,18 @@ export const WordsList: React.FC = () => {
                     <Typography variant="body2">{word.progress}</Typography>
                   </TableCell>
                   <TableCell>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: 1,
-                        mt: 1
-                      }}
-                    >
-                      {word.tags.length > 0 ? (
-                        word.tags.slice(0, 3).map((tag) => (
-                          <Chip
-                            key={tag.id}
-                            label={tag.name}
-                            variant="outlined"
-                            color="primary"
-                            size="small"
-                          />
-                        ))
-                      ) : (
-                        '—'
-                      )}
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                      {word.tags.length > 0
+                        ? word.tags.slice(0, 3).map((tag) => (
+                            <Chip
+                              key={tag.id}
+                              label={tag.name}
+                              variant="outlined"
+                              color="primary"
+                              size="small"
+                            />
+                          ))
+                        : '—'}
                       {word.tags.length > 3 && (
                         <Chip
                           label={`+${word.tags.length - 3}`}
@@ -655,9 +594,7 @@ export const WordsList: React.FC = () => {
         </Box>
       ) : (
         <Typography variant="h6" align="center" mt={4}>
-          {search
-            ? 'Нет слов, соответствующих поиску.'
-            : 'В этом словаре пока нет слов.'}
+          {search ? 'Нет слов, соответствующих поиску.' : 'В этом словаре пока нет слов.'}
         </Typography>
       )}
 
@@ -671,6 +608,8 @@ export const WordsList: React.FC = () => {
           />
         </Box>
       )}
+
+      {/* Модалки */}
       {id && (
         <AddWordModal
           open={isAddModalOpen}
@@ -688,6 +627,7 @@ export const WordsList: React.FC = () => {
         />
       )}
 
+      {/* Snackbar */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}
