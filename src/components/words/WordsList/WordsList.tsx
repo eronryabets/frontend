@@ -180,18 +180,39 @@ export const WordsList: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   // ===== useEffect для подгрузки слов =====
+  // useEffect(() => {
+  //   if (id) {
+  //     if (dictionaryId !== id) {
+  //       dispatch(setDictionaryId(id));
+  //     }
+  //     const page = parseInt(searchParams.get('page') || '1', 10);
+  //     dispatch(setCurrentPage(page));
+  //     const searchTerm = searchParams.get('search') || '';
+  //     dispatch(setSearchTerm(searchTerm));
+  //     setSearchInput(searchTerm);
+  //   }
+  // }, [dispatch, id, searchParams, dictionaryId]);
+
+  // 1. Эффект для установки dictionaryId только при смене id
   useEffect(() => {
-    if (id) {
-      if (dictionaryId !== id) {
-        dispatch(setDictionaryId(id));
-      }
-      const page = parseInt(searchParams.get('page') || '1', 10);
-      dispatch(setCurrentPage(page));
-      const searchTerm = searchParams.get('search') || '';
-      dispatch(setSearchTerm(searchTerm));
-      setSearchInput(searchTerm);
+    if (id && dictionaryId !== id) {
+      dispatch(setDictionaryId(id));
     }
-  }, [dispatch, id, searchParams, dictionaryId]);
+  // убираем всю логику с currentPage и search отсюда
+  }, [id, dictionaryId, dispatch]);
+
+// 2. Эффект для установки текущей страницы и поиска из URL
+  useEffect(() => {
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    dispatch(setCurrentPage(page));
+
+    const searchTerm = searchParams.get('search') || '';
+    dispatch(setSearchTerm(searchTerm));
+    setSearchInput(searchTerm);
+
+  // убираем dictionaryId из зависимостей, чтобы не триггерить повторно
+  }, [dispatch, searchParams]);
+
 
   useEffect(() => {
     if (id && dictionaryId) {
@@ -343,7 +364,7 @@ export const WordsList: React.FC = () => {
       (progressMin !== '' && progressMaxNum < progressMinNum)
     );
 
-  // ===== [NEW] Проверка, что пользователь вообще задал какие-то фильтры
+  // ===== Проверка, что пользователь вообще задал какие-то фильтры
   const hasAnyFilter =
     tagNames.length > 0 ||
     progressMin !== '' ||
@@ -590,7 +611,7 @@ export const WordsList: React.FC = () => {
               variant="contained"
               color="primary"
               onClick={handleApplyFilters}
-              // [NEW] выключаем кнопку, если нет фильтров или есть ошибки
+              //  выключаем кнопку, если нет фильтров или есть ошибки
               disabled={isApplyFiltersDisabled}
             >
               Применить фильтры
