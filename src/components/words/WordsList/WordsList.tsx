@@ -5,9 +5,15 @@ import { useParams, useSearchParams } from 'react-router-dom';
 // Пакеты MUI
 import {
   Box, Button, IconButton, TextField, Tooltip,
-  Chip, Stack, Typography, Collapse // Collapse для анимированного сворачивания
+  Chip, Stack, Typography, Collapse, CircularProgress, Table,
+  TableHead, TableRow, TableCell, TableBody, Snackbar, Alert, Pagination, Avatar
 } from '@mui/material';
-import { Close as CloseIcon, MapsUgc as MapsUgcIcon, Edit as EditIcon } from '@mui/icons-material';
+
+import {
+  Close as CloseIcon,
+  MapsUgc as MapsUgcIcon,
+  Edit as EditIcon
+} from '@mui/icons-material';
 
 // DatePicker, Dayjs и адаптер:
 import dayjs, { Dayjs } from 'dayjs';
@@ -17,19 +23,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 // Остальные компоненты и Redux
 import {
-  Pagination,
-  CircularProgress,
-  Snackbar,
-  Alert,
-  Avatar,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody
-} from '@mui/material';
-
-import {
   fetchWords,
   setCurrentPage,
   setDictionaryId,
@@ -38,7 +31,12 @@ import {
 } from '@/redux/slices/wordsSlice.ts';
 import { RootState, AppDispatch } from '@/redux/store.ts';
 
-import { AddWordModal, EditWordModal, MyIconButton, SpeechButton } from '@/components';
+import {
+  AddWordModal,
+  EditWordModal,
+  MyIconButton,
+  SpeechButton
+} from '@/components';
 import defaultCover from '@/assets/default_word_image.jpg';
 
 /** Хелпер для форматирования даты (обрезаем до "yyyy-mm-dd") */
@@ -67,10 +65,10 @@ export const WordsList: React.FC = () => {
   // Локальное состояние для поля поиска
   const [searchInput, setSearchInput] = useState(search || '');
 
-  // ===== 1. Состояние для показа/скрытия фильтров =====
+  //Состояние для показа/скрытия фильтров =====
   const [isFilterOpen, setFilterOpen] = useState<boolean>(false);
 
-  // ===== 2. Состояния для тегов =====
+  //Состояния для тегов =====
   const [tagInput, setTagInput] = useState<string>('');
   const [tagNames, setTagNames] = useState<string[]>(filters.tags || []);
 
@@ -96,7 +94,7 @@ export const WordsList: React.FC = () => {
     setTagNames((prev) => prev.filter((t) => t !== tag));
   }, []);
 
-  // ===== 3. Прогресс и count =====
+  // ===== Прогресс и count max = 10, min = 0 =====
   const [progressMin, setProgressMin] = useState<string>(
     filters.progress_min?.toString() || ''
   );
@@ -111,7 +109,7 @@ export const WordsList: React.FC = () => {
     filters.count_max?.toString() || ''
   );
 
-  // ===== 4. Даты (DatePicker) =====
+  // ===== Даты (DatePicker) =====
   const [createdAtAfter, setCreatedAtAfter] = useState<Dayjs | null>(
     filters.created_at_after ? dayjs(filters.created_at_after) : null
   );
@@ -119,7 +117,7 @@ export const WordsList: React.FC = () => {
     filters.created_at_before ? dayjs(filters.created_at_before) : null
   );
 
-  // ===== 5. Применение и сброс =====
+  // ===== Применение и сброс =====
   const handleApplyFilters = useCallback(() => {
     dispatch(
       setFilters({
@@ -263,9 +261,12 @@ export const WordsList: React.FC = () => {
   }, []);
 
   // ===== Обработка поиска =====
-  const handleSearchInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(event.target.value);
-  }, []);
+  const handleSearchInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchInput(event.target.value);
+    },
+    []
+  );
 
   const handleSearch = useCallback(() => {
     dispatch(setSearchTerm(searchInput.trim()));
@@ -285,12 +286,87 @@ export const WordsList: React.FC = () => {
     dispatch(setSearchTerm(''));
   }, [dispatch]);
 
-  // ===== Отрисовка =====
+  // ===== Валидация для Count min и Count max =====
+  const countMinNum = Number(countMin);
+  const countMaxNum = Number(countMax);
 
+  const isCountMinValid =
+    countMin === '' ||
+    (countMinNum >= 0 &&
+      (countMax === '' || countMinNum <= countMaxNum));
+
+  const isCountMaxValid =
+    countMax === '' ||
+    (countMaxNum >= 0 &&
+      (countMin === '' || countMaxNum >= countMinNum));
+
+  const countMinError =
+    countMin !== '' &&
+    (countMinNum < 0 || (countMax !== '' && countMinNum > countMaxNum));
+
+  const countMaxError =
+    countMax !== '' &&
+    (countMaxNum < 0 || (countMin !== '' && countMaxNum < countMinNum));
+
+  // ===== [NEW] Валидация для Progress min и Progress max =====
+  const progressMinNum = Number(progressMin);
+  const progressMaxNum = Number(progressMax);
+
+  // Минимальный прогресс не меньше 0, не больше 10, и не должен превышать progressMax
+  const isProgressMinValid =
+    progressMin === '' ||
+    (progressMinNum >= 0 &&
+      progressMinNum <= 10 &&
+      (progressMax === '' || progressMinNum <= progressMaxNum));
+
+  // Максимальный прогресс не меньше 0, не больше 10, и не должен быть меньше progressMin
+  const isProgressMaxValid =
+    progressMax === '' ||
+    (progressMaxNum >= 0 &&
+      progressMaxNum <= 10 &&
+      (progressMin === '' || progressMaxNum >= progressMinNum));
+
+  // Определим, есть ли ошибка
+  const progressMinError =
+    progressMin !== '' &&
+    (
+      progressMinNum < 0 ||
+      progressMinNum > 10 ||
+      (progressMax !== '' && progressMinNum > progressMaxNum)
+    );
+
+  const progressMaxError =
+    progressMax !== '' &&
+    (
+      progressMaxNum < 0 ||
+      progressMaxNum > 10 ||
+      (progressMin !== '' && progressMaxNum < progressMinNum)
+    );
+
+  // ===== [NEW] Проверка, что пользователь вообще задал какие-то фильтры
+  const hasAnyFilter =
+    tagNames.length > 0 ||
+    progressMin !== '' ||
+    progressMax !== '' ||
+    countMin !== '' ||
+    countMax !== '' ||
+    createdAtAfter !== null ||
+    createdAtBefore !== null;
+
+  // Общая логика: кнопка «Применить фильтры» неактивна, если
+  // 1) ни один фильтр не выбран
+  // 2) есть ошибки в count или progress
+  const isApplyFiltersDisabled = !hasAnyFilter ||
+    !isCountMinValid ||
+    !isCountMaxValid ||
+    !isProgressMinValid ||
+    !isProgressMaxValid;
+
+  // ===== Отрисовка =====
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={4}>
-        <CircularProgress />
+        <CircularProgress/>
       </Box>
     );
   }
@@ -324,7 +400,7 @@ export const WordsList: React.FC = () => {
         <Button
           variant="contained"
           color="primary"
-          startIcon={<MapsUgcIcon />}
+          startIcon={<MapsUgcIcon/>}
           onClick={handleOpenAddModal}
         >
           Добавить слово
@@ -348,7 +424,7 @@ export const WordsList: React.FC = () => {
                   sx={{ ml: 1 }}
                   aria-label="Очистить поиск"
                 >
-                  <CloseIcon fontSize="small" />
+                  <CloseIcon fontSize="small"/>
                 </IconButton>
               </Tooltip>
             )
@@ -361,7 +437,7 @@ export const WordsList: React.FC = () => {
           onClick={handleSearch}
           disabled={loading}
         >
-          {loading ? <CircularProgress size={24} /> : 'Поиск'}
+          {loading ? <CircularProgress size={24}/> : 'Поиск'}
         </Button>
 
         {/* Кнопка показать/скрыть фильтр */}
@@ -422,6 +498,17 @@ export const WordsList: React.FC = () => {
               value={progressMin}
               onChange={(e) => setProgressMin(e.target.value)}
               sx={{ width: 150 }}
+              inputProps={{ min: 0, max: 10 }} // [NEW] ограничиваем ввод
+              error={progressMinError}
+              helperText={
+                progressMinError
+                  ? progressMinNum < 0
+                    ? 'Значение не может быть меньше 0'
+                    : progressMinNum > 10
+                      ? 'Значение не может быть больше 10'
+                      : 'Минимальное значение не может превышать максимальноe'
+                  : ''
+              }
             />
             <TextField
               type="number"
@@ -429,6 +516,17 @@ export const WordsList: React.FC = () => {
               value={progressMax}
               onChange={(e) => setProgressMax(e.target.value)}
               sx={{ width: 150 }}
+              inputProps={{ min: 0, max: 10 }} // [NEW] ограничиваем ввод
+              error={progressMaxError}
+              helperText={
+                progressMaxError
+                  ? progressMaxNum < 0
+                    ? 'Значение не может быть меньше 0'
+                    : progressMaxNum > 10
+                      ? 'Значение не может быть больше 10'
+                      : 'Максимальное значение не может быть меньше минимального'
+                  : ''
+              }
             />
           </Box>
 
@@ -440,6 +538,15 @@ export const WordsList: React.FC = () => {
               value={countMin}
               onChange={(e) => setCountMin(e.target.value)}
               sx={{ width: 150 }}
+              inputProps={{ min: 0 }}
+              error={countMinError}
+              helperText={
+                countMinError
+                  ? countMinNum < 0
+                    ? 'Минимальное значение не может быть меньше 0'
+                    : 'Минимальное значение не может превышать максимальное'
+                  : ''
+              }
             />
             <TextField
               type="number"
@@ -447,6 +554,15 @@ export const WordsList: React.FC = () => {
               value={countMax}
               onChange={(e) => setCountMax(e.target.value)}
               sx={{ width: 150 }}
+              inputProps={{ min: 0 }}
+              error={countMaxError}
+              helperText={
+                countMaxError
+                  ? countMaxNum < 0
+                    ? 'Максимальное значение не может быть меньше 0'
+                    : 'Максимальное значение не может быть меньше минимального'
+                  : ''
+              }
             />
           </Box>
 
@@ -470,10 +586,19 @@ export const WordsList: React.FC = () => {
 
           {/* Кнопки "Применить" / "Сбросить" */}
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleApplyFilters}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleApplyFilters}
+              // [NEW] выключаем кнопку, если нет фильтров или есть ошибки
+              disabled={isApplyFiltersDisabled}
+            >
               Применить фильтры
             </Button>
-            <Button variant="outlined" onClick={handleResetFilters}>
+            <Button
+              variant="outlined"
+              onClick={handleResetFilters}
+            >
               Сбросить фильтры
             </Button>
           </Box>
