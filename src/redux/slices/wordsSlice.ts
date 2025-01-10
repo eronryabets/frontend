@@ -265,7 +265,7 @@ const wordsSlice = createSlice({
          */
         setSearchTerm(state, action: PayloadAction<string>) {
             state.search = action.payload;
-            state.currentPage = 1; // Сбрасываем страницу при новом поиске
+            // state.currentPage = 1; // Сбрасываем страницу при новом поиске - вызывало ошибку
         },
         /**
          * Устанавливает значения фильтров и сбрасывает текущую страницу.
