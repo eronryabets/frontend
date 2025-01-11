@@ -684,7 +684,7 @@ export const WordsList: React.FC = () => {
                                             dispatch(setOrdering(newOrder));
                                         }}
                                     >
-                                        Termin
+                                        <strong>Termin</strong>
                                     </TableSortLabel>
                                 </TableCell>
                                 <TableCell><strong>Translate</strong></TableCell>
@@ -702,7 +702,7 @@ export const WordsList: React.FC = () => {
                                             dispatch(setOrdering(newOrder));
                                         }}
                                     >
-                                        Count
+                                        <strong>Views</strong>
                                     </TableSortLabel>
                                 </TableCell>
                                 <TableCell>
@@ -719,10 +719,10 @@ export const WordsList: React.FC = () => {
                                             dispatch(setOrdering(newOrder));
                                         }}
                                     >
-                                        Progress
+                                        <strong>Progress</strong>
                                     </TableSortLabel>
                                 </TableCell>
-                                <TableCell><strong>Теги</strong></TableCell>
+                                <TableCell><strong>Tags</strong></TableCell>
                                 <TableCell>
                                     <TableSortLabel
                                         active={ordering === 'created_at' || ordering === '-created_at'}
@@ -737,7 +737,7 @@ export const WordsList: React.FC = () => {
                                             dispatch(setOrdering(newOrder));
                                         }}
                                     >
-                                        Added
+                                        <strong>Added</strong>
                                     </TableSortLabel>
                                 </TableCell>
                             </TableRow>

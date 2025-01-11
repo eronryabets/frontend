@@ -55,6 +55,7 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
             secondary: {
                 main: red[500],
             },
+            divider: isLight ? '#000000' : 'rgba(255, 255, 255, 0.12)',
             //Настройка Фонов (элементов) и Текста
             background: {
                 default: themeMode === 'light' ? '#fafafa' : '#303030',
@@ -101,6 +102,16 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
                     },
                 },
             },
+            //изменение разделителя в таблицах
+            MuiTableCell: {
+                styleOverrides: {
+                    root: {
+                        borderBottom: isLight
+                            ? '1px solid rgba(47,47,45,0.42)'   // при светлой теме
+                            : '1px solid rgba(255, 255, 255, 0.12)', // при тёмной
+                    },
+                },
+            },
             // Настройка другие компонентов
         },
         //брейкпоинты для настройки стилей в зависимости от размера экрана
@@ -114,7 +125,7 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
             },
         },
         //Настройка заднего градиента (фона)
-         customBackground: {
+        customBackground: {
             gradient: getGradient(
                 themeMode === 'light' ? '#eadfdf' : '#2e2e2e',
                 themeMode === 'light' ? '#f0f0f0' : '#1c1c1c',
