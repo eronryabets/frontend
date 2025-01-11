@@ -45,6 +45,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 // lodash.debounce для дебаунсинга при вводе
 // import debounce from 'lodash.debounce' -> '@mui/material';
 
+// Импортируем useTheme для определения темы
+import { useTheme } from '@mui/material/styles';
+
 // Остальные компоненты и Redux
 import {
   fetchWords,
@@ -52,7 +55,7 @@ import {
   setDictionaryId,
   setSearchTerm,
   setFilters,
-  setOrdering // Экшен для сортировки
+  setOrdering
 } from '@/redux/slices/wordsSlice.ts';
 import { RootState, AppDispatch } from '@/redux/store.ts';
 
@@ -64,13 +67,15 @@ import {
 } from '@/components';
 import defaultCover from '@/assets/default_word_image.jpg';
 
+// Импорт функции для подсветки progress
+import { getBackgroundColorByProgress } from '@/utils/getBackgroundColorByProgress';
+
 /** Хелпер для форматирования даты (обрезаем до "yyyy-mm-dd") */
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '';
   return dateStr.substring(0, 10);
 }
 
-// Опции для селекта сортировки
 const sortingOptions = [
   { label: 'Без сортировки', value: '' },
   { label: 'Termin (A → Z)', value: 'word' },
@@ -88,7 +93,6 @@ export const WordsList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Достаём данные из Redux
   const {
     words,
     loading,
@@ -101,13 +105,13 @@ export const WordsList: React.FC = () => {
     ordering
   } = useSelector((state: RootState) => state.words);
 
-  // Локальное состояние для поля поиска
-  const [searchInput, setSearchInput] = useState(search || '');
+  // Подключаем тему
+  const theme = useTheme();
 
-  // Состояние для показа/скрытия фильтров
+  const [searchInput, setSearchInput] = useState(search || '');
   const [isFilterOpen, setFilterOpen] = useState<boolean>(false);
 
-  // Состояния для тегов
+  // Теги
   const [tagInput, setTagInput] = useState<string>('');
   const [tagNames, setTagNames] = useState<string[]>(filters.tags || []);
 
@@ -130,13 +134,13 @@ export const WordsList: React.FC = () => {
     setTagNames((prev) => prev.filter((t) => t !== tag));
   }, []);
 
-  // Поля фильтров (прогресс, count)
+  // Прогресс и count
   const [progressMin, setProgressMin] = useState<string>(filters.progress_min?.toString() || '');
   const [progressMax, setProgressMax] = useState<string>(filters.progress_max?.toString() || '');
   const [countMin, setCountMin] = useState<string>(filters.count_min?.toString() || '');
   const [countMax, setCountMax] = useState<string>(filters.count_max?.toString() || '');
 
-  // Даты (DatePicker)
+  // Даты
   const [createdAtAfter, setCreatedAtAfter] = useState<Dayjs | null>(
     filters.created_at_after ? dayjs(filters.created_at_after) : null
   );
@@ -144,7 +148,7 @@ export const WordsList: React.FC = () => {
     filters.created_at_before ? dayjs(filters.created_at_before) : null
   );
 
-  // === Применение/Сброс фильтров ===
+  // Применить и Сбросить фильтры
   const handleApplyFilters = useCallback(() => {
     dispatch(
       setFilters({
@@ -192,7 +196,7 @@ export const WordsList: React.FC = () => {
     dispatch(setCurrentPage(1));
   }, [dispatch]);
 
-  // Модалки и Snackbar
+  // Модалки
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editWordData, setEditWordData] = useState<null | {
@@ -207,25 +211,24 @@ export const WordsList: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
-  // Эффект для установки dictionaryId при смене id
+  // При смене словаря
   useEffect(() => {
     if (id && dictionaryId !== id) {
       dispatch(setDictionaryId(id));
     }
   }, [id, dictionaryId, dispatch]);
 
-  // Эффект для установки текущей страницы и поиска из URL
+  // Берём page и search из URL
   useEffect(() => {
     const page = parseInt(searchParams.get('page') || '1', 10);
     dispatch(setCurrentPage(page));
 
     const searchTerm = searchParams.get('search') || '';
-    // Установим локальное состояние и Redux
     dispatch(setSearchTerm(searchTerm));
     setSearchInput(searchTerm);
   }, [dispatch, searchParams]);
 
-  // Загрузка слов при изменении словаря/страницы/поиска/фильтров/сортировки
+  // Загрузка слов
   useEffect(() => {
     if (id && dictionaryId) {
       dispatch(
@@ -257,7 +260,7 @@ export const WordsList: React.FC = () => {
     [dispatch]
   );
 
-  // Открыть/Закрыть модалку добавления
+  // Модалки Add/Edit
   const handleOpenAddModal = useCallback(() => {
     setIsAddModalOpen(true);
   }, []);
@@ -265,7 +268,6 @@ export const WordsList: React.FC = () => {
     setIsAddModalOpen(false);
   }, []);
 
-  // Открыть/Закрыть модалку редактирования
   const handleOpenEditModal = useCallback((word: any) => {
     setEditWordData({
       id: word.id,
@@ -282,13 +284,11 @@ export const WordsList: React.FC = () => {
     setEditWordData(null);
   }, []);
 
-  // Текущий словарь и язык
   const currentDictionary = useSelector((state: RootState) =>
     state.dictionaries.dictionaries.find((dict) => dict.id === dictionaryId)
   );
   const language = currentDictionary?.language || 'en-US';
 
-  // Успешное удаление слова
   const handleDeleteSuccess = useCallback(() => {
     handleCloseEditModal();
     setSnackbarMessage('Слово успешно удалено.');
@@ -299,7 +299,7 @@ export const WordsList: React.FC = () => {
     setSnackbarOpen(false);
   }, []);
 
-  // === Дебаунсинг при вводе поиска ===
+  // Дебаунсинг для поля поиска
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       dispatch(setSearchTerm(value.trim()));
@@ -308,7 +308,6 @@ export const WordsList: React.FC = () => {
     [dispatch]
   );
 
-  // Обработчик ввода в поле поиска (через дебаунс)
   const handleSearchInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setSearchInput(event.target.value);
@@ -317,7 +316,7 @@ export const WordsList: React.FC = () => {
     [debouncedSearch]
   );
 
-  // Если всё-таки оставляем кнопку "Поиск" (по желанию)
+  // Если оставляем кнопку "Поиск"
   const handleSearch = useCallback(() => {
     dispatch(setSearchTerm(searchInput.trim()));
     dispatch(setCurrentPage(1));
@@ -332,7 +331,6 @@ export const WordsList: React.FC = () => {
     [handleSearch]
   );
 
-  // Очистка поля поиска
   const handleResetSearch = useCallback(() => {
     setSearchInput('');
     dispatch(setSearchTerm(''));
@@ -365,7 +363,6 @@ export const WordsList: React.FC = () => {
       (progressMin !== '' && progressMaxNum < progressMinNum)
     );
 
-  // Проверка есть ли какие-то фильтры
   const hasAnyFilter =
     tagNames.length > 0 ||
     progressMin !== '' ||
@@ -375,7 +372,6 @@ export const WordsList: React.FC = () => {
     createdAtAfter !== null ||
     createdAtBefore !== null;
 
-  // Отключение кнопки "Применить"
   const isApplyFiltersDisabled =
     !hasAnyFilter ||
     countMinError ||
@@ -383,7 +379,7 @@ export const WordsList: React.FC = () => {
     progressMinError ||
     progressMaxError;
 
-  // [SORTING] Обработчик изменения порядка через селект
+  // Обработчик изменения сортировки (через Select)
   const handleOrderingChange = useCallback(
     (event: SelectChangeEvent<string>) => {
       const newOrder = event.target.value;
@@ -392,36 +388,6 @@ export const WordsList: React.FC = () => {
     [dispatch]
   );
 
-  // [SORTING] Обработчик клика по заголовку (для таблицы)
-  // const handleSort = useCallback(
-  //   (field: string) => {
-  //     // Если текущее поле уже ASC, то ставим DESC; если уже DESC, то ставим ASC, иначе — ASC
-  //     let newOrder = field;
-  //
-  //     if (ordering === field) {
-  //       newOrder = `-${field}`; // ASC -> DESC
-  //     } else if (ordering === `-${field}`) {
-  //       newOrder = field; // DESC -> ASC
-  //     } else {
-  //       newOrder = field; // по умолчанию ASC
-  //     }
-  //     dispatch(setOrdering(newOrder));
-  //   },
-  //   [dispatch, ordering]
-  // );
-
-  // Функция для определения направления и "активности" сортировки
-  // const getSortDirection = (field: string): 'asc' | 'desc' => {
-  //   if (ordering === field) return 'asc';
-  //   if (ordering === `-${field}`) return 'desc';
-  //   return 'asc'; // Если текущее поле не активно, по умолчанию пусть будет asc
-  // };
-  //
-  // const isSortedField = (field: string): boolean => {
-  //   return ordering === field || ordering === `-${field}`;
-  // };
-
-  // Рендер
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt={4}>
@@ -455,7 +421,6 @@ export const WordsList: React.FC = () => {
           gap: 2
         }}
       >
-        {/* Добавить слово */}
         <Button
           variant="contained"
           color="primary"
@@ -465,14 +430,14 @@ export const WordsList: React.FC = () => {
           Добавить слово
         </Button>
 
-        {/* Поле поиска (дебаунсинг уже настроен) */}
+        {/* Поле поиска с дебаунсом */}
         <TextField
           label="Поиск слов"
           variant="outlined"
           size="small"
           value={searchInput}
-          onChange={handleSearchInputChange}   // <-- здесь дебаунс
-          onKeyPress={handleSearchKeyPress}    // <-- на случай, если хотим нажимать Enter
+          onChange={handleSearchInputChange}
+          onKeyPress={handleSearchKeyPress}
           sx={{ width: '300px' }}
           InputProps={{
             endAdornment: search && (
@@ -489,8 +454,6 @@ export const WordsList: React.FC = () => {
             )
           }}
         />
-
-        {/* Кнопка Явного Поиска (по желанию) */}
         <Button
           variant="contained"
           color="secondary"
@@ -500,7 +463,6 @@ export const WordsList: React.FC = () => {
           {loading ? <CircularProgress size={24}/> : 'Поиск'}
         </Button>
 
-        {/* Кнопка показать/скрыть фильтр */}
         <Button
           variant="contained"
           color={isFilterOpen ? 'warning' : 'info'}
@@ -509,7 +471,7 @@ export const WordsList: React.FC = () => {
           {isFilterOpen ? 'Свернуть фильтр' : 'Показать фильтр'}
         </Button>
 
-        {/* Селект для выбора сортировки (через выпадающий список) */}
+        {/* Select для сортировки */}
         <FormControl size="small" sx={{ minWidth: 200 }}>
           <InputLabel id="sorting-label">Сортировка</InputLabel>
           <Select
@@ -527,7 +489,7 @@ export const WordsList: React.FC = () => {
         </FormControl>
       </Box>
 
-      {/* --- Блок ФИЛЬТРОВ (свертываемый) --- */}
+      {/* --- ФИЛЬТРЫ (свертываемые) --- */}
       <Collapse in={isFilterOpen}>
         <Box
           sx={{
@@ -536,7 +498,7 @@ export const WordsList: React.FC = () => {
             p: 2,
             mt: 1,
             mb: 2,
-            maxWidth: '350px',
+            maxWidth: '350px'
           }}
         >
           <Typography variant="h6" gutterBottom>
@@ -552,10 +514,7 @@ export const WordsList: React.FC = () => {
             onChange={handleTagInputChange}
             onKeyDown={handleTagKeyDown}
             variant="outlined"
-            sx={{
-              mb: 2,
-              maxWidth: '315px',
-            }}
+            sx={{ mb: 2, maxWidth: '315px' }}
             placeholder="Введите тег и нажмите Enter или запятую"
           />
           {tagNames.length > 0 && (
@@ -571,7 +530,7 @@ export const WordsList: React.FC = () => {
             </Stack>
           )}
 
-          {/* Progress От и До */}
+          {/* Прогресс От/До */}
           <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
             <TextField
               type="number"
@@ -587,7 +546,7 @@ export const WordsList: React.FC = () => {
                     ? 'Значение не может быть меньше 0'
                     : progressMinNum > 10
                       ? 'Значение не может быть больше 10'
-                      : 'Минимальное значение не может превышать максимальноe'
+                      : 'Минимальное не может превышать максимальное'
                   : ''
               }
             />
@@ -605,13 +564,13 @@ export const WordsList: React.FC = () => {
                     ? 'Значение не может быть меньше 0'
                     : progressMaxNum > 10
                       ? 'Значение не может быть больше 10'
-                      : 'Максимальное значение не может быть меньше минимального'
+                      : 'Максимальное не может быть меньше минимального'
                   : ''
               }
             />
           </Box>
 
-          {/* Count От и До */}
+          {/* Count От/До */}
           <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
             <TextField
               type="number"
@@ -625,7 +584,7 @@ export const WordsList: React.FC = () => {
                 countMinError
                   ? countMinNum < 0
                     ? 'Минимальное значение не может быть меньше 0'
-                    : 'Минимальное значение не может превышать максимальное'
+                    : 'Минимальное не может превышать максимальное'
                   : ''
               }
             />
@@ -641,22 +600,15 @@ export const WordsList: React.FC = () => {
                 countMaxError
                   ? countMaxNum < 0
                     ? 'Максимальное значение не может быть меньше 0'
-                    : 'Максимальное значение не может быть меньше минимального'
+                    : 'Максимальное не может быть меньше минимального'
                   : ''
               }
             />
           </Box>
 
-          {/* Даты (DatePicker) */}
+          {/* Даты */}
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Box sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              mb: 2,
-              flexWrap: 'wrap',
-              maxWidth: '315px'
-            }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2, maxWidth: '315px' }}>
               <DatePicker
                 label="Дата от"
                 value={createdAtAfter}
@@ -672,7 +624,7 @@ export const WordsList: React.FC = () => {
             </Box>
           </LocalizationProvider>
 
-          {/* Кнопки "Применить" / "Сбросить" */}
+          {/* Кнопки Применить/Сбросить */}
           <Box sx={{ display: 'flex', gap: 4.6 }}>
             <Button
               variant="contained"
@@ -692,15 +644,13 @@ export const WordsList: React.FC = () => {
         </Box>
       </Collapse>
 
-      {/* --- Таблица слов (с сортировкой по клику) --- */}
+      {/* Таблица слов */}
       {words && words.length > 0 ? (
         <Box mt={2}>
           <Table sx={{ minWidth: 650 }} aria-label="words table">
             <TableHead>
               <TableRow>
                 <TableCell><strong></strong></TableCell>
-
-                {/* Termin */}
                 <TableCell>
                   <TableSortLabel
                     active={ordering === 'word' || ordering === '-word'}
@@ -718,11 +668,7 @@ export const WordsList: React.FC = () => {
                     Termin
                   </TableSortLabel>
                 </TableCell>
-
-                {/* Translate (не сортируем, нет ordering_fields=translation) */}
                 <TableCell><strong>Translate</strong></TableCell>
-
-                {/* Count */}
                 <TableCell>
                   <TableSortLabel
                     active={ordering === 'count' || ordering === '-count'}
@@ -740,8 +686,6 @@ export const WordsList: React.FC = () => {
                     Count
                   </TableSortLabel>
                 </TableCell>
-
-                {/* Progress */}
                 <TableCell>
                   <TableSortLabel
                     active={ordering === 'progress' || ordering === '-progress'}
@@ -759,10 +703,7 @@ export const WordsList: React.FC = () => {
                     Progress
                   </TableSortLabel>
                 </TableCell>
-
                 <TableCell><strong>Теги</strong></TableCell>
-
-                {/* Added */}
                 <TableCell>
                   <TableSortLabel
                     active={ordering === 'created_at' || ordering === '-created_at'}
@@ -843,9 +784,29 @@ export const WordsList: React.FC = () => {
                   <TableCell>
                     <Typography variant="body2">{word.count}</Typography>
                   </TableCell>
+
+                  {/* Подсветка progress в кружке */}
                   <TableCell>
-                    <Typography variant="body2">{word.progress}</Typography>
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: '50%',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 'bold',
+                        fontSize: '0.8rem',
+                        // Динамический фон
+                        backgroundColor: getBackgroundColorByProgress(word.progress),
+                        // Цвет текста в зависимости от темы (dark/light)
+                        color: theme.palette.mode === 'dark' ? '#fff' : '#000'
+                      }}
+                    >
+                      {word.progress}
+                    </Box>
                   </TableCell>
+
                   <TableCell>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
                       {word.tags.length > 0
@@ -885,7 +846,6 @@ export const WordsList: React.FC = () => {
         </Typography>
       )}
 
-      {/* Пагинация */}
       {totalPages > 1 && (
         <Box display="flex" justifyContent="center" mt={4}>
           <Pagination
