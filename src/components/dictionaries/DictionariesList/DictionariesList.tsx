@@ -21,6 +21,8 @@ import {
 
 import defaultCover from '@/assets/default_cover.png'; // ПОСТАВИТЬ ПОТОМ ДРУГУЮ ЗАГЛУШКУ
 
+import { getLanguageName } from '@/utils/getLanguageName';
+
 export const DictionariesList: React.FC = () => {
     const dispatch = useAppDispatch();
     const { dictionaries, loading, error, currentPage, totalPages } = useAppSelector(
@@ -135,7 +137,7 @@ export const DictionariesList: React.FC = () => {
                                             {dict.name}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            Язык: {dict.language}
+                                            {`Язык : ${getLanguageName(dict.language)}`}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
                                             Обнавлен: {new Date(dict.updated_at).toLocaleDateString()}
