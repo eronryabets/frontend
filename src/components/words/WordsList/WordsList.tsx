@@ -759,14 +759,14 @@ export const WordsList: React.FC = () => {
                                         }
                                     }}
                                 >
-                                    <TableCell>
+                                    <TableCell sx={{ width: 70 }}>
                                         <Avatar
                                             src={word.image_path ? word.image_path : defaultCover}
                                             alt={word.word}
                                             sx={{width: 60, height: 60, borderRadius: 4}}
                                         />
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell sx={{ maxWidth: 450 }}>
                                         <Box display="flex" alignItems="center">
                                             <SpeechButton text={word.word} lang={language}/>
                                             <Typography
@@ -781,7 +781,7 @@ export const WordsList: React.FC = () => {
                                             </Typography>
                                         </Box>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell sx={{ maxWidth: 450 }}>
                                         <Box display="flex" alignItems="center">
                                             <MyIconButton
                                                 color="primary"

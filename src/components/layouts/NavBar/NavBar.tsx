@@ -82,7 +82,8 @@ export const NavBar = () => {
     };
 
     return (
-        <AppBar position="fixed">
+        <AppBar position="static">
+             {/* заменил с fixed на static */}
             <Toolbar>
                 {/* Название приложения */}
                 {/* Кликабельная надпись "Smart Reader" */}
