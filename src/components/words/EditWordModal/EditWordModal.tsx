@@ -21,10 +21,11 @@ import {
     Typography,
     Slider,
 } from '@mui/material';
-import { PhotoCamera } from '@mui/icons-material';
+import {Close as CloseIcon, PhotoCamera} from '@mui/icons-material';
 
 import defaultCover from '@/assets/default_word_image.jpg';
 import progressColors from '@/utils/constants/progressColors.ts';
+import {MyIconButton} from "@/components";
 
 
 interface EditWordModalProps {
@@ -168,7 +169,19 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+            }}>
             <DialogTitle>Редактировать слово</DialogTitle>
+            <MyIconButton
+                    color="secondary"
+                    startIcon={<CloseIcon/>}
+                    onClick={onClose}/>
+            </Box>
+
             <DialogContent>
                 <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
                     <Avatar

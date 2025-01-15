@@ -23,9 +23,10 @@ import {
     Select,
     MenuItem,
 } from '@mui/material';
-import { PhotoCamera } from '@mui/icons-material';
+import {Close as CloseIcon, PhotoCamera} from '@mui/icons-material';
 
 import defaultCover from '@/assets/default_word_image.jpg';
+import {MyIconButton} from "@/components";
 
 
 
@@ -162,7 +163,19 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({open, onClose, dictio
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+            }}>
             <DialogTitle>Добавить слово</DialogTitle>
+            <MyIconButton
+                    color="secondary"
+                    startIcon={<CloseIcon/>}
+                    onClick={onClose}/>
+            </Box>
+
             <DialogContent>
                 <Box sx={{display: 'flex', alignItems: 'center', mb: 2}}>
                     <Avatar

@@ -7,7 +7,7 @@ import { updateBook } from '@/redux/slices/bookSlice.ts';
 
 import { Book } from '@/types';
 import { languageOptions } from '@/config/languageOptions.ts';
-import { GenreSelect } from '@/components';
+import {GenreSelect, MyIconButton} from '@/components';
 
 import {
     Dialog,
@@ -27,7 +27,7 @@ import {
     MenuItem,
 } from '@mui/material';
 
-import { PhotoCamera } from '@mui/icons-material';
+import {Close as CloseIcon, PhotoCamera} from '@mui/icons-material';
 import { SelectChangeEvent } from '@mui/material/Select';
 
 interface EditBookModalProps {
@@ -143,7 +143,19 @@ export const EditBookModal: React.FC<EditBookModalProps> = ({ open, onClose, boo
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+            }}>
             <DialogTitle>Редактировать книгу</DialogTitle>
+            <MyIconButton
+                    color="secondary"
+                    startIcon={<CloseIcon/>}
+                    onClick={onClose}/>
+            </Box>
+
             <DialogContent>
                 {/* Превью обложки */}
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
