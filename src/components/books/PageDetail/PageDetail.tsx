@@ -324,6 +324,7 @@ export const PageDetail: React.FC = () => {
               fontSize: `${fontSizeRem}rem`, // Применение динамического размера шрифта
               lineHeight: 1.8,
               textAlign: 'left',
+              whiteSpace: 'pre-wrap', //Теперь несколько пробелов в начале строки или табы не будут схлопываться.
             }}
           >
             <TextRenderer
