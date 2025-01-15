@@ -70,7 +70,7 @@ import defaultCover from '@/assets/default_word_image.jpg';
 // Импорт функции для подсветки progress
 import {getBackgroundColorByProgress} from '@/utils/getBackgroundColorByProgress';
 
-import { getLanguageName } from '@/utils/getLanguageName';
+import {getLanguageName} from '@/utils/getLanguageName';
 
 /** Хелпер для форматирования даты (обрезаем до "yyyy-mm-dd") */
 function formatDate(dateStr: string | null): string {
@@ -666,7 +666,12 @@ export const WordsList: React.FC = () => {
             {/* Таблица слов */}
             {words && words.length > 0 ? (
                 <Box mt={2}>
-                    <Table sx={{minWidth: 650}} aria-label="words table">
+                    <Table
+                        sx={{
+                            minWidth: 650,
+                            // tableLayout: 'fixed'
+                        }}
+                        aria-label="words table">
                         <TableHead>
                             <TableRow>
                                 <TableCell><strong></strong></TableCell>
@@ -759,14 +764,23 @@ export const WordsList: React.FC = () => {
                                         }
                                     }}
                                 >
-                                    <TableCell sx={{ width: 70 }}>
+
+                                    {/*WORD IMAGE*/}
+                                    <TableCell sx={{maxWidth: 70}}>
                                         <Avatar
                                             src={word.image_path ? word.image_path : defaultCover}
                                             alt={word.word}
                                             sx={{width: 60, height: 60, borderRadius: 4}}
                                         />
                                     </TableCell>
-                                    <TableCell sx={{ maxWidth: 450 }}>
+
+                                    {/*WORD TERMIN*/}
+                                    <TableCell
+                                        sx={{
+                                            minWidth: {xs: 'auto', md: 450},
+                                            maxWidth: {xs: 'none', md: 450}
+                                        }}
+                                    >
                                         <Box display="flex" alignItems="center">
                                             <SpeechButton text={word.word} lang={language}/>
                                             <Typography
@@ -781,7 +795,14 @@ export const WordsList: React.FC = () => {
                                             </Typography>
                                         </Box>
                                     </TableCell>
-                                    <TableCell sx={{ maxWidth: 450 }}>
+
+                                    {/*WORD TRANSLATE*/}
+                                    <TableCell
+                                        sx={{
+                                            minWidth: {xs: 'auto', md: 450},
+                                            maxWidth: {xs: 'none', md: 450}
+                                        }}
+                                    >
                                         <Box display="flex" alignItems="center">
                                             <MyIconButton
                                                 color="primary"
@@ -800,11 +821,13 @@ export const WordsList: React.FC = () => {
                                             </Typography>
                                         </Box>
                                     </TableCell>
+
+                                    {/*WORD VIEWS COUNT*/}
                                     <TableCell>
                                         <Typography variant="body2">{word.count}</Typography>
                                     </TableCell>
 
-                                    {/* Подсветка progress в кружке */}
+                                    {/* WORD PROGRESS - highlight */}
                                     <TableCell>
                                         <Box
                                             sx={{
@@ -826,10 +849,15 @@ export const WordsList: React.FC = () => {
                                         </Box>
                                     </TableCell>
 
+                                    {/*WORD TAGS*/}
                                     <TableCell>
-                                        <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1}}>
+                                        <Box
+                                            sx={{
+                                                display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1,
+                                                maxWidth: {xs: 'none', md: 150}
+                                            }}>
                                             {word.tags.length > 0
-                                                ? word.tags.slice(0, 3).map((tag) => (
+                                                ? word.tags.slice(0, 2).map((tag) => (
                                                     <Chip
                                                         key={tag.id}
                                                         label={tag.name}
@@ -839,9 +867,9 @@ export const WordsList: React.FC = () => {
                                                     />
                                                 ))
                                                 : '—'}
-                                            {word.tags.length > 3 && (
+                                            {word.tags.length > 2 && (
                                                 <Chip
-                                                    label={`+${word.tags.length - 3}`}
+                                                    label={`+${word.tags.length - 2}`}
                                                     variant="outlined"
                                                     color="primary"
                                                     size="small"
@@ -849,6 +877,8 @@ export const WordsList: React.FC = () => {
                                             )}
                                         </Box>
                                     </TableCell>
+
+                                    {/*WORD ADDED*/}
                                     <TableCell>
                                         <Typography variant="body2">
                                             {formatDate(word.created_at)}
