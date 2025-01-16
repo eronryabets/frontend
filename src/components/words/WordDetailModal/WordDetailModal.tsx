@@ -40,7 +40,7 @@ interface WordDetailModalProps {
     onClose: () => void;
     wordId: string | null; // Если слова нет, передаём null
     language: string;     // Новый проп для динамического языка
-    onDeleteSuccess: () => void; // <-- Проброшен из родителя (PageDetail)
+    onDeleteSuccess: (severity: 'success' | 'error') => void; // <-- Проброшен из родителя (PageDetail)
 }
 
 export const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose, wordId, language, onDeleteSuccess }) => {
@@ -127,7 +127,7 @@ export const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose,
      // Функция, вызываемая при успешном удалении слова
     const handleLocalDeleteSuccess  = () => {
         onClose(); // Закрываем WordDetailModal
-        onDeleteSuccess(); // А заодно уведомляем родителя, чтобы он показал Snackbar
+        onDeleteSuccess('success'); // А заодно уведомляем родителя, чтобы он показал Snackbar
     };
 
 

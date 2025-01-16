@@ -193,12 +193,25 @@ export const PageDetail: React.FC = () => {
     // Управление состоянием Snackbar
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity]
+      = useState<'success' | 'error' | 'info' | 'warning'>('success');
 
   // Обработчик успешного удаления слова
-  const handleDeleteSuccess = () => {
+  const handleDeleteSuccess = (severity: 'success' | 'error') => {
+    // setSnackbarMessage('Слово успешно удалено.');
+    // setSnackbarOpen(true);
+    // setIsWordDetailOpen(false); // Закрываем WordDetailModal
+
+    // Можем поставить любое сообщение
+  if (severity === 'success') {
     setSnackbarMessage('Слово успешно удалено.');
-    setSnackbarOpen(true);
-    setIsWordDetailOpen(false); // Закрываем WordDetailModal
+    setSnackbarSeverity('success');
+  } else {
+    // для ошибки другое сообщение:
+    setSnackbarMessage('Не удалось удалить слово!');
+    setSnackbarSeverity('error');
+  }
+  setSnackbarOpen(true);
   };
 
   // Закрытие Snackbar
@@ -211,6 +224,19 @@ export const PageDetail: React.FC = () => {
     }
     setSnackbarOpen(false);
   };
+
+  // ====== Для ограничения запроса на перевод выделенного текста 999 символов ======
+  useEffect(() => {
+    if (selectedText && selectedText.length > 999) {
+      // Сбрасываем выделение/popover, чтобы не открывать TranslationDialog
+      handlePopoverClose();
+
+      // Показываем сообщение об ошибке
+      setSnackbarMessage('Невозможно выделить более 999 символов для перевода.');
+      setSnackbarSeverity('error');     // <-- Указываем что это ошибка, красный цвет или другой
+      setSnackbarOpen(true);
+    }
+  }, [selectedText, handlePopoverClose]);
 
 
 
@@ -426,11 +452,11 @@ export const PageDetail: React.FC = () => {
        {/* Snackbar для уведомлений */}
       <Snackbar
                 open={snackbarOpen}
-                autoHideDuration={2000}
+                autoHideDuration={3000}
                 onClose={handleSnackbarClose}
                 // message={snackbarMessage}
                 anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}>
-                <Alert severity="success" sx={{width: '100%'}}>
+                <Alert severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>

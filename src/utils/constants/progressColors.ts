@@ -15,11 +15,14 @@ const progressColors: Record<number, string> = {
     7: 'rgba(153, 255, 0, 0.3)',     // Лаймово-зеленый
     8: 'rgba(144,238,144,0.3)',      // Зеленовато-желтый
     9: 'rgba(102,222,71,0.4)',       // Зеленый лаймовый
-    10: 'rgba(0,128,0,0.5)' ,         // Зеленый
-    11: 'rgba(47,47,45,0.42)'          // Зеленый
+    10: 'rgba(0,128,0,0.5)' ,        // Зеленый
 };
 
 export default progressColors;
+
+export const testColors: Record<number, string> = {
+    0: 'rgba(36,91,225,0.42)'      // тест
+};
 
 /**
  * Default colors :

@@ -31,7 +31,7 @@ import {MyIconButton} from "@/components";
 interface EditWordModalProps {
     open: boolean;
     onClose: () => void;
-    onDeleteSuccess: () => void;
+    onDeleteSuccess: (severity: 'success' | 'error') => void;
     dictionaryId: string;
     wordData: {
         id: string;
@@ -158,9 +158,10 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
         try {
             const resultAction = await dispatch(deleteWord({wordId: wordData.id}));
             if (deleteWord.fulfilled.match(resultAction)) {
-                onDeleteSuccess(); // Вызываем callback при успешном удалении
+                onDeleteSuccess('success'); // Вызываем callback при успешном удалении
             } else {
                 setSubmitError(resultAction.payload || 'Не удалось удалить слово.');
+                onDeleteSuccess('error')
             }
         } catch (err) {
             setSubmitError('Не удалось удалить слово.');
