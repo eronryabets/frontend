@@ -470,7 +470,11 @@ export const WordsList: React.FC = () => {
                     value={searchInput}
                     onChange={handleSearchInputChange}
                     onKeyPress={handleSearchKeyPress}
-                    sx={{width: '300px'}}
+                    sx={{
+                        width: '300px',
+                        backgroundColor: searchInput ? 'rgba(144,238,144,0.14)' : 'inherit', // Подсветка при наличии текста
+                        borderRadius: 1, //подгоним подсветку под края закругленные.
+                    }}
                     InputProps={{
                         endAdornment: search && (
                             <Tooltip title="Очистить поиск" arrow>
