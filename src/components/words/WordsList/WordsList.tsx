@@ -27,13 +27,17 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    TableSortLabel, debounce
+    TableSortLabel,
+    debounce,
 } from '@mui/material';
 import {SelectChangeEvent} from '@mui/material/Select';
 import {
     Close as CloseIcon,
     MapsUgc as MapsUgcIcon,
-    Edit as EditIcon
+    Edit as EditIcon,
+    FilterListOutlined as FilterListOutlinedIcon,
+    FilterListOffOutlined as FilterListOffOutlinedIcon,
+    ExpandLessOutlined as ExpandLessOutlinedIcon,
 } from '@mui/icons-material';
 
 // DatePicker, Dayjs и адаптер
@@ -41,9 +45,6 @@ import dayjs, {Dayjs} from 'dayjs';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
-
-// lodash.debounce для дебаунсинга при вводе
-// import debounce from 'lodash.debounce' -> '@mui/material';
 
 // Импортируем useTheme для определения темы
 import {useTheme} from '@mui/material/styles';
@@ -71,9 +72,6 @@ import defaultCover from '@/assets/default_word_image.jpg';
 import {getBackgroundColorByProgress} from '@/utils/getBackgroundColorByProgress';
 
 import {getLanguageName} from '@/utils/getLanguageName';
-
-import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 
 /** Хелпер для форматирования даты (обрезаем до "yyyy-mm-dd") */
 function formatDate(dateStr: string | null): string {
@@ -535,9 +533,9 @@ export const WordsList: React.FC = () => {
                         }}
                     >
                         {hasAnyFilter ? (
-                            <RemoveRedEyeOutlinedIcon sx={{color: 'green'}}/>
+                            <FilterListOutlinedIcon sx={{color: 'green'}}/>
                         ) : (
-                            <VisibilityOffOutlinedIcon/>
+                            <FilterListOffOutlinedIcon/>
                         )}
                     </IconButton>
                 </Tooltip>
@@ -701,6 +699,23 @@ export const WordsList: React.FC = () => {
                         >
                             Применить
                         </Button>
+                        {/*<Tooltip title="Свернуть фильтр" arrow>*/}
+                                {/*<IconButton*/}
+                                {/*    // onClick={handleResetSearch}*/}
+                                {/*    size="small"*/}
+                                {/*    sx={{ml: 1}}*/}
+                                {/*    aria-label="Очистить поиск"*/}
+                                {/*>*/}
+                                {/*    <ExpandLessOutlinedIcon fontSize="small"/>*/}
+                                {/*</IconButton>*/}
+                        {/*</Tooltip>*/}
+                            <MyIconButton
+                                                color="primary"
+                                                startIcon={<ExpandLessOutlinedIcon/>}
+                                                onClick={() => setFilterOpen(!isFilterOpen)}
+                                                tooltipTitle="Свернуть фильтр"
+                                            />
+
                         <Button
                             variant="outlined"
                             onClick={handleResetFilters}
