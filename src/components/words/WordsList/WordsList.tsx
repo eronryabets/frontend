@@ -716,6 +716,7 @@ export const WordsList: React.FC = () => {
 
                         <Button
                             variant="outlined"
+                            color="info"
                             onClick={handleResetFilters}
                         >
                             Сбросить
@@ -726,10 +727,10 @@ export const WordsList: React.FC = () => {
 
             {/* Таблица слов */}
             {words && words.length > 0 ? (
-                <Box mt={2}>
+                <Box sx={{ width: '100%', overflowX: 'auto' }}>
                     <Table
                         sx={{
-                            minWidth: 650,
+                            // minWidth: 650,
                             // tableLayout: 'fixed'
                         }}
                         aria-label="words table">
