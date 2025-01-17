@@ -72,6 +72,9 @@ import {getBackgroundColorByProgress} from '@/utils/getBackgroundColorByProgress
 
 import {getLanguageName} from '@/utils/getLanguageName';
 
+import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+
 /** Хелпер для форматирования даты (обрезаем до "yyyy-mm-dd") */
 function formatDate(dateStr: string | null): string {
     if (!dateStr) return '';
@@ -517,6 +520,27 @@ export const WordsList: React.FC = () => {
                         ))}
                     </Select>
                 </FormControl>
+                {/* Иконка-индикатор фильтра */}
+                <Tooltip
+                    title={hasAnyFilter ? 'Фильтр применён. Сбросить фильтр?' : 'Фильтр не активен'}
+                    arrow
+                >
+                    <IconButton
+                        onClick={() => {
+                            // Если фильтр был активен, при клике сбросим его,
+                            // или реализуйте другую логику переключения
+                            if (hasAnyFilter) {
+                                handleResetFilters();
+                            }
+                        }}
+                    >
+                        {hasAnyFilter ? (
+                            <RemoveRedEyeOutlinedIcon sx={{color: 'green'}}/>
+                        ) : (
+                            <VisibilityOffOutlinedIcon/>
+                        )}
+                    </IconButton>
+                </Tooltip>
             </Box>
 
             {/* --- ФИЛЬТРЫ (свертываемые) --- */}
