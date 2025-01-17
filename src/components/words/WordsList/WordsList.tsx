@@ -120,6 +120,11 @@ export const WordsList: React.FC = () => {
     const [tagInput, setTagInput] = useState<string>('');
     const [tagNames, setTagNames] = useState<string[]>(filters.tags || []);
 
+    // Синхронизируем локальное состояние с фильтрами (если фильтры обновятся из другого места - по клику тега)
+    useEffect(() => {
+        setTagNames(filters.tags || []);
+    }, [filters.tags]);
+
     const handleTagInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setTagInput(event.target.value);
     }, []);
@@ -395,14 +400,22 @@ export const WordsList: React.FC = () => {
 
     /** Конец секции валидация фильтра  */
 
-        // Обработчик изменения сортировки (через Select)
+        // Обработчик нажатия по тегу - для применения фильтра.
+    const handleTagClick = useCallback((tag: string) => {
+            // Обновляем фильтр: фильтруем только по выбранному тегу.
+            dispatch(setFilters({...filters, tags: [tag]}));
+            // Сбрасываем номер страницы
+            dispatch(setCurrentPage(1));
+        }, [dispatch, filters]);
+
+    // Обработчик изменения сортировки (через Select)
     const handleOrderingChange = useCallback(
-            (event: SelectChangeEvent<string>) => {
-                const newOrder = event.target.value;
-                dispatch(setOrdering(newOrder));
-            },
-            [dispatch]
-        );
+        (event: SelectChangeEvent<string>) => {
+            const newOrder = event.target.value;
+            dispatch(setOrdering(newOrder));
+        },
+        [dispatch]
+    );
 
     if (loading) {
         return (
@@ -933,13 +946,17 @@ export const WordsList: React.FC = () => {
                                             }}>
                                             {word.tags.length > 0
                                                 ? word.tags.slice(0, 2).map((tag) => (
-                                                    <Chip
-                                                        key={tag.id}
-                                                        label={tag.name}
-                                                        variant="outlined"
-                                                        color="primary"
-                                                        size="small"
-                                                    />
+                                                    <Tooltip key={tag.id}
+                                                             title="Нажмите, чтобы отфильтровать по этому тегу" arrow>
+                                                        <Chip
+                                                            label={tag.name}
+                                                            variant="outlined"
+                                                            color="primary"
+                                                            size="small"
+                                                            onClick={() => handleTagClick(tag.name)}
+                                                            sx={{cursor: 'pointer'}}
+                                                        />
+                                                    </Tooltip>
                                                 ))
                                                 : '—'}
                                             {word.tags.length > 2 && (
