@@ -38,6 +38,7 @@ import {
     FilterListOutlined as FilterListOutlinedIcon,
     FilterListOffOutlined as FilterListOffOutlinedIcon,
     ExpandLessOutlined as ExpandLessOutlinedIcon,
+    ExpandMoreOutlined as ExpandMoreOutlinedIcon,
 } from '@mui/icons-material';
 
 // DatePicker, Dayjs и адаптер
@@ -498,6 +499,11 @@ export const WordsList: React.FC = () => {
                     variant="contained"
                     color={isFilterOpen ? 'warning' : 'info'}
                     onClick={() => setFilterOpen(!isFilterOpen)}
+                    startIcon={
+                        isFilterOpen
+                            ? <ExpandLessOutlinedIcon/>
+                            : <ExpandMoreOutlinedIcon/>
+                    }
                 >
                     {isFilterOpen ? 'Свернуть фильтр' : 'Показать фильтр'}
                 </Button>
