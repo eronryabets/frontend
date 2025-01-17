@@ -78,6 +78,7 @@ function formatDate(dateStr: string | null): string {
     return dateStr.substring(0, 10);
 }
 
+/** Лейблы фильтрации */
 const sortingOptions = [
     {label: 'Без сортировки', value: ''},
     {label: 'Termin (A → Z)', value: 'word'},
@@ -340,7 +341,8 @@ export const WordsList: React.FC = () => {
         dispatch(setCurrentPage(1));
     }, [dispatch]);
 
-    // Валидация count
+    /** Секция валидация фильтра :  */
+        // Валидация count
     const countMinNum = Number(countMin);
     const countMaxNum = Number(countMax);
     const countMinError =
@@ -375,21 +377,30 @@ export const WordsList: React.FC = () => {
         createdAtAfter !== null ||
         createdAtBefore !== null;
 
+    // Определяем, что дата «до» меньше даты «от»
+    const dateRangeError = Boolean(
+        createdAtAfter &&
+        createdAtBefore &&
+        createdAtAfter.isAfter(createdAtBefore)  // если "от" позже, чем "до"
+    );
+
+    // Если есть *Error, мы хотим отключить кнопку Применить.
     const isApplyFiltersDisabled =
         !hasAnyFilter ||
-        countMinError ||
-        countMaxError ||
-        progressMinError ||
-        progressMaxError;
+        countMinError || countMaxError ||
+        progressMinError || progressMaxError ||
+        dateRangeError;
 
-    // Обработчик изменения сортировки (через Select)
+    /** Конец секции валидация фильтра  */
+
+        // Обработчик изменения сортировки (через Select)
     const handleOrderingChange = useCallback(
-        (event: SelectChangeEvent<string>) => {
-            const newOrder = event.target.value;
-            dispatch(setOrdering(newOrder));
-        },
-        [dispatch]
-    );
+            (event: SelectChangeEvent<string>) => {
+                const newOrder = event.target.value;
+                dispatch(setOrdering(newOrder));
+            },
+            [dispatch]
+        );
 
     if (loading) {
         return (
@@ -643,8 +654,21 @@ export const WordsList: React.FC = () => {
                         </Box>
                     </LocalizationProvider>
 
+                    {/* Если есть ошибка в диапазоне дат, показываем сообщение */}
+                    {dateRangeError && (
+                        <Typography color="error" sx={{mb: 2}}>
+                            Дата «От» не может быть больше, чем дата «До».
+                        </Typography>
+                    )}
+
                     {/* Кнопки Применить/Сбросить */}
-                    <Box sx={{display: 'flex', gap: 4.6}}>
+                    <Box sx={{
+                        display: 'flex',
+                        // gap: 4.6
+                        justifyContent: 'space-between', // распределяет дочерние элементы по краям
+                        width: '100%', // контейнер занимает всю ширину родителя
+                        mb: 2,      // отступ снизу (опционально)
+                    }}>
                         <Button
                             variant="contained"
                             color="primary"
