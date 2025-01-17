@@ -21,7 +21,7 @@ const progressColors: Record<number, string> = {
 export default progressColors;
 
 export const testColors: Record<number, string> = {
-    0: 'rgba(36,91,225,0.42)'      // тест
+    0: 'rgba(64,66,75,0.42)'      // тест
 };
 
 /**

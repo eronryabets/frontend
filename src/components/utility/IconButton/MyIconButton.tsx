@@ -4,24 +4,28 @@ import {Button, ButtonProps, Tooltip} from '@mui/material';
 import {SxProps, Theme} from '@mui/system';
 
 // Определяем интерфейс пропсов, наследуем от стандартных ButtonProps
-interface MyIconButtonProps extends Omit<ButtonProps, 'color' | 'startIcon' | 'onClick'> {
-    color?: 'primary' | 'secondary' | 'inherit' | 'success' | 'error' | 'info' | 'warning';
-    startIcon: React.ReactNode;
-    onClick: () => void;
-    sx?: SxProps<Theme>; // Для дополнительных стилей, если необходимо
-    tooltipTitle?: string;
+interface MyIconButtonProps
+  extends Omit<ButtonProps, 'color' | 'startIcon' | 'onClick'> {
+  color?: 'primary' | 'secondary' | 'inherit' | 'success' | 'error' | 'info' | 'warning';
+  startIcon: React.ReactNode;
+  onClick: () => void;
+  sx?: SxProps<Theme>;
+  tooltipTitle?: string;    // Опциональный текст для тултипа
+  bgColor?: string;         // Опциональный цвет фона кнопки
+  hoverBgColor?: string;    // Опциональный цвет фона при ховере
 }
 
 export const MyIconButton: React.FC<MyIconButtonProps> = ({
-       color = 'primary',
-       startIcon,
-       onClick,
-       sx,
-       tooltipTitle,
-       ...rest
+  color = 'primary',
+  startIcon,
+  onClick,
+  sx,
+  tooltipTitle,
+  bgColor,
+  hoverBgColor,
+  ...rest
 }) => {
-
-    // Сначала готовим саму кнопку
+  // Формируем кнопку
   const buttonContent = (
     <Button
       color={color}
@@ -29,23 +33,32 @@ export const MyIconButton: React.FC<MyIconButtonProps> = ({
       onClick={onClick}
       sx={{
         borderRadius: 10,    // круглые углы
-        width: 40,           // Фиксированная ширина
-        height: 40,          // Фиксированная высота
-        minWidth: 40,        // Минимальная ширина
-        padding: 0,          // Убираем внутренние отступы
-        mr: 2,               // Отступ справа
+        width: 40,           // фиксированная ширина
+        height: 40,          // фиксированная высота
+        minWidth: 40,
+        padding: 0,
+        mr: 2,
         '& .MuiButton-startIcon': {
-          margin: 0,         // Убираем отступ между иконкой и текстом
+          margin: 0,         // убираем отступ между иконкой и текстом
         },
-        ...sx,
+        // Ниже используем опциональные bgColor и hoverBgColor, если заданы
+        ...(bgColor && {
+          backgroundColor: bgColor,
+          // Если не укажем own color, MUI может сам подмешать primary
+          // поэтому можно указать variant="contained" где-то или просто переопределить:
+          '&:hover': {
+            backgroundColor: hoverBgColor || bgColor, // если hoverBgColor нет, берём bgColor
+          },
+        }),
+        ...sx, // Подмешиваем остальные стили, если переданы
       }}
       {...rest}
     >
-      {/* Тут только иконка, текст не нужен */}
+      {/* Никакого текста, только иконка */}
     </Button>
   );
 
-  // Если tooltipTitle задан, рендерим <Tooltip>, иначе — саму кнопку
+  // Если tooltipTitle передан, оборачиваем в <Tooltip>, иначе возвращаем кнопку
   if (tooltipTitle) {
     return (
       <Tooltip title={tooltipTitle} arrow>
@@ -54,6 +67,5 @@ export const MyIconButton: React.FC<MyIconButtonProps> = ({
     );
   }
 
-  // Если tooltipTitle нет, возвращаем кнопку без тултипа
   return buttonContent;
 };

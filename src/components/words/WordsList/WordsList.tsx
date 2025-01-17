@@ -699,22 +699,14 @@ export const WordsList: React.FC = () => {
                         >
                             Применить
                         </Button>
-                        {/*<Tooltip title="Свернуть фильтр" arrow>*/}
-                                {/*<IconButton*/}
-                                {/*    // onClick={handleResetSearch}*/}
-                                {/*    size="small"*/}
-                                {/*    sx={{ml: 1}}*/}
-                                {/*    aria-label="Очистить поиск"*/}
-                                {/*>*/}
-                                {/*    <ExpandLessOutlinedIcon fontSize="small"/>*/}
-                                {/*</IconButton>*/}
-                        {/*</Tooltip>*/}
-                            <MyIconButton
-                                                color="primary"
-                                                startIcon={<ExpandLessOutlinedIcon/>}
-                                                onClick={() => setFilterOpen(!isFilterOpen)}
-                                                tooltipTitle="Свернуть фильтр"
-                                            />
+                        <MyIconButton
+                            color="primary"
+                            startIcon={<ExpandLessOutlinedIcon/>}
+                            onClick={() => setFilterOpen(!isFilterOpen)}
+                            tooltipTitle="Свернуть фильтр"
+                            bgColor="rgba(64,66,75,0.42)"
+                            hoverBgColor="rgba(64,66,75,0.9)"
+                        />
 
                         <Button
                             variant="outlined"
