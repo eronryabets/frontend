@@ -1,13 +1,15 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 import axios from 'axios';
 
 import api from '@/utils/api';
-import { AUTH_API_URL } from '@/config/urls.ts';
+import {AUTH_API_URL} from '@/config/urls.ts';
 
-import { clearUserInfo, getUserInfo } from './userInfoSlice';
-import { AuthorizationData, AuthorizationState } from '@/types';
+import {clearUserInfo, getUserInfo} from './userInfoSlice';
+import {AuthorizationData, AuthorizationState} from '@/types';
 
-import { persistor } from '../store';
+import {persistor, RootState} from '../store';
+import {fetchDictionaries} from "@/redux/slices/dictionarySlice.ts";
+import {setTheme} from "@/redux/slices/themeSlice.ts";
 
 // Изначальное состояние авторизации
 const initialState: AuthorizationState = {
@@ -22,7 +24,7 @@ const initialState: AuthorizationState = {
 // Авторизация пользователя
 export const authorizationUser = createAsyncThunk(
     'authorization/authorizationUser',
-    async (formData: AuthorizationData, {dispatch, rejectWithValue}) => {
+    async (formData: AuthorizationData, {dispatch, getState, rejectWithValue}) => {
         try {
             // Aвторизация на сервисе
             const authResponse = await axios.post(`${AUTH_API_URL}login/`, formData, {
@@ -35,6 +37,23 @@ export const authorizationUser = createAsyncThunk(
                 // После успешной авторизации делаем запрос на получение данных пользователя
                 console.log(`authorizationUser getUserInfo(): `);
                 dispatch(getUserInfo());  // Получаем данные пользователя
+
+                // Вызываем инициализацию
+                //Загружаем словарь
+                dispatch(fetchDictionaries(1));
+
+                //Выставляем тему
+                // Получаем состояние через getState()
+                const state = getState() as RootState;
+                const userData = state.userInfo.userData;
+                // Используем optional chaining для безопасного доступа к theme.mode
+                const userThemeMode = userData?.settings?.theme?.mode as 'light' | 'dark' | undefined;
+
+                // Если тема пользователя существует – установим её
+                if (userThemeMode) {
+                    dispatch(setTheme(userThemeMode));
+                }
+
 
                 return authResponse.data;  // Возвращаем данные авторизации
             } else {

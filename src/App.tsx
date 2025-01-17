@@ -24,7 +24,7 @@ import {
     BookDetail,
     PageDetail,
     WordsList,
-    AuthListener,
+    UserOptionsListener,
 } from '@/components';
 
 
@@ -38,7 +38,7 @@ const AppContent = () => {
         <ThemeProvider theme={theme}>
             <CssBaseline/>
             <GlobalStyles/>
-            <AuthListener />
+            <UserOptionsListener />
             <Routes>
                 {/* Защищенные маршруты */}
                 <Route element={<ProtectedRoute/>}>
