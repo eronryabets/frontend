@@ -4,11 +4,8 @@ interface ThemeState {
   mode: 'light' | 'dark';
 }
 
-// Получаем сохранённое значение из localStorage
-const savedMode = localStorage.getItem('themeMode') as 'light' | 'dark' | null;
-
 const initialState: ThemeState = {
-  mode: savedMode || 'light',  // если в localStorage нет значения, используем 'light'
+  mode: 'light',
 };
 
 const themeSlice = createSlice({
@@ -16,15 +13,10 @@ const themeSlice = createSlice({
   initialState,
   reducers: {
     toggleTheme: (state) => {
-      // Переключаем тему
-      const newMode = state.mode === 'light' ? 'dark' : 'light';
-      state.mode = newMode;
-      // Сохраняем новое значение в localStorage
-      localStorage.setItem('themeMode', newMode);
+      state.mode = state.mode === 'light' ? 'dark' : 'light';
     },
     setTheme: (state, action: PayloadAction<'light' | 'dark'>) => {
       state.mode = action.payload;
-      localStorage.setItem('themeMode', action.payload);
     },
   },
 });
