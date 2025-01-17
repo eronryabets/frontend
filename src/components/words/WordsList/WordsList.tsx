@@ -517,7 +517,7 @@ export const WordsList: React.FC = () => {
                         p: 2,
                         mt: 1,
                         mb: 2,
-                        maxWidth: '350px'
+                        maxWidth: '355px'
                     }}
                 >
                     <Typography variant="h6" gutterBottom>
@@ -627,7 +627,7 @@ export const WordsList: React.FC = () => {
 
                     {/* Даты */}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Box sx={{display: 'flex', flexDirection: 'column', gap: 2, mb: 2, maxWidth: '315px'}}>
+                        <Box sx={{display: 'flex', gap: 2, mb: 2}}>
                             <DatePicker
                                 label="Дата от"
                                 value={createdAtAfter}
