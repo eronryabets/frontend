@@ -509,7 +509,15 @@ export const WordsList: React.FC = () => {
                 </Button>
 
                 {/* Select для сортировки */}
-                <FormControl size="small" sx={{minWidth: 200}}>
+                <FormControl
+                    size="small"
+                    sx={{
+                        minWidth: 200,
+                        // Если ordering не пустой, фон становится зеленоватым, иначе inherit
+                        backgroundColor: ordering ? 'rgba(144,238,144,0.14)' : 'inherit',
+                        borderRadius: 1, // опционально, чтобы применить скругление
+                    }}
+                >
                     <InputLabel id="sorting-label">Сортировка</InputLabel>
                     <Select
                         labelId="sorting-label"
@@ -524,6 +532,7 @@ export const WordsList: React.FC = () => {
                         ))}
                     </Select>
                 </FormControl>
+
                 {/* Иконка-индикатор фильтра */}
                 <Tooltip
                     title={hasAnyFilter ? 'Фильтр применён. Сбросить фильтр?' : 'Фильтр не активен'}
@@ -727,7 +736,7 @@ export const WordsList: React.FC = () => {
 
             {/* Таблица слов */}
             {words && words.length > 0 ? (
-                <Box sx={{ width: '100%', overflowX: 'auto' }}>
+                <Box sx={{width: '100%', overflowX: 'auto'}}>
                     <Table
                         sx={{
                             // minWidth: 650,
