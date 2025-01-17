@@ -28,7 +28,6 @@ import {
     Select,
     MenuItem,
     TableSortLabel,
-    debounce,
 } from '@mui/material';
 import {SelectChangeEvent} from '@mui/material/Select';
 import {
@@ -310,22 +309,22 @@ export const WordsList: React.FC = () => {
         setSnackbarOpen(false);
     }, []);
 
-    // Дебаунсинг для поля поиска
-    const debouncedSearch = useCallback(
-        debounce((value: string) => {
-            dispatch(setSearchTerm(value.trim()));
-            dispatch(setCurrentPage(1));
-        }, 500),
-        [dispatch]
-    );
+    // // Дебаунсинг для поля поиска
+    // const debouncedSearch = useCallback(
+    //     debounce((value: string) => {
+    //         dispatch(setSearchTerm(value.trim()));
+    //         dispatch(setCurrentPage(1));
+    //     }, 500),
+    //     [dispatch]
+    // );
 
     const handleSearchInputChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            setSearchInput(event.target.value);
-            debouncedSearch(event.target.value);
-        },
-        [debouncedSearch]
-    );
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchInput(event.target.value);
+        // debouncedSearch(event.target.value);
+    },
+    []
+);
 
     // Если оставляем кнопку "Поиск"
     const handleSearch = useCallback(() => {
@@ -342,6 +341,7 @@ export const WordsList: React.FC = () => {
         [handleSearch]
     );
 
+    // При нажатии Enter
     const handleResetSearch = useCallback(() => {
         setSearchInput('');
         dispatch(setSearchTerm(''));
