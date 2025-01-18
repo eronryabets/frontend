@@ -19,7 +19,7 @@ import {
     Chip,
     Stack,
     Typography,
-    Slider,
+    Slider, Tooltip,
 } from '@mui/material';
 import {
     Close as CloseIcon,
@@ -267,22 +267,24 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
-                        gap: 1,
                     }}
                 >
-                    <IconButton
-                        onClick={toggleHighlightDisabled}
-                        aria-label="toggle highlight"
+                    <Tooltip
+                        title={
+                            highlightDisabled
+                                ? 'Подсветка слова выключена'
+                                : 'Подсветка слова включена'
+                        }
+                        arrow
                     >
-                        {highlightDisabled ? (
-                            <VisibilityOffIcon sx={{color: 'red'}}/>
-                        ) : (
-                            <VisibilityIcon sx={{color: 'green'}}/>
-                        )}
-                    </IconButton>
-                    <Typography variant="body1">
-                        {highlightDisabled ? 'Подсветка слова выключена' : 'Подсветка слова включена'}
-                    </Typography>
+                        <IconButton onClick={toggleHighlightDisabled} aria-label="toggle highlight">
+                            {highlightDisabled ? (
+                                <VisibilityOffIcon sx={{color: 'red'}}/>
+                            ) : (
+                                <VisibilityIcon sx={{color: 'green'}}/>
+                            )}
+                        </IconButton>
+                    </Tooltip>
                 </Box>
 
                 {/* Поле ввода прогресса */}
@@ -308,7 +310,7 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
                             {value: 9, label: '9'},
                             {value: 10, label: '10'},
                         ]}
-                        valueLabelDisplay="on"
+                        valueLabelDisplay="off" // Отключаем отображение всплывающего значения
                         onChange={handleProgressChange}
                         aria-labelledby="progress-slider"
                         sx={{
