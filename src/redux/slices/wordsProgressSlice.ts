@@ -38,6 +38,7 @@ const wordsProgressSlice = createSlice({
     name: 'wordsProgress',
     initialState,
     reducers: {
+        //НЕ ИСПОЛЬЗУЮТСЯ НА ДАННЫЙ МОМЕНТ!
         setWordProgress(state, action: PayloadAction<{ word: string; progress: number }>) {
             const {word, progress} = action.payload;
             const index = state.words.findIndex((w) => w.word.toLowerCase()
@@ -49,7 +50,7 @@ const wordsProgressSlice = createSlice({
         addWordProgress(state, action: PayloadAction<{ id: string; word: string; progress: number }>) {
             const {id, word, progress} = action.payload;
             // Добавляем новое слово в массив words (wordsProgress)
-            state.words.push({id, word, progress});
+            state.words.push({id, word, progress,  highlight_disabled: false}); //добавили highlight_disabled с дефолтным значением.
         },
     },
     extraReducers: (builder) => {
@@ -84,8 +85,8 @@ const wordsProgressSlice = createSlice({
             })
             //доп обработка при добавлении слова addWord.fulfilled - добавляем в  Ворд Прогресса.
             .addCase(addWord.fulfilled, (state, action) => {
-                const {id, word, progress} = action.payload;
-                state.words.push({word, progress, id});
+                const {id, word, progress, highlight_disabled} = action.payload;
+                state.words.push({id, word, progress, highlight_disabled });
                 // addWordProgress({id, word, progress});
             })
 

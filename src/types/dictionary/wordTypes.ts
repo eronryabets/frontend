@@ -16,6 +16,7 @@ export interface Word {
     progress: number;
     created_at: string;
     updated_at: string;
+    highlight_disabled: boolean;
 }
 
 export interface WordsResponse {
@@ -69,6 +70,7 @@ export interface WordProgress {
     id: string;
     word: string;
     progress: number; // 0 до 10
+    highlight_disabled: boolean;
 }
 
 export interface WordsProgressState {
@@ -86,4 +88,5 @@ export interface PartialUpdateWordPayload {
     image_path?: File | null;
     progress?: number;
     count?: number;
+    highlight_disabled?: boolean;
 }

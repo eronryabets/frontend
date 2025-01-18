@@ -190,7 +190,8 @@ export const updateWord = createAsyncThunk<
             tag_names,
             image_path,
             progress,
-            count
+            count,
+            highlight_disabled
         } = payload;
         const formData = new FormData();
         formData.append('dictionary', dictionaryId);
@@ -205,6 +206,7 @@ export const updateWord = createAsyncThunk<
         }
         if (progress !== undefined) formData.append('progress', progress.toString());
         if (count !== undefined) formData.append('count', count.toString());
+        if (highlight_disabled !== undefined) formData.append('highlight_disabled', highlight_disabled.toString());
 
         try {
             // Используем PATCH для частичных обновлений
