@@ -2,13 +2,22 @@ import React from 'react';
 import {Word} from '@/components';
 
 interface TextRendererProps {
+    /** Текстовое содержимое для отображения */
     content: string;
+    /** Обработчик клика по слову */
     onWordClick: (event: React.MouseEvent<HTMLSpanElement>, word: string) => void;
+    /** Функция для получения стилей подсветки для слова */
     highlightWord?: (word: string) => React.CSSProperties | undefined;
 }
 
+/**
+ * TextRenderer
+ * Разбивает переданный текст на токены (слова, пробелы, знаки препинания) и отображает их.
+ * Слова оборачиваются в компонент Word с возможностью подсветки и обработкой клика.
+ */
+
 export const TextRenderer: React.FC<TextRendererProps> = ({content, onWordClick, highlightWord}) => {
-    // Регулярное выражение для разделения текста на слова, знаки препинания и пробелы
+     // Разбиваем текст на слова, пробелы, знаки препинания и переносы строк.
     const tokens = content.match(/(\n|\s+|[\w'-]+|[^\s\w])/g) || [];
 
     return (
