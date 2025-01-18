@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, {useState, useEffect} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
 
-import { RootState, AppDispatch } from '@/redux/store.ts';
-import { updateWord, deleteWord } from '@/redux/slices/wordsSlice.ts';
+import {RootState, AppDispatch} from '@/redux/store.ts';
+import {updateWord, deleteWord} from '@/redux/slices/wordsSlice.ts';
 
 import {
     Dialog,
@@ -21,7 +21,12 @@ import {
     Typography,
     Slider,
 } from '@mui/material';
-import {Close as CloseIcon, PhotoCamera} from '@mui/icons-material';
+import {
+    Close as CloseIcon,
+    PhotoCamera,
+    Visibility as VisibilityIcon,
+    VisibilityOff as VisibilityOffIcon,
+} from '@mui/icons-material';
 
 import defaultCover from '@/assets/default_word_image.jpg';
 import progressColors from '@/utils/constants/progressColors.ts';
@@ -40,10 +45,17 @@ interface EditWordModalProps {
         tags: { name: string }[];
         image_path: string | null;
         progress: number;
+        highlight_disabled: boolean;
     }
 }
 
-export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDeleteSuccess, dictionaryId, wordData}) => {
+export const EditWordModal: React.FC<EditWordModalProps> = ({
+                                                                open,
+                                                                onClose,
+                                                                onDeleteSuccess,
+                                                                dictionaryId,
+                                                                wordData
+                                                            }) => {
     const dispatch = useDispatch<AppDispatch>();
     const {loading, error} = useSelector((state: RootState) => state.words);
 
@@ -60,9 +72,14 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
     // Состояние для диалога подтверждения удаления
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+    // Новое состояние для highlight_disabled (по умолчанию — то, что пришло с бэка)
+    const [highlightDisabled, setHighlightDisabled] = useState<boolean>(
+        wordData.highlight_disabled ?? false
+    );
+
+    // При открытии модалки обновляем состояние с данными слова
     useEffect(() => {
         if (open) {
-            // При открытии модалки обновляем состояние с данными слова
             setCurrentWord(wordData.word);
             setTranslation(wordData.translation);
             setTagNames(wordData.tags.map(t => t.name));
@@ -71,6 +88,7 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
             setImagePreview(wordData.image_path || null);
             setSubmitError(null);
             setProgress(wordData.progress);
+            setHighlightDisabled(wordData.highlight_disabled ?? false);
         }
     }, [open, wordData]);
 
@@ -136,7 +154,8 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
                 translation,
                 tag_names: tagNames,
                 image_path: imagePath,
-                progress: safeProgress // <-- Передаем progress
+                progress: safeProgress,
+                highlight_disabled: highlightDisabled,
             }));
             if (updateWord.fulfilled.match(resultAction)) {
                 onClose();
@@ -151,6 +170,11 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
     const handleDelete = () => {
         // Открываем диалог подтверждения удаления
         setOpenDeleteDialog(true);
+    };
+
+    // Обработчик переключения highlightDisabled
+    const toggleHighlightDisabled = () => {
+        setHighlightDisabled(prev => !prev);
     };
 
     const confirmDelete = async () => {
@@ -176,8 +200,8 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
                 justifyContent: 'space-between',
                 alignItems: 'center',
             }}>
-            <DialogTitle>Редактировать слово</DialogTitle>
-            <MyIconButton
+                <DialogTitle>Редактировать слово</DialogTitle>
+                <MyIconButton
                     color="secondary"
                     startIcon={<CloseIcon/>}
                     onClick={onClose}/>
@@ -236,6 +260,31 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
                     helperText={`${translation.length}/500`}
                 />
 
+                {/* Переключатель highlight_disabled */}
+                <Box
+                    sx={{
+                        mb: 4,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 1,
+                    }}
+                >
+                    <IconButton
+                        onClick={toggleHighlightDisabled}
+                        aria-label="toggle highlight"
+                    >
+                        {highlightDisabled ? (
+                            <VisibilityOffIcon sx={{color: 'red'}}/>
+                        ) : (
+                            <VisibilityIcon sx={{color: 'green'}}/>
+                        )}
+                    </IconButton>
+                    <Typography variant="body1">
+                        {highlightDisabled ? 'Подсветка слова выключена' : 'Подсветка слова включена'}
+                    </Typography>
+                </Box>
+
                 {/* Поле ввода прогресса */}
                 <Box data-name="progressSlider" sx={{mb: 4}}>
                     <Typography id="progress-slider" gutterBottom>
@@ -247,17 +296,17 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({open, onClose, onDe
                         max={10}
                         step={1}
                         marks={[
-                            { value: 0, label: '0' },
-                            { value: 1, label: '1' },
-                            { value: 2, label: '2' },
-                            { value: 3, label: '3' },
-                            { value: 4, label: '4' },
-                            { value: 5, label: '5' },
-                            { value: 6, label: '6' },
-                            { value: 7, label: '7' },
-                            { value: 8, label: '8' },
-                            { value: 9, label: '9' },
-                            { value: 10, label: '10' },
+                            {value: 0, label: '0'},
+                            {value: 1, label: '1'},
+                            {value: 2, label: '2'},
+                            {value: 3, label: '3'},
+                            {value: 4, label: '4'},
+                            {value: 5, label: '5'},
+                            {value: 6, label: '6'},
+                            {value: 7, label: '7'},
+                            {value: 8, label: '8'},
+                            {value: 9, label: '9'},
+                            {value: 10, label: '10'},
                         ]}
                         valueLabelDisplay="on"
                         onChange={handleProgressChange}

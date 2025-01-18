@@ -215,6 +215,7 @@ export const WordsList: React.FC = () => {
         tags: { id: string; name: string }[];
         image_path: string | null;
         progress: number;
+        highlight_disabled: boolean;
     }>(null);
 
     const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -284,7 +285,8 @@ export const WordsList: React.FC = () => {
             translation: word.translation,
             tags: word.tags,
             image_path: word.image_path,
-            progress: word.progress
+            progress: word.progress,
+            highlight_disabled: word.highlight_disabled,
         });
         setIsEditModalOpen(true);
     }, []);

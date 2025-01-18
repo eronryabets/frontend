@@ -312,6 +312,7 @@ export const WordDetailModal: React.FC<WordDetailModalProps> = ({ open, onClose,
                         tags: word.tags,
                         image_path: word.image_path,
                         progress: word.progress || 0,
+                        highlight_disabled: word.highlight_disabled,
                     }}/>
             )}
         </Dialog>
