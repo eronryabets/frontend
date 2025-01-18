@@ -39,6 +39,7 @@ import {
     Book,
     DisplaySettings as DisplaySettingsIcon
 } from '@mui/icons-material';
+import {INVISIBLE_COLOR} from "@/utils/constants/constants.ts";
 
 export const PageDetail: React.FC = () => {
     const {bookId, pageNumber} = useParams<{
@@ -157,7 +158,7 @@ export const PageDetail: React.FC = () => {
         if (wordData !== undefined) {
             if (wordData.highlight_disabled) {
                 // Если подсветка отключена, возвращаем нужный цвет (например, полупрозрачный фиолетовый)
-                return {backgroundColor: 'rgba(194,118,239,0.10)'};
+                return {backgroundColor: INVISIBLE_COLOR};
             }
             // Иначе возвращаем цвет, рассчитанный по progress
             return {backgroundColor: getBackgroundColorByProgress(wordData.progress)};

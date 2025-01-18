@@ -31,6 +31,7 @@ import {
 import defaultCover from '@/assets/default_word_image.jpg';
 import progressColors from '@/utils/constants/progressColors.ts';
 import {MyIconButton} from "@/components";
+import { INVISIBLE_COLOR } from '@/utils/constants/constants';
 
 
 interface EditWordModalProps {
@@ -269,6 +270,19 @@ export const EditWordModal: React.FC<EditWordModalProps> = ({
                         alignItems: 'center',
                     }}
                 >
+                    <Typography
+                        variant="body1"
+                        sx={{
+                            mr: 1,
+                            backgroundColor: highlightDisabled
+                                ? INVISIBLE_COLOR // если подсветка отключена
+                                : progressColors[progress], // если включена – использовать цвет из progressColors
+                            padding: '4px 8px',
+                            borderRadius: 1,
+                        }}
+                    >
+                        Подсветка слова в тексте:
+                    </Typography>
                     <Tooltip
                         title={
                             highlightDisabled
