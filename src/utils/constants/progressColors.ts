@@ -16,7 +16,6 @@ const progressColors: Record<number, string> = {
     8: 'rgba(144,238,144,0.3)',      // Зеленовато-желтый
     9: 'rgba(102,222,71,0.4)',       // Зеленый лаймовый
     10: 'rgba(0,128,0,0.5)' ,        // Зеленый
-    99: 'rgba(194,118,239,0.10)',       // Красный
 };
 
 export default progressColors;

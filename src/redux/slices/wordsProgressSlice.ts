@@ -76,6 +76,8 @@ const wordsProgressSlice = createSlice({
                 );
                 if (index !== -1) {
                     state.words[index].progress = updatedWord.progress;
+                    // Добавили обновление флага highlight_disabled:
+                    state.words[index].highlight_disabled = updatedWord.highlight_disabled;
                 }
             })
             //доп обработка при удалении слова deleteWord.fulfilled - удаляем и с Ворд Прогресса.
