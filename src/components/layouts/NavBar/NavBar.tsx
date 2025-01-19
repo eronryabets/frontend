@@ -1,11 +1,11 @@
 import React from 'react';
-import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useAppDispatch } from '@/redux/hooks.ts';
+import {Link, useLocation} from "react-router-dom";
+import {useSelector} from "react-redux";
+import {useAppDispatch} from '@/redux/hooks.ts';
 
-import { RootState } from "@/redux/store.ts";
-import { toggleTheme } from "@/redux/slices/themeSlice.ts";
-import { logout } from "@/redux/slices/authorizationSlice.ts";
+import {RootState} from "@/redux/store.ts";
+import {toggleTheme} from "@/redux/slices/themeSlice.ts";
+import {logout} from "@/redux/slices/authorizationSlice.ts";
 
 import {
     AppBar,
@@ -83,7 +83,7 @@ export const NavBar = () => {
 
     return (
         <AppBar position="static">
-             {/* заменил с fixed на static */}
+            {/* заменил с fixed на static */}
             <Toolbar>
                 {/* Название приложения */}
                 {/* Кликабельная надпись "Smart Reader" */}
@@ -94,11 +94,22 @@ export const NavBar = () => {
                     sx={{
                         flexGrow: 1,
                         textDecoration: 'none',
-                        color: 'inherit',
+                        color: 'inherit', // остальной текст наследует цвет темы
                         cursor: 'pointer',
                     }}
                 >
-                    ReaderOK
+                    Reader
+                    <Box
+                        component="span"
+                        sx={{
+                            fontFamily: 'inherit',         // Наследуем шрифт основного текста
+                            fontSize: '1.0em',               // делаем букву "i" чуть крупнее
+                            color: 'orange',                 // устанавливаем оранжевый цвет для буквы "i"
+                            // WebkitTextStroke: '1px black',   // добавляем обводку (контура) черного цвета
+                        }}
+                    >
+                        i
+                    </Box>
                 </Typography>
 
                 {/* Основные кнопки навигации */}

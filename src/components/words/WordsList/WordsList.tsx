@@ -27,7 +27,9 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    TableSortLabel,
+    TableSortLabel, Checkbox, DialogActions,
+    DialogContent,
+    Dialog, DialogTitle,
 } from '@mui/material';
 import {SelectChangeEvent} from '@mui/material/Select';
 import {
@@ -56,7 +58,7 @@ import {
     setDictionaryId,
     setSearchTerm,
     setFilters,
-    setOrdering
+    setOrdering, deleteWord, updateWord
 } from '@/redux/slices/wordsSlice.ts';
 import {RootState, AppDispatch} from '@/redux/store.ts';
 
@@ -92,6 +94,7 @@ const sortingOptions = [
     {label: 'Added (новые → старые)', value: '-created_at'}
 ];
 
+//TODO: Frontend: bulkAction thunk , Backend: POST /words/bulk_update/
 export const WordsList: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const dispatch = useDispatch<AppDispatch>();
@@ -127,6 +130,86 @@ export const WordsList: React.FC = () => {
     const handleTagInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setTagInput(event.target.value);
     }, []);
+
+    //ЧЕК БОКС ТЕСТ ========================================================================
+
+    const [selectedWordIds, setSelectedWordIds] = useState<string[]>([]);
+
+// Хелпер для toggling чекбоксов
+    const handleSelectWord = (wordId: string) => {
+        setSelectedWordIds((prevSelected) => {
+            // Если уже выбрано — убираем
+            if (prevSelected.includes(wordId)) {
+                return prevSelected.filter((id) => id !== wordId);
+            } else {
+                // Иначе добавляем
+                return [...prevSelected, wordId];
+            }
+        });
+    };
+
+    const [bulkAction, setBulkAction] = useState<string>('');
+    // Для показа диалога подтверждения
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
+    const handleBulkAction = async (action: string) => {
+        if (selectedWordIds.length === 0) return;
+
+        if (action === 'delete') {
+            // Удаляем все выбранные слова
+            // Можно запускать несколько запросов Promise.all
+            await Promise.all(
+                selectedWordIds.map(async (wordId) => {
+                    await dispatch(deleteWord({wordId}));
+                })
+            );
+            setSnackbarMessage(`Удалено слов: ${selectedWordIds.length}`);
+            setSnackbarOpen(true);
+
+        } else if (action === 'disable') {
+            // highlight_disabled = true
+            await Promise.all(
+                selectedWordIds.map(async (wordId) => {
+                    await dispatch(updateWord({
+                        wordId,
+                        dictionaryId: id!,
+                        highlight_disabled: true
+                    }));
+                })
+            );
+            setSnackbarMessage(`Подсветка отключена для ${selectedWordIds.length} слов`);
+            setSnackbarOpen(true);
+
+        } else if (action === 'enable') {
+            // highlight_disabled = false
+            await Promise.all(
+                selectedWordIds.map(async (wordId) => {
+                    await dispatch(updateWord({
+                        wordId,
+                        dictionaryId: id!,
+                        highlight_disabled: false
+                    }));
+                })
+            );
+            setSnackbarMessage(`Подсветка включена для ${selectedWordIds.length} слов`);
+            setSnackbarOpen(true);
+        }
+    };
+
+    //Обработчик для чекбокса "All"
+    const handleSelectAll = () => {
+        // Если сейчас выбраны все слова, то снимаем выделение
+        if (selectedWordIds.length === words.length) {
+            setSelectedWordIds([]);
+        } else {
+            // Иначе выбираем все слова
+            const allIds = words.map((w) => w.id);
+            setSelectedWordIds(allIds);
+        }
+    };
+
+
+    //ЧЕК БОКС ТЕСТ OFF========================================================================
 
     const handleTagKeyDown = useCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter' || event.key === ',') {
@@ -321,12 +404,12 @@ export const WordsList: React.FC = () => {
     // );
 
     const handleSearchInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchInput(event.target.value);
-        // debouncedSearch(event.target.value);
-    },
-    []
-);
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            setSearchInput(event.target.value);
+            // debouncedSearch(event.target.value);
+        },
+        []
+    );
 
     // Если оставляем кнопку "Поиск"
     const handleSearch = useCallback(() => {
@@ -573,7 +656,35 @@ export const WordsList: React.FC = () => {
                         )}
                     </IconButton>
                 </Tooltip>
+
+                <FormControl
+                    size="small"
+                    sx={{
+                        minWidth: 200,
+                    }}
+                >
+                    <InputLabel id="bulk-action-label">Действия</InputLabel>
+                    <Select
+                        labelId="bulk-action-label"
+                        label="Действия"
+                        value={bulkAction}
+                        onChange={(e) => {
+                            const selectedValue = e.target.value;
+                            setBulkAction(selectedValue);
+                            // Если пользователь выбрал что-то кроме '', открываем диалог
+                            if (selectedValue !== '') {
+                                setConfirmOpen(true);
+                            }
+                        }}
+                    >
+                        <MenuItem value="delete">Удалить выбранные</MenuItem>
+                        <MenuItem value="disable">Невидимая подсветка</MenuItem>
+                        <MenuItem value="enable">Видимая подсветка</MenuItem>
+                    </Select>
+                </FormControl>
+
             </Box>
+
 
             {/* --- ФИЛЬТРЫ (свертываемые) --- */}
             <Collapse in={isFilterOpen}>
@@ -764,7 +875,27 @@ export const WordsList: React.FC = () => {
                         aria-label="words table">
                         <TableHead>
                             <TableRow>
-                                <TableCell><strong></strong></TableCell>
+
+                                <TableCell padding="checkbox">
+                                    <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                        <Checkbox
+                                            color="primary"
+                                            onChange={handleSelectAll}
+                                            // 3. Вычисляем, выбранны ли все слова
+                                            checked={selectedWordIds.length === words.length && words.length > 0}
+                                            //  режим "indeterminate" - когда выделена только часть. Но это опционально:
+                                            indeterminate={
+                                                selectedWordIds.length > 0 && selectedWordIds.length < words.length
+                                            }
+                                        />
+                                        <strong>All</strong>
+                                    </Box>
+                                </TableCell>
+
+                                <TableCell>
+                                    <strong></strong>
+                                </TableCell>
+
                                 <TableCell>
                                     <TableSortLabel
                                         active={ordering === 'word' || ordering === '-word'}
@@ -854,6 +985,13 @@ export const WordsList: React.FC = () => {
                                         }
                                     }}
                                 >
+                                    {/* Ячейка с чекбоксом */}
+                                    <TableCell padding="checkbox">
+                                        <Checkbox
+                                            checked={selectedWordIds.includes(word.id)}
+                                            onChange={() => handleSelectWord(word.id)}
+                                        />
+                                    </TableCell>
 
                                     {/*WORD IMAGE*/}
                                     <TableCell sx={{maxWidth: 70}}>
@@ -1029,6 +1167,48 @@ export const WordsList: React.FC = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            {/*ДИАЛОГОВОЕ ОКНО ПОДТВЕРДЛЕНИЯ ДЛЯ ВЫБОРА МЕНЮ "ДЕЙСТВИЯ" */}
+            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+                <DialogTitle>Подтверждение действия</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Вы уверены, что хотите выполнить действие &laquo;
+                        {bulkAction === 'delete'
+                            ? 'Удалить выбранные'
+                            : bulkAction === 'disable'
+                                ? 'Невидимая подсветка'
+                                : bulkAction === 'enable'
+                                    ? 'Видимая подсветка'
+                                    : ''
+                        }
+                        &raquo; для {selectedWordIds.length} слов?
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={async () => {
+                            // Выполняем выбранное действие
+                            await handleBulkAction(bulkAction);
+                            setConfirmOpen(false);
+                            setBulkAction('');
+                            // Можно почистить выделения
+                            // setSelectedWordIds([]);
+                        }}
+                    >
+                        Да
+                    </Button>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={() => {
+                            setConfirmOpen(false);
+                        }}
+                    >
+                        Отмена
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
         </Box>
     );
 };
