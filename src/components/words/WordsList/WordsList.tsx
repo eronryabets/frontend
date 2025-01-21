@@ -58,7 +58,8 @@ import {
     setDictionaryId,
     setSearchTerm,
     setFilters,
-    setOrdering, deleteWord, updateWord
+    setOrdering,
+    bulkWordAction,
 } from '@/redux/slices/wordsSlice.ts';
 import {RootState, AppDispatch} from '@/redux/store.ts';
 
@@ -156,44 +157,26 @@ export const WordsList: React.FC = () => {
         if (selectedWordIds.length === 0) return;
 
         if (action === 'delete') {
-            // Удаляем все выбранные слова
-            // Можно запускать несколько запросов Promise.all
-            await Promise.all(
-                selectedWordIds.map(async (wordId) => {
-                    await dispatch(deleteWord({wordId}));
-                })
-            );
+            await dispatch(bulkWordAction({
+                action: 'delete',
+                wordIds: selectedWordIds,
+            }));
             setSnackbarMessage(`Удалено слов: ${selectedWordIds.length}`);
-            setSnackbarOpen(true);
-
         } else if (action === 'disable') {
-            // highlight_disabled = true
-            await Promise.all(
-                selectedWordIds.map(async (wordId) => {
-                    await dispatch(updateWord({
-                        wordId,
-                        dictionaryId: id!,
-                        highlight_disabled: true
-                    }));
-                })
-            );
+            await dispatch(bulkWordAction({
+                action: 'disable_highlight',
+                wordIds: selectedWordIds,
+            }));
             setSnackbarMessage(`Подсветка отключена для ${selectedWordIds.length} слов`);
-            setSnackbarOpen(true);
-
         } else if (action === 'enable') {
-            // highlight_disabled = false
-            await Promise.all(
-                selectedWordIds.map(async (wordId) => {
-                    await dispatch(updateWord({
-                        wordId,
-                        dictionaryId: id!,
-                        highlight_disabled: false
-                    }));
-                })
-            );
+            await dispatch(bulkWordAction({
+                action: 'enable_highlight',
+                wordIds: selectedWordIds,
+            }));
             setSnackbarMessage(`Подсветка включена для ${selectedWordIds.length} слов`);
-            setSnackbarOpen(true);
         }
+
+        setSnackbarOpen(true);
     };
 
     //Обработчик для чекбокса "All"

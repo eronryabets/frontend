@@ -1,5 +1,4 @@
-
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
 
 import api from '../../utils/api';
 
@@ -11,8 +10,8 @@ import {
     PartialUpdateWordPayload,
 } from '@/types';
 
-import { PAGE_SIZE } from '@/utils/constants/constants.ts';
-import { GET_DICT_WORDS_URL } from '@/config/urls.ts';
+import {PAGE_SIZE} from '@/utils/constants/constants.ts';
+import {GET_DICT_WORDS_URL} from '@/config/urls.ts';
 
 
 const initialState: WordsState = {
@@ -25,8 +24,8 @@ const initialState: WordsState = {
     adding: false,
     addError: null,
     search: '',
-     ordering: '',
-     filters: {
+    ordering: '',
+    filters: {
         tags: [] as string[], // Массив названий тегов
         progress_min: null as number | null,
         progress_max: null as number | null,
@@ -43,16 +42,17 @@ const initialState: WordsState = {
 export const fetchWords = createAsyncThunk<
     WordsResponse,
     {
-      dictionaryId: string;
-      page: number;
-      search?: string;
-      filters?: WordsState['filters'];
-      ordering?: string; // Новое поле
+        dictionaryId: string;
+        page: number;
+        search?: string;
+        filters?: WordsState['filters'];
+        ordering?: string; // Новое поле
     },
     { rejectValue: string }
 >(
     'words/fetchWords',
-    async ({ dictionaryId,
+    async ({
+               dictionaryId,
                page,
                search,
                filters,
@@ -238,13 +238,39 @@ export const deleteWord = createAsyncThunk<
     { rejectValue: string }
 >(
     'words/deleteWord',
-    async ({ wordId }, thunkAPI) => {
+    async ({wordId}, thunkAPI) => {
         try {
             // удаление слова по URL: /words/{wordId}/, метод DELETE
             await api.delete(`${GET_DICT_WORDS_URL}${wordId}/`);
             return wordId;
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.message || 'Ошибка при удалении слова');
+        }
+    }
+);
+
+/**
+ * Thunk для bulk actions - (delete, disable_highlight, enable_highlight).
+ */
+export const bulkWordAction = createAsyncThunk<
+    { detail: string },
+    { action: string; wordIds: string[] },
+    { rejectValue: string }
+>(
+    'words/bulkWordAction',
+    async ({action, wordIds}, thunkAPI) => {
+        try {
+            const response =
+                await api.post<{ detail: string }>(`${GET_DICT_WORDS_URL}bulk_action/`, {
+                action,
+                word_ids: wordIds,
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.detail) {
+                return thunkAPI.rejectWithValue(error.response.data.detail);
+            }
+            return thunkAPI.rejectWithValue('Error doing bulk action');
         }
     }
 );
@@ -294,9 +320,9 @@ const wordsSlice = createSlice({
          * Устанавливает значения фильтров и сбрасывает текущую страницу.
          */
         setOrdering(state, action: PayloadAction<string>) {
-             state.ordering = action.payload;
-             state.currentPage = 1; // При смене сортировки перейдём на первую страницу
-    },
+            state.ordering = action.payload;
+            state.currentPage = 1; // При смене сортировки перейдём на первую страницу
+        },
         /**
          * Сбрасывает состояние добавления слова.
          */
@@ -330,8 +356,8 @@ const wordsSlice = createSlice({
                 state.adding = false;
                 // Добавляем новое слово в начало списка
                 state.words.unshift(action.payload);
-                 // Пересчитываем totalPages исходя из нового количества слов
-                 state.totalPages = Math.ceil((state.words.length) / PAGE_SIZE); // TODO: захардить под 50
+                // Пересчитываем totalPages исходя из нового количества слов
+                state.totalPages = Math.ceil((state.words.length) / PAGE_SIZE); // TODO: захардить под 50
             })
             .addCase(addWord.rejected, (state, action) => {
                 state.adding = false;
@@ -351,7 +377,7 @@ const wordsSlice = createSlice({
             .addCase(updateWord.rejected, (state, action) => {
                 state.error = action.payload || 'Ошибка при обновлении слова';
             })
-             // Обработка deleteWord
+            // Обработка deleteWord
             .addCase(deleteWord.fulfilled, (state, action) => {
                 // Удаляем слово из массива words
                 state.words = state.words.filter(w => w.id !== action.payload);
@@ -380,6 +406,41 @@ const wordsSlice = createSlice({
             })
             .addCase(fetchWordById.rejected, (state, action) => {
                 state.error = action.payload || 'Ошибка при получении слова';
+            })
+            //bulkWordAction
+            .addCase(bulkWordAction.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(bulkWordAction.fulfilled, (state, action) => {
+                state.loading = false;
+                // Пример: action.meta.arg хранит, что мы передавали в thunk
+                const {action: bulkAction, wordIds} = action.meta.arg;
+
+                // Если нужно локально обновить state.words
+                if (bulkAction === 'delete') {
+                    // Удаляем слова с этими id
+                    state.words = state.words.filter(w => !wordIds.includes(w.id));
+                    // Пересчитываем totalPages
+                    state.totalPages = Math.ceil(state.words.length / PAGE_SIZE);
+                } else if (bulkAction === 'disable_highlight') {
+                    // Ищем все слова, которые есть в wordIds, и выставляем highlight_disabled = true
+                    state.words.forEach(w => {
+                        if (wordIds.includes(w.id)) {
+                            w.highlight_disabled = true;
+                        }
+                    });
+                } else if (bulkAction === 'enable_highlight') {
+                    state.words.forEach(w => {
+                        if (wordIds.includes(w.id)) {
+                            w.highlight_disabled = false;
+                        }
+                    });
+                }
+            })
+            .addCase(bulkWordAction.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || 'Ошибка при массовом действии';
             });
     },
 });
