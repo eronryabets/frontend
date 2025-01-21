@@ -114,18 +114,50 @@ export const NavBar = () => {
 
                 {/* Основные кнопки навигации */}
                 <Box sx={{display: 'flex', alignItems: 'center',}}>
+                    <Box sx={{display: 'flex', alignItems: 'center'}}>
+                        <Button
+                            color="inherit"
+                            component={Link}
+                            to="/dictionaries"
+                            sx={{
+                                textTransform: 'none',
+                                backgroundColor: isActive('/dictionaries')
+                                    ? 'rgba(255,255,255,0.2)'
+                                    : 'transparent',
+                                borderRadius: 1,
+                                mr: 2,
+                                transition: 'background-color 0.3s',
+                                '&:hover': {
+                                    backgroundColor: isActive('/dictionaries')
+                                        ? 'rgba(255,255,255,0.3)'
+                                        : 'rgba(255,255,255,0.1)',
+                                },
+                            }}
+                        >
+                            Vocabulary
+                        </Button>
+                    </Box>
+
                     <Button
                         color="inherit"
                         component={Link}
-                        to="/dictionaries"
+                        to="/training"
                         sx={{
-                            textTransform: 'none', // Опционально: убрать заглавные буквы
-                            border: isActive('/dictionaries') ? '2px solid white' : 'none',
-                            borderRadius: 1, // Для более аккуратного вида
-                            mr: 2, // Отступ справа
+                            textTransform: 'none', // убираем заглавные буквы
+                            backgroundColor: isActive('/training')
+                                ? 'rgba(255,255,255,0.2)' // затемнённый фон для активной вкладки
+                                : 'transparent',
+                            borderRadius: 1, // для аккуратного скругления углов
+                            mr: 2,           // отступ справа
+                            transition: 'background-color 0.3s', // плавный переход цвета
+                            '&:hover': {
+                                backgroundColor: isActive('/training')
+                                    ? 'rgba(255,255,255,0.3)' // немного более тёмный при наведении, если активна
+                                    : 'rgba(255,255,255,0.1)', // легкое затемнение при наведении, если не активна
+                            },
                         }}
                     >
-                        Vocabulary
+                        Training
                     </Button>
 
                     {/* Кнопка "Books" с выпадающим меню */}
@@ -221,5 +253,6 @@ export const NavBar = () => {
                 </Box>
             </Toolbar>
         </AppBar>
-    );
+    )
+        ;
 };

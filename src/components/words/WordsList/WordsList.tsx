@@ -75,6 +75,7 @@ import defaultCover from '@/assets/default_word_image.jpg';
 import {getBackgroundColorByProgress} from '@/utils/getBackgroundColorByProgress';
 
 import {getLanguageName} from '@/utils/getLanguageName';
+import {addWordsToTraining} from "@/redux/slices/trainingSlice.ts";
 
 /** Хелпер для форматирования даты (обрезаем до "yyyy-mm-dd") */
 function formatDate(dateStr: string | null): string {
@@ -155,6 +156,17 @@ export const WordsList: React.FC = () => {
 
     const handleBulkAction = async (action: string) => {
         if (selectedWordIds.length === 0) return;
+
+        if (action === 'train') {
+            // Берём полные объекты слов из words
+            const selectedWords = words.filter((w) => selectedWordIds.includes(w.id));
+            // Диспатчим addWordsToTraining
+            dispatch(addWordsToTraining(selectedWords));
+
+            setSnackbarMessage(`Добавлено слов на тренировку: ${selectedWords.length}`);
+            setSnackbarOpen(true);
+            return;
+        }
 
         if (action === 'delete') {
             await dispatch(bulkWordAction({
@@ -593,7 +605,7 @@ export const WordsList: React.FC = () => {
                     {isFilterOpen ? 'Свернуть фильтр' : 'Показать фильтр'}
                 </Button>
 
-                 {/* Иконка-индикатор фильтра */}
+                {/* Иконка-индикатор фильтра */}
                 <Tooltip
                     title={hasAnyFilter ? 'Фильтр применён. Сбросить фильтр?' : 'Фильтр не активен'}
                     arrow
@@ -663,6 +675,7 @@ export const WordsList: React.FC = () => {
                         <MenuItem value="delete">Удалить выбранные</MenuItem>
                         <MenuItem value="disable">Невидимая подсветка</MenuItem>
                         <MenuItem value="enable">Видимая подсветка</MenuItem>
+                        <MenuItem value="train">На тренировку</MenuItem>
                     </Select>
                 </FormControl>
 

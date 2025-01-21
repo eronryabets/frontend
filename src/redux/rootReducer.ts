@@ -12,6 +12,7 @@ import translationReducer from './slices/translationSlice';
 import dictionaryReducer from './slices/dictionarySlice';
 import wordsReducer from './slices/wordsSlice';
 import wordsProgressReducer from './slices/wordsProgressSlice';
+import trainingSliceReducer from "./slices/trainingSlice.ts";
 
 
 // Объединяем все редьюсеры в один appReducer
@@ -28,6 +29,7 @@ const appReducer = combineReducers({
   dictionaries: dictionaryReducer,
   words: wordsReducer,
   wordsProgress: wordsProgressReducer,
+  training: trainingSliceReducer,
 });
 
 // Определяем тип RootState

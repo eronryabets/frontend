@@ -15,7 +15,8 @@ const persistConfig: { storage: any; whitelist: string[]; key: string } = {
         'theme',
         'books',
         'dictionaries',
-        'wordsProgress'
+        'wordsProgress',
+        'trainingSlice',
     ], // массив редюсеров, которые нужно сохранять (например, авторизация), а blacklist для исключения
 };
 

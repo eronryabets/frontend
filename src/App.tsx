@@ -24,7 +24,7 @@ import {
     BookDetail,
     PageDetail,
     WordsList,
-    UserOptionsListener,
+    UserOptionsListener, TrainingPage,
 } from '@/components';
 
 
@@ -54,6 +54,7 @@ const AppContent = () => {
                         {/*DICTIONARY*/}
                         <Route path="/dictionaries" element={<DictionariesList />} />
                         <Route path="/dictionary/:id" element={<WordsList />} />
+                        <Route path="/training" element={<TrainingPage />} />
                     </Route>
                 </Route>
 

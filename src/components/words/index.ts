@@ -4,3 +4,4 @@ export * from './EditWordModal/EditWordModal.tsx';
 export * from './Word/Word.tsx';
 export * from './WordDetailModal/WordDetailModal.tsx';
 export * from './WordsList/WordsList.tsx';
+export * from './TrainingPage/TrainingPage.tsx';
