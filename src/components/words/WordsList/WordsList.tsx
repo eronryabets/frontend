@@ -593,6 +593,28 @@ export const WordsList: React.FC = () => {
                     {isFilterOpen ? 'Свернуть фильтр' : 'Показать фильтр'}
                 </Button>
 
+                 {/* Иконка-индикатор фильтра */}
+                <Tooltip
+                    title={hasAnyFilter ? 'Фильтр применён. Сбросить фильтр?' : 'Фильтр не активен'}
+                    arrow
+                >
+                    <IconButton
+                        onClick={() => {
+                            // Если фильтр был активен, при клике сбросим его,
+                            // или реализуйте другую логику переключения
+                            if (hasAnyFilter) {
+                                handleResetFilters();
+                            }
+                        }}
+                    >
+                        {hasAnyFilter ? (
+                            <FilterListOutlinedIcon sx={{color: 'green'}}/>
+                        ) : (
+                            <FilterListOffOutlinedIcon/>
+                        )}
+                    </IconButton>
+                </Tooltip>
+
                 {/* Select для сортировки */}
                 <FormControl
                     size="small"
@@ -617,28 +639,6 @@ export const WordsList: React.FC = () => {
                         ))}
                     </Select>
                 </FormControl>
-
-                {/* Иконка-индикатор фильтра */}
-                <Tooltip
-                    title={hasAnyFilter ? 'Фильтр применён. Сбросить фильтр?' : 'Фильтр не активен'}
-                    arrow
-                >
-                    <IconButton
-                        onClick={() => {
-                            // Если фильтр был активен, при клике сбросим его,
-                            // или реализуйте другую логику переключения
-                            if (hasAnyFilter) {
-                                handleResetFilters();
-                            }
-                        }}
-                    >
-                        {hasAnyFilter ? (
-                            <FilterListOutlinedIcon sx={{color: 'green'}}/>
-                        ) : (
-                            <FilterListOffOutlinedIcon/>
-                        )}
-                    </IconButton>
-                </Tooltip>
 
                 <FormControl
                     size="small"
