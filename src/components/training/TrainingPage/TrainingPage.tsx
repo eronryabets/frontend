@@ -10,7 +10,6 @@ import {
     Collapse,
     IconButton,
     Checkbox,
-    Tooltip
 } from '@mui/material';
 import {
     Close as CloseIcon,
@@ -132,6 +131,7 @@ export const TrainingPage: React.FC = () => {
                 flexDirection: 'column',
             }}
         >
+
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                 <Typography variant="h4">
                     Тренировка слов: {wordsCount}
@@ -139,11 +139,11 @@ export const TrainingPage: React.FC = () => {
 
                 {/* Кнопка для открытия/закрытия списка слов */}
                 <Button variant="contained" color="primary" onClick={toggleWordList}
-                startIcon={
-                        isFilterOpen
-                            ? <ExpandLessOutlinedIcon/>
-                            : <ExpandMoreOutlinedIcon/>
-                    }
+                        startIcon={
+                            isFilterOpen
+                                ? <ExpandLessOutlinedIcon/>
+                                : <ExpandMoreOutlinedIcon/>
+                        }
                 >
                     {isListOpen ? 'Скрыть список слов' : 'Показать список слов'}
                 </Button>
@@ -164,53 +164,50 @@ export const TrainingPage: React.FC = () => {
                         borderRadius: 2,
                     }}
                 >
+
                     {/* Шапка списка: "Select All" и Bulk кнопка */}
-                    <Box display="flex" alignItems="center" mb={1}>
-                        <Checkbox
-                            color="primary"
-                            onChange={handleSelectAll}
-                            checked={selectedWordIds.length === trainingWords.length && trainingWords.length > 0}
-                            indeterminate={
-                                selectedWordIds.length > 0 && selectedWordIds.length < trainingWords.length
-                            }
-                        />
-                        <Typography variant="subtitle1">Выбрать все</Typography>
-                        {selectedWordIds.length > 0 && (
-                            <Box ml={2}>
-                                <Tooltip title="Удалить выбранные слова" arrow>
-                                    <IconButton
-                                        color="error"
-                                        onClick={handleBulkRemove}
-                                        sx={{
-                                            backgroundColor: 'error.main',
-                                            color: 'white',
-                                            '&:hover': {
-                                                backgroundColor: 'error.dark',
-                                            },
-                                        }}
-                                    >
-                                        <DeleteForeverIcon/>
-                                    </IconButton>
-                                </Tooltip>
-                            </Box>
-                        )}
-                        {/* Кнопка сортировки по прогрессу */}
-                        <Box ml={2}>
-                            <MyIconButton
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                        {/* Левая группа: чекбокс, текст, кнопка удаления */}
+                        <Box display="flex" alignItems="center">
+                            <Checkbox
                                 color="primary"
-                                onClick={toggleSortOrder}>
-                                {sortOrder === "asc" ? (
-                                    <>
+                                onChange={handleSelectAll}
+                                checked={selectedWordIds.length === trainingWords.length && trainingWords.length > 0}
+                                indeterminate={
+                                    selectedWordIds.length > 0 && selectedWordIds.length < trainingWords.length
+                                }
+                            />
+                            <Typography variant="subtitle1">Выбрать все</Typography>
+                             <Box ml={2}>
+                                <MyIconButton color="primary" onClick={toggleSortOrder}>
+                                    {sortOrder === "asc" ? (
                                         <ArrowUpwardIcon fontSize="small"/>
-                                    </>
-                                ) : (
-                                    <>
+                                    ) : (
                                         <ArrowDownwardIcon fontSize="small"/>
-                                    </>
-                                )}
-                            </MyIconButton>
+                                    )}
+                                </MyIconButton>
+                            </Box>
                         </Box>
+
+                        {/* Правая группа: кнопка сортировки */}
+                        <Box display="flex" alignItems="center">
+                            {selectedWordIds.length > 0 && (
+                                <Box ml={2}>
+                                    <MyIconButton
+                                        color="error"
+                                        startIcon={<DeleteForeverIcon/>}
+                                        onClick={handleBulkRemove}
+                                        tooltipTitle="Удалить выбранные слова"
+                                        size={"large"}
+                                        bgColor="rgba(255,0,0,0.22)"
+                                        hoverBgColor="rgba(255,0,0,0.33)"
+                                    />
+                                </Box>
+                            )}
+                        </Box>
+
                     </Box>
+
 
                     {trainingWords.length === 0 ? (
                         <Typography variant="body2" color="text.secondary">
