@@ -29,7 +29,9 @@ import {
     MenuItem,
     TableSortLabel, Checkbox, DialogActions,
     DialogContent,
-    Dialog, DialogTitle,
+    Dialog,
+    DialogTitle,
+    InputAdornment,
 } from '@mui/material';
 import {SelectChangeEvent} from '@mui/material/Select';
 import {
@@ -62,7 +64,7 @@ import {
     bulkWordAction,
 } from '@/redux/slices/wordsSlice.ts';
 import {RootState, AppDispatch} from '@/redux/store.ts';
-
+import SearchIcon from '@mui/icons-material/Search';
 import {
     AddWordModal,
     EditWordModal,
@@ -555,7 +557,7 @@ export const WordsList: React.FC = () => {
                     Добавить слово
                 </Button>
 
-                {/* Поле поиска с дебаунсом */}
+                {/* Поле поиска */}
                 <TextField
                     label="Поиск слов"
                     variant="outlined"
@@ -565,32 +567,47 @@ export const WordsList: React.FC = () => {
                     onKeyPress={handleSearchKeyPress}
                     sx={{
                         width: '300px',
-                        backgroundColor: searchInput ? 'rgba(144,238,144,0.14)' : 'inherit', // Подсветка при наличии текста
-                        borderRadius: 1, //подгоним подсветку под края закругленные.
+                        backgroundColor: searchInput ? 'rgba(144,238,144,0.14)' : 'inherit',
+                        borderRadius: 1,
                     }}
                     InputProps={{
-                        endAdornment: search && (
-                            <Tooltip title="Очистить поиск" arrow>
-                                <IconButton
-                                    onClick={handleResetSearch}
-                                    size="small"
-                                    sx={{ml: 1}}
-                                    aria-label="Очистить поиск"
-                                >
-                                    <CloseIcon fontSize="small"/>
-                                </IconButton>
-                            </Tooltip>
-                        )
+                        // Если введён текст, показываем кнопку очистки слева
+                        startAdornment: searchInput && (
+                            <InputAdornment position="start">
+                                <Tooltip title="Очистить поиск" arrow>
+                                    <IconButton
+                                        onClick={handleResetSearch}
+                                        size="small"
+                                        sx={{mr: 1}}
+                                        color="secondary"
+                                        aria-label="Очистить поиск"
+                                    >
+                                        <CloseIcon fontSize="small"/>
+                                    </IconButton>
+                                </Tooltip>
+                            </InputAdornment>
+                        ),
+                        // В любом случае показываем иконку поиска справа
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <SearchIcon
+                                    color="primary"
+                                    onClick={handleSearch}
+                                    sx={{cursor: 'pointer'}}
+                                />
+                            </InputAdornment>
+                        ),
                     }}
                 />
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleSearch}
-                    disabled={loading}
-                >
-                    {loading ? <CircularProgress size={24}/> : 'Поиск'}
-                </Button>
+                {/*старая кнопка поиска*/}
+                {/*<Button*/}
+                {/*    variant="contained"*/}
+                {/*    color="secondary"*/}
+                {/*    onClick={handleSearch}*/}
+                {/*    disabled={loading}*/}
+                {/*>*/}
+                {/*    {loading ? <CircularProgress size={24}/> : 'Поиск'}*/}
+                {/*</Button>*/}
 
                 <Button
                     variant="contained"
@@ -1175,7 +1192,9 @@ export const WordsList: React.FC = () => {
                                 ? 'Невидимая подсветка'
                                 : bulkAction === 'enable'
                                     ? 'Видимая подсветка'
-                                    : ''
+                                    : bulkAction === 'train'
+                                        ? 'Отправить на тренировку'
+                                        : ''
                         }
                         &raquo; для {selectedWordIds.length} слов?
                     </Typography>
