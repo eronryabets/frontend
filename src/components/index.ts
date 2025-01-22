@@ -7,3 +7,4 @@ export * from './dictionaries';
 export * from './layouts';
 export * from './protected';
 export * from './user';
+export * from './training';
