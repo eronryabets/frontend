@@ -7,7 +7,7 @@ import {SxProps, Theme} from '@mui/system';
 interface MyIconButtonProps
   extends Omit<ButtonProps, 'color' | 'startIcon' | 'onClick'> {
   color?: 'primary' | 'secondary' | 'inherit' | 'success' | 'error' | 'info' | 'warning';
-  startIcon: React.ReactNode;
+  startIcon?: React.ReactNode;
   onClick: () => void;
   sx?: SxProps<Theme>;
   tooltipTitle?: string;    // Опциональный текст для тултипа

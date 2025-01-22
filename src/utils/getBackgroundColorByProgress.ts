@@ -20,3 +20,17 @@ export function getBackgroundColorByProgress(progress: number): string {
 
     return progressColors[progress];
 }
+
+/**
+ * Изменяет значение альфа-канала в строке RGBA.
+ *
+ * @param {string} rgba - Исходная строка RGBA, например, "rgba(255, 0, 0, 0.5)".
+ * @param {number} newAlpha - Новое значение альфа-канала.
+ * @returns {string} Новая строка RGBA с обновлённым альфа-каналом.
+ */
+export function adjustAlpha(rgba: string, newAlpha: number): string {
+  return rgba.replace(
+    /rgba\((\d+,\s*\d+,\s*\d+),\s*([\d.]+)\)/,
+    `rgba($1, ${newAlpha})`
+  );
+}

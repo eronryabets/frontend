@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, {useState, useMemo, useCallback} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {
     Container,
     Box,
@@ -12,16 +12,18 @@ import {
     Checkbox,
     Tooltip
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import {Close as CloseIcon} from '@mui/icons-material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
-import { clearTrainingWords, removeWordFromTraining } from '@/redux/slices/trainingSlice';
-import { trainingSessions } from "@/utils/index.ts";
-import { TrainingCardGrid } from "@/components/index.ts";
-import { RootState } from '@/redux/store';
+import {clearTrainingWords, removeWordFromTraining} from '@/redux/slices/trainingSlice';
+import {trainingSessions} from "@/utils/index.ts";
+import {MyIconButton, TrainingCardGrid} from "@/components/index.ts";
+import {RootState} from '@/redux/store';
 
 // Импортируем функцию для подсветки
-import { getBackgroundColorByProgress } from '@/utils/getBackgroundColorByProgress'; // Убедитесь, что путь верный
+import {adjustAlpha, getBackgroundColorByProgress} from '@/utils/getBackgroundColorByProgress';
 
 export const TrainingPage: React.FC = () => {
     const dispatch = useDispatch();
@@ -37,6 +39,15 @@ export const TrainingPage: React.FC = () => {
     const [isListOpen, setListOpen] = useState(false);
     // Новое состояние для хранения выбранных слов (по их id)
     const [selectedWordIds, setSelectedWordIds] = useState<string[]>([]);
+    // Состояние для сортировки (asc или desc)
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+    // Мемоизируем отсортированный список слов по прогрессу
+    const sortedTrainingWords = useMemo(() => {
+        return [...trainingWords].sort((a, b) => {
+            return sortOrder === "asc" ? a.progress - b.progress : b.progress - a.progress;
+        });
+    }, [trainingWords, sortOrder]);
 
     const handleClearTraining = () => {
         const count = trainingWords.length;
@@ -82,20 +93,27 @@ export const TrainingPage: React.FC = () => {
     // Удаление одного слова (по отдельности)
     const handleRemoveWord = (wordId: string) => {
         dispatch(removeWordFromTraining(wordId));
-        // При удалении, можно также обновить список выбранных
         setSelectedWordIds((prev) => prev.filter((id) => id !== wordId));
     };
 
     // Обработка bulk удаления выбранных слов
     const handleBulkRemove = () => {
-        // Проходим по выбранным и диспатчим экшен для каждого
         selectedWordIds.forEach((id) => {
             dispatch(removeWordFromTraining(id));
         });
         setSnackbarMessage(`Удалили ${selectedWordIds.length} слов(а) из тренировки`);
         setSnackbarOpen(true);
-        setSelectedWordIds([]); // сбросить выделение после удаления
+        setSelectedWordIds([]);
     };
+
+    // Функция для переключения сортировки. При повторном клике меняем направление сортировки
+    const toggleSortOrder = useCallback(() => {
+        setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    }, []);
+
+    // Ограничиваем длину отображаемого слова, если нужно
+    const truncateText = (text: string, maxLength = 20) =>
+        text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 
     return (
         <Container
@@ -116,13 +134,9 @@ export const TrainingPage: React.FC = () => {
                 </Button>
             </Box>
 
-            {/* Кнопка для открытия/скрытия списка слов */}
+            {/* Кнопка для открытия/закрытия списка слов */}
             <Box mb={3}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={toggleWordList}
-                >
+                <Button variant="contained" color="primary" onClick={toggleWordList}>
                     {isListOpen ? 'Скрыть список слов' : 'Показать список слов'}
                 </Button>
             </Box>
@@ -137,8 +151,7 @@ export const TrainingPage: React.FC = () => {
                         borderRadius: 2,
                     }}
                 >
-
-                    {/* Шапка списка со "Select All" и кнопкой Bulk удаления */}
+                    {/* Шапка списка: "Select All" и Bulk кнопка */}
                     <Box display="flex" alignItems="center" mb={1}>
                         <Checkbox
                             color="primary"
@@ -149,8 +162,6 @@ export const TrainingPage: React.FC = () => {
                             }
                         />
                         <Typography variant="subtitle1">Выбрать все</Typography>
-
-                        {/* Кнопка для удаления выбранных слов */}
                         {selectedWordIds.length > 0 && (
                             <Box ml={2}>
                                 <Tooltip title="Удалить выбранные слова" arrow>
@@ -165,11 +176,27 @@ export const TrainingPage: React.FC = () => {
                                             },
                                         }}
                                     >
-                                        <DeleteForeverIcon />
+                                        <DeleteForeverIcon/>
                                     </IconButton>
                                 </Tooltip>
                             </Box>
                         )}
+                        {/* Кнопка сортировки по прогрессу */}
+                        <Box ml={2}>
+                            <MyIconButton
+                                color="primary"
+                                onClick={toggleSortOrder}>
+                                {sortOrder === "asc" ? (
+                                    <>
+                                        <ArrowUpwardIcon fontSize="small"/>
+                                    </>
+                                ) : (
+                                    <>
+                                        <ArrowDownwardIcon fontSize="small"/>
+                                    </>
+                                )}
+                            </MyIconButton>
+                        </Box>
                     </Box>
 
                     {trainingWords.length === 0 ? (
@@ -177,7 +204,7 @@ export const TrainingPage: React.FC = () => {
                             Нет слов в тренировке.
                         </Typography>
                     ) : (
-                        trainingWords.map((word, index) => (
+                        sortedTrainingWords.map((word, index) => (
                             <Box
                                 key={word.id}
                                 display="flex"
@@ -187,10 +214,10 @@ export const TrainingPage: React.FC = () => {
                                     mb: 1,
                                     borderBottom:
                                         index !== trainingWords.length - 1 ? '1px solid #ccc' : 'none',
-                                    // Применяем цвет фона на основе прогресса
-                                    backgroundColor: getBackgroundColorByProgress(word.progress),
+                                    backgroundColor: adjustAlpha(getBackgroundColorByProgress(word.progress), 0.1),
                                     borderRadius: 1,
                                     p: 1,
+                                    transition: 'background-color 0.3s',
                                 }}
                             >
                                 <Box display="flex" alignItems="center">
@@ -199,18 +226,38 @@ export const TrainingPage: React.FC = () => {
                                         onChange={() => handleSelectWord(word.id)}
                                         color="primary"
                                     />
-                                    <Typography variant="body1">
-                                        {word.word} – {word.translation}
+                                    <Typography
+                                        variant="body1">
+                                        {truncateText(word.word)} – {truncateText(word.translation)}
                                     </Typography>
                                 </Box>
-                                <IconButton
-                                    size="small"
-                                    color="error"
-                                    onClick={() => handleRemoveWord(word.id)}
-                                    aria-label="Удалить слово"
-                                >
-                                    <CloseIcon />
-                                </IconButton>
+                                <Box display="flex" alignItems="center">
+                                    <Box
+                                        sx={{
+                                            width: 28,
+                                            height: 28,
+                                            borderRadius: '50%',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontWeight: 'bold',
+                                            fontSize: '0.8rem',
+                                            backgroundColor: getBackgroundColorByProgress(word.progress),
+                                            border: '1px solid black',
+                                            mr: 1,
+                                        }}
+                                    >
+                                        {word.progress}
+                                    </Box>
+                                    <IconButton
+                                        size="small"
+                                        color="error"
+                                        onClick={() => handleRemoveWord(word.id)}
+                                        aria-label="Удалить слово"
+                                    >
+                                        <CloseIcon/>
+                                    </IconButton>
+                                </Box>
                             </Box>
                         ))
                     )}
@@ -218,16 +265,16 @@ export const TrainingPage: React.FC = () => {
             </Collapse>
 
             {/* Карточки тренировок (пример) */}
-            <TrainingCardGrid sessions={trainingSessions} />
+            <TrainingCardGrid sessions={trainingSessions}/>
 
             {/* Snackbar для уведомлений */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={3000}
                 onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
             >
-                <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+                <Alert onClose={handleSnackbarClose} severity="success" sx={{width: '100%'}}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
