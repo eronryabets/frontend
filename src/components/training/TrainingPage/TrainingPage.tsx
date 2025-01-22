@@ -9,7 +9,7 @@ import {
     Alert,
     Collapse,
     IconButton,
-    Checkbox,
+    Checkbox, Dialog, DialogTitle, DialogContent, DialogActions,
 } from '@mui/material';
 import {
     Close as CloseIcon,
@@ -44,6 +44,8 @@ export const TrainingPage: React.FC = () => {
     const [selectedWordIds, setSelectedWordIds] = useState<string[]>([]);
     // Состояние для сортировки (asc или desc)
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     // Мемоизируем отсортированный список слов по прогрессу
     const sortedTrainingWords = useMemo(() => {
@@ -101,13 +103,14 @@ export const TrainingPage: React.FC = () => {
     };
 
     // Обработка bulk удаления выбранных слов
-    const handleBulkRemove = () => {
+    const handleBulkRemove = async () => {
         selectedWordIds.forEach((id) => {
             dispatch(removeWordFromTraining(id));
         });
         setSnackbarMessage(`Удалили ${selectedWordIds.length} слов(а) из тренировки`);
         setSnackbarOpen(true);
         setSelectedWordIds([]);
+        setConfirmOpen(false);
     };
 
     // Функция для переключения сортировки. При повторном клике меняем направление сортировки
@@ -178,7 +181,7 @@ export const TrainingPage: React.FC = () => {
                                 }
                             />
                             <Typography variant="subtitle1">Выбрать все</Typography>
-                             <Box ml={2}>
+                            <Box ml={2}>
                                 <MyIconButton color="primary" onClick={toggleSortOrder}>
                                     {sortOrder === "asc" ? (
                                         <ArrowUpwardIcon fontSize="small"/>
@@ -196,7 +199,7 @@ export const TrainingPage: React.FC = () => {
                                     <MyIconButton
                                         color="error"
                                         startIcon={<DeleteForeverIcon/>}
-                                        onClick={handleBulkRemove}
+                                        onClick={() => setConfirmOpen(true)}
                                         tooltipTitle="Удалить выбранные слова"
                                         size={"large"}
                                         bgColor="rgba(255,0,0,0.22)"
@@ -288,6 +291,31 @@ export const TrainingPage: React.FC = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+
+            {/* Диалог подтверждения bulk‑удаления */}
+            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+                <DialogTitle>Подтверждение удаления</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Вы уверены, что хотите удалить {selectedWordIds.length} слов(а)?
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        onClick={handleBulkRemove}
+                    >
+                        Да
+                    </Button>
+                    <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={() => setConfirmOpen(false)}
+                    >
+                        Отмена
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
         </Container>
     );
 };
