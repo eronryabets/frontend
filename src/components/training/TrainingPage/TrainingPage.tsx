@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     Container,
     Box,
@@ -9,15 +9,19 @@ import {
     Alert,
     Collapse,
     IconButton,
-    Checkbox, Tooltip
+    Checkbox,
+    Tooltip
 } from '@mui/material';
-import {Close as CloseIcon} from '@mui/icons-material';
+import { Close as CloseIcon } from '@mui/icons-material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
-import {clearTrainingWords, removeWordFromTraining} from '@/redux/slices/trainingSlice';
-import {trainingSessions} from "@/utils/index.ts";
-import {TrainingCardGrid} from "@/components/index.ts";
-import {RootState} from '@/redux/store';
+import { clearTrainingWords, removeWordFromTraining } from '@/redux/slices/trainingSlice';
+import { trainingSessions } from "@/utils/index.ts";
+import { TrainingCardGrid } from "@/components/index.ts";
+import { RootState } from '@/redux/store';
+
+// Импортируем функцию для подсветки
+import { getBackgroundColorByProgress } from '@/utils/getBackgroundColorByProgress'; // Убедитесь, что путь верный
 
 export const TrainingPage: React.FC = () => {
     const dispatch = useDispatch();
@@ -112,7 +116,7 @@ export const TrainingPage: React.FC = () => {
                 </Button>
             </Box>
 
-            {/* Кнопка для открытия/закрытия списка слов */}
+            {/* Кнопка для открытия/скрытия списка слов */}
             <Box mb={3}>
                 <Button
                     variant="contained"
@@ -134,20 +138,17 @@ export const TrainingPage: React.FC = () => {
                     }}
                 >
 
-                    <Box display="flex" alignItems="center">
-
-                        {/* Шапка списка со "Select All" */}
-                        <Box display="flex" alignItems="center" mb={1}>
-                            <Checkbox
-                                color="primary"
-                                onChange={handleSelectAll}
-                                checked={selectedWordIds.length === trainingWords.length && trainingWords.length > 0}
-                                indeterminate={
-                                    selectedWordIds.length > 0 && selectedWordIds.length < trainingWords.length
-                                }
-                            />
-                            <Typography variant="subtitle1">Выбрать все</Typography>
-                        </Box>
+                    {/* Шапка списка со "Select All" и кнопкой Bulk удаления */}
+                    <Box display="flex" alignItems="center" mb={1}>
+                        <Checkbox
+                            color="primary"
+                            onChange={handleSelectAll}
+                            checked={selectedWordIds.length === trainingWords.length && trainingWords.length > 0}
+                            indeterminate={
+                                selectedWordIds.length > 0 && selectedWordIds.length < trainingWords.length
+                            }
+                        />
+                        <Typography variant="subtitle1">Выбрать все</Typography>
 
                         {/* Кнопка для удаления выбранных слов */}
                         {selectedWordIds.length > 0 && (
@@ -156,7 +157,6 @@ export const TrainingPage: React.FC = () => {
                                     <IconButton
                                         color="error"
                                         onClick={handleBulkRemove}
-                                        // Дополнительное оформление, если нужно сделать эффект "contained"
                                         sx={{
                                             backgroundColor: 'error.main',
                                             color: 'white',
@@ -165,14 +165,12 @@ export const TrainingPage: React.FC = () => {
                                             },
                                         }}
                                     >
-                                        <DeleteForeverIcon/>
+                                        <DeleteForeverIcon />
                                     </IconButton>
                                 </Tooltip>
                             </Box>
                         )}
-
                     </Box>
-
 
                     {trainingWords.length === 0 ? (
                         <Typography variant="body2" color="text.secondary">
@@ -189,6 +187,10 @@ export const TrainingPage: React.FC = () => {
                                     mb: 1,
                                     borderBottom:
                                         index !== trainingWords.length - 1 ? '1px solid #ccc' : 'none',
+                                    // Применяем цвет фона на основе прогресса
+                                    backgroundColor: getBackgroundColorByProgress(word.progress),
+                                    borderRadius: 1,
+                                    p: 1,
                                 }}
                             >
                                 <Box display="flex" alignItems="center">
@@ -207,7 +209,7 @@ export const TrainingPage: React.FC = () => {
                                     onClick={() => handleRemoveWord(word.id)}
                                     aria-label="Удалить слово"
                                 >
-                                    <CloseIcon/>
+                                    <CloseIcon />
                                 </IconButton>
                             </Box>
                         ))
@@ -216,16 +218,16 @@ export const TrainingPage: React.FC = () => {
             </Collapse>
 
             {/* Карточки тренировок (пример) */}
-            <TrainingCardGrid sessions={trainingSessions}/>
+            <TrainingCardGrid sessions={trainingSessions} />
 
             {/* Snackbar для уведомлений */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={3000}
                 onClose={handleSnackbarClose}
-                anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
-                <Alert onClose={handleSnackbarClose} severity="success" sx={{width: '100%'}}>
+                <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
