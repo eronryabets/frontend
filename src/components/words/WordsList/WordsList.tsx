@@ -354,6 +354,7 @@ export const WordsList: React.FC = () => {
     const handleOpenAddModal = useCallback(() => {
         setIsAddModalOpen(true);
     }, []);
+
     const handleCloseAddModal = useCallback(() => {
         setIsAddModalOpen(false);
     }, []);

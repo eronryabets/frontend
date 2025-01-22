@@ -57,35 +57,37 @@ export const AddWordModal: React.FC<AddWordModalProps> = ({open, onClose, dictio
     const [selectedDictionaryId, setSelectedDictionaryId] = useState<string>('');
 
     useEffect(() => {
-        if (open) {
-            setWord(initialWord || '');
-            setTranslation(initialTranslation || '');
-            setTagNames([]);
-            setTagInput('');
-            setImagePath(null);
-            setImagePreview(null);
-            setSubmitError(null);
-            dispatch(resetAddWordState());
+  if (open) {
+    // Сбрасываем поля:
+    setWord(initialWord || '');
+    setTranslation(initialTranslation || '');
+    setTagNames([]);
+    setTagInput('');
+    setImagePath(null);
+    setImagePreview(null);
+    setSubmitError(null);
+    dispatch(resetAddWordState());
 
-            if (dictionaries && dictionaries.length > 0) {
-                // Проверяем есть ли сохранённый словарь в localStorage
-                const lastSelected = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (dictionaries && dictionaries.length > 0) {
+      // 1. Если передан dictionaryId, пробуем его
+      if (dictionaryId && dictionaries.find(d => d.id === dictionaryId)) {
+        setSelectedDictionaryId(dictionaryId);
+      } else {
+        // 2. Иначе проверяем localStorage
+        const lastSelected = localStorage.getItem(LOCAL_STORAGE_KEY);
 
-                if (lastSelected && dictionaries.find(d => d.id === lastSelected)) {
-                    // Если сохранённый словарь существует в текущем списке словарей, используем его
-                    setSelectedDictionaryId(lastSelected);
-                } else if (dictionaryId && dictionaries.find(d => d.id === dictionaryId)) {
-                    // Если есть переданный dictionaryId и он в списке словарей
-                    setSelectedDictionaryId(dictionaryId);
-                } else {
-                    // Иначе выбираем первый словарь
-                    setSelectedDictionaryId(dictionaries[0].id);
-                }
-            } else {
-                setSelectedDictionaryId('');
-            }
+        if (lastSelected && dictionaries.find(d => d.id === lastSelected)) {
+          setSelectedDictionaryId(lastSelected);
+        } else {
+          // 3. Если ничего не подошло — берем первый словарь (последний использованный).
+          setSelectedDictionaryId(dictionaries[0].id);
         }
-    }, [open, initialWord, initialTranslation, dictionaryId, dictionaries, dispatch]);
+      }
+    } else {
+      setSelectedDictionaryId('');
+    }
+  }
+}, [open, initialWord, initialTranslation, dictionaryId, dictionaries, dispatch]);
 
     const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setWord(e.target.value);
