@@ -12,7 +12,11 @@ import {
     Checkbox,
     Tooltip
 } from '@mui/material';
-import {Close as CloseIcon} from '@mui/icons-material';
+import {
+    Close as CloseIcon,
+    ExpandLessOutlined as ExpandLessOutlinedIcon,
+    ExpandMoreOutlined as ExpandMoreOutlinedIcon
+} from '@mui/icons-material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -68,6 +72,7 @@ export const TrainingPage: React.FC = () => {
     // Функция переключения показа списка
     const toggleWordList = () => {
         setListOpen((prev) => !prev);
+        setFilterOpen(!isFilterOpen);
     };
 
     // Хендлер для одиночного выбора слова
@@ -115,6 +120,8 @@ export const TrainingPage: React.FC = () => {
     const truncateText = (text: string, maxLength = 20) =>
         text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 
+    const [isFilterOpen, setFilterOpen] = useState<boolean>(false);
+
     return (
         <Container
             sx={{
@@ -129,16 +136,22 @@ export const TrainingPage: React.FC = () => {
                 <Typography variant="h4">
                     Тренировка слов: {wordsCount}
                 </Typography>
+
+                {/* Кнопка для открытия/закрытия списка слов */}
+                <Button variant="contained" color="primary" onClick={toggleWordList}
+                startIcon={
+                        isFilterOpen
+                            ? <ExpandLessOutlinedIcon/>
+                            : <ExpandMoreOutlinedIcon/>
+                    }
+                >
+                    {isListOpen ? 'Скрыть список слов' : 'Показать список слов'}
+                </Button>
+
                 <Button variant="outlined" color="error" onClick={handleClearTraining}>
                     Очистить список тренировки
                 </Button>
-            </Box>
 
-            {/* Кнопка для открытия/закрытия списка слов */}
-            <Box mb={3}>
-                <Button variant="contained" color="primary" onClick={toggleWordList}>
-                    {isListOpen ? 'Скрыть список слов' : 'Показать список слов'}
-                </Button>
             </Box>
 
             {/* Свертывающийся список слов */}
