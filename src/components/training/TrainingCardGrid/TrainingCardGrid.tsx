@@ -111,4 +111,4 @@ export const TrainingCardGrid: React.FC<TrainingCardGridProps> = ({ sessions }) 
   );
 };
 
-// export default TrainingCardGrid;
+ export default TrainingCardGrid;
