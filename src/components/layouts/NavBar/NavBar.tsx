@@ -32,7 +32,7 @@ import {USER_API_MEDIA_URL} from "@/config/urls.ts";
 export const NavBar = () => {
     const dispatch = useAppDispatch();
     const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [booksMenuAnchorEl, setBooksMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+    // const [booksMenuAnchorEl, setBooksMenuAnchorEl] = React.useState<null | HTMLElement>(null);
     const location = useLocation();
 
     const themeMode = useSelector((state: RootState) => state.theme.mode);
@@ -48,13 +48,13 @@ export const NavBar = () => {
     };
 
     // Handlers for Books Menu
-    const handleBooksMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setBooksMenuAnchorEl(event.currentTarget);
-    };
+    // const handleBooksMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    //     setBooksMenuAnchorEl(event.currentTarget);
+    // };
 
-    const handleBooksMenuClose = () => {
-        setBooksMenuAnchorEl(null);
-    };
+    // const handleBooksMenuClose = () => {
+    //     setBooksMenuAnchorEl(null);
+    // };
 
     const handleThemeToggle = () => {
         dispatch(toggleTheme());
@@ -74,7 +74,7 @@ export const NavBar = () => {
 
     // Проверка открытости меню
     const isUserMenuOpen = Boolean(userMenuAnchorEl);
-    const isBooksMenuOpen = Boolean(booksMenuAnchorEl);
+    // const isBooksMenuOpen = Boolean(booksMenuAnchorEl);
 
     // Функция для определения, является ли путь активным
     const isActive = (path: string) => {
@@ -160,47 +160,71 @@ export const NavBar = () => {
                         Training
                     </Button>
 
-                    {/* Кнопка "Books" с выпадающим меню */}
-                    <Box
-                        sx={{position: 'relative'}}
-                        onMouseEnter={handleBooksMenuOpen}
-                        onMouseLeave={handleBooksMenuClose}
-                    >
+                    <Box sx={{display: 'flex', alignItems: 'center'}}>
                         <Button
                             color="inherit"
-                            aria-controls={isBooksMenuOpen ? 'books-menu' : undefined}
-                            aria-haspopup="true"
-                            aria-expanded={isBooksMenuOpen ? 'true' : undefined}
+                            component={Link}
+                            to="/books"
+                            sx={{
+                                textTransform: 'none',
+                                backgroundColor: isActive('/dictionaries')
+                                    ? 'rgba(255,255,255,0.2)'
+                                    : 'transparent',
+                                borderRadius: 1,
+                                mr: 2,
+                                transition: 'background-color 0.3s',
+                                '&:hover': {
+                                    backgroundColor: isActive('/dictionaries')
+                                        ? 'rgba(255,255,255,0.3)'
+                                        : 'rgba(255,255,255,0.1)',
+                                },
+                            }}
                         >
                             Books
                         </Button>
-                        <Menu
-                            id="books-menu"
-                            anchorEl={booksMenuAnchorEl}
-                            open={isBooksMenuOpen}
-                            onClose={handleBooksMenuClose}
-                            MenuListProps={{
-                                onMouseEnter: () => setBooksMenuAnchorEl(booksMenuAnchorEl),
-                                onMouseLeave: handleBooksMenuClose,
-                            }}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'left',
-                            }}
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'left',
-                            }}
-                            TransitionComponent={Fade}
-                        >
-                            <MenuItem component={Link} to="/book" onClick={handleBooksMenuClose}>
-                                Book Upload
-                            </MenuItem>
-                            <MenuItem component={Link} to="/booklist" onClick={handleBooksMenuClose}>
-                                Book List
-                            </MenuItem>
-                        </Menu>
                     </Box>
+
+                    {/* Кнопка "Books" с выпадающим меню */}
+                    {/*<Box*/}
+                    {/*    sx={{position: 'relative'}}*/}
+                    {/*    onMouseEnter={handleBooksMenuOpen}*/}
+                    {/*    onMouseLeave={handleBooksMenuClose}*/}
+                    {/*>*/}
+                    {/*    <Button*/}
+                    {/*        color="inherit"*/}
+                    {/*        aria-controls={isBooksMenuOpen ? 'books-menu' : undefined}*/}
+                    {/*        aria-haspopup="true"*/}
+                    {/*        aria-expanded={isBooksMenuOpen ? 'true' : undefined}*/}
+                    {/*    >*/}
+                    {/*        Books*/}
+                    {/*    </Button>*/}
+                    {/*    <Menu*/}
+                    {/*        id="books-menu"*/}
+                    {/*        anchorEl={booksMenuAnchorEl}*/}
+                    {/*        open={isBooksMenuOpen}*/}
+                    {/*        onClose={handleBooksMenuClose}*/}
+                    {/*        MenuListProps={{*/}
+                    {/*            onMouseEnter: () => setBooksMenuAnchorEl(booksMenuAnchorEl),*/}
+                    {/*            onMouseLeave: handleBooksMenuClose,*/}
+                    {/*        }}*/}
+                    {/*        anchorOrigin={{*/}
+                    {/*            vertical: 'bottom',*/}
+                    {/*            horizontal: 'left',*/}
+                    {/*        }}*/}
+                    {/*        transformOrigin={{*/}
+                    {/*            vertical: 'top',*/}
+                    {/*            horizontal: 'left',*/}
+                    {/*        }}*/}
+                    {/*        TransitionComponent={Fade}*/}
+                    {/*    >*/}
+                    {/*        <MenuItem component={Link} to="/bookUpload" onClick={handleBooksMenuClose}>*/}
+                    {/*            Book Upload*/}
+                    {/*        </MenuItem>*/}
+                    {/*        <MenuItem component={Link} to="/books" onClick={handleBooksMenuClose}>*/}
+                    {/*            Book List*/}
+                    {/*        </MenuItem>*/}
+                    {/*    </Menu>*/}
+                    {/*</Box>*/}
 
                     {/* Кнопка переключения темы */}
                     <IconButton onClick={handleThemeToggle}
@@ -245,7 +269,7 @@ export const NavBar = () => {
                         <MenuItem component={Link} to="/dictionaries" onClick={handleUserMenuClose}>
                             Dictionaries
                         </MenuItem>
-                        <MenuItem component={Link} to="/book" onClick={handleUserMenuClose}>
+                        <MenuItem component={Link} to="/books" onClick={handleUserMenuClose}>
                             Books
                         </MenuItem>
                         <MenuItem onClick={handleLogout}>Logout</MenuItem>

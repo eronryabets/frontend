@@ -19,7 +19,21 @@ import {
     Chip,
     CardActionArea,
     useTheme,
+    FormControl,
+    Select, InputLabel,
+    Tooltip,
+    IconButton, Button, TextField, InputAdornment,
 } from '@mui/material';
+
+import {
+    Close as CloseIcon,
+    FilterListOutlined as FilterListOutlinedIcon,
+    FilterListOffOutlined as FilterListOffOutlinedIcon,
+    ExpandLessOutlined as ExpandLessOutlinedIcon,
+    ExpandMoreOutlined as ExpandMoreOutlinedIcon,
+    Search as SearchIcon,
+    MenuBook as MenuBook,
+} from '@mui/icons-material';
 
 import defaultCover from '@/assets/default_cover.png';
 
@@ -68,8 +82,137 @@ export const BooksList: React.FC = () => {
                 flexDirection: 'column',
             }}
         >
+            {/* ========== ДЕМО (ЗАГЛУШКА) - ПАНЕЛИ ПОИСКА, ФИЛЬТРА и т.д. [START] ========== */}
+
+            {/* ---НА основе WordList Блок с кнопками: Добавить слово, Поиск, Фильтр, Сортировка --- */}
+            <Box
+                sx={{
+                    pl: 2,
+                    pb: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: 2
+                }}
+            >
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<MenuBook/>}
+                    component={Link}
+                    to="/bookUpload"
+                >
+                    Добавить книгу
+                </Button>
+
+                {/* Поле поиска */}
+                <TextField
+                    label="Поиск слов"
+                    variant="outlined"
+                    size="small"
+                    value={'test mock'}
+                    onChange={()=>{}}
+                    onKeyPress={()=>{}}
+                    sx={{
+                        width: '300px',
+                        // backgroundColor: searchInput ? 'rgba(144,238,144,0.14)' : 'inherit',
+                        borderRadius: 1,
+                    }}
+                    InputProps={{
+                        // Если введён текст, показываем кнопку очистки слева
+                        startAdornment: 1111 && (
+                            <InputAdornment position="start">
+                                <Tooltip title="Очистить поиск" arrow>
+                                    <IconButton
+                                        onClick={()=>{}}
+                                        size="small"
+                                        sx={{mr: 1}}
+                                        color="secondary"
+                                        aria-label="Очистить поиск"
+                                    >
+                                        <CloseIcon fontSize="small"/>
+                                    </IconButton>
+                                </Tooltip>
+                            </InputAdornment>
+                        ),
+                        // В любом случае показываем иконку поиска справа
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <SearchIcon
+                                    color="primary"
+                                    onClick={()=>{}}
+                                    sx={{cursor: 'pointer'}}
+                                />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+
+                <Button
+                    variant="contained"
+                    color={null ? 'warning' : 'info'}
+                    onClick={()=>{}}
+                    startIcon={
+                        null
+                            ? <ExpandLessOutlinedIcon/>
+                            : <ExpandMoreOutlinedIcon/>
+                    }
+                >
+                    {null ? 'Свернуть фильтр' : 'Показать фильтр'}
+                </Button>
+
+                {/* Иконка-индикатор фильтра */}
+                <Tooltip
+                    title={null ? 'Фильтр применён. Сбросить фильтр?' : 'Фильтр не активен'}
+                    arrow
+                >
+                    <IconButton
+                        onClick={() => {
+                            // Если фильтр был активен, при клике сбросим его,
+                            // или реализуйте другую логику переключения
+                            // if (hasAnyFilter) {
+                            //     handleResetFilters();
+                            // }
+                        }}
+                    >
+                        {null ? (
+                            <FilterListOutlinedIcon sx={{color: 'green'}}/>
+                        ) : (
+                            <FilterListOffOutlinedIcon/>
+                        )}
+                    </IconButton>
+                </Tooltip>
+
+                {/* Select для сортировки */}
+                <FormControl
+                    size="small"
+                    sx={{
+                        minWidth: 200,
+                        // Если ordering не пустой, фон становится зеленоватым, иначе inherit
+                        // backgroundColor: ordering ? 'rgba(144,238,144,0.14)' : 'inherit',
+                        borderRadius: 1, // опционально, чтобы применить скругление
+                    }}
+                >
+                    <InputLabel id="sorting-label">Сортировка</InputLabel>
+                    <Select
+                        labelId="sorting-label"
+                        label="Сортировка"
+                        value={1111}
+                        onChange={()=>{}}
+                    >
+                        {/*{sortingOptions.map((option) => (*/}
+                        {/*    <MenuItem key={option.value} value={option.value}>*/}
+                        {/*        {option.label}*/}
+                        {/*    </MenuItem>*/}
+                        {/*))}*/}
+                    </Select>
+                </FormControl>
+            </Box>
+
+            {/* ========== ДЕМО (ЗАГЛУШКА) - ПАНЕЛИ ПОИСКА, ФИЛЬТРА и т.д. [END] ========== */}
+
             {/* Обёртка с flexGrow */}
-            <Box flexGrow={1}>
+            <Box flexGrow={1} mt={2}>
                 {/* Блок с книгами */}
                 <Box
                     display="grid"

@@ -47,8 +47,8 @@ const AppContent = () => {
                         <Route path="/profile" element={<ProfilePage/>}/>
                         <Route path="/settings" element={<UserSettingsPage/>}/>
                         {/*BOOK*/}
-                        <Route path="/book" element={<BookUpload/>}/>
-                        <Route path="/booklist" element={<BooksList/>}/>
+                        <Route path="/bookUpload" element={<BookUpload/>}/>
+                        <Route path="/books" element={<BooksList/>}/>
                         <Route path="/book/:id" element={<BookDetail/>}/>
                         <Route path="/books/:bookId/chapters/:chapterId/pages/:pageNumber" element={<PageDetail/>}/>
                         {/*DICTIONARY*/}
