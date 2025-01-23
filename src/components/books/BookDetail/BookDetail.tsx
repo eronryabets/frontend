@@ -180,6 +180,17 @@ export const BookDetail: React.FC = () => {
         setExpandedChapters(new Set());
     };
 
+    // Новый «тоггл» для всех глав: если все открыты → свернуть, иначе открыть
+    const allChaptersExpanded = book && expandedChapters.size === book.chapters.length;
+    const handleToggleAll = () => {
+        if (!book) return;
+        if (allChaptersExpanded) {
+            handleCollapseAll();
+        } else {
+            handleExpandAll();
+        }
+    };
+
     // Функция для переключения состояния конкретной главы
     const handleToggleChapter = (chapterId: string, isExpanded: boolean) => {
         setExpandedChapters((prev) => {
@@ -345,18 +356,16 @@ export const BookDetail: React.FC = () => {
                             <Typography variant="h6" gutterBottom>
                                 Список Глав:
                             </Typography>
-                            <Box>
-                                <Tooltip title="Развернуть все">
-                                    <IconButton onClick={handleExpandAll} aria-label="expand all">
-                                        <ExpandMoreIcon sx={{ borderRadius: 2, boxShadow: 6 }} />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Свернуть все">
-                                    <IconButton onClick={handleCollapseAll} aria-label="collapse all">
+                            {/* ОДНА кнопка - в зависимости от состояния (все ли раскрыты) */}
+                            <Tooltip title={allChaptersExpanded ? 'Свернуть все' : 'Развернуть все'}>
+                                <IconButton onClick={handleToggleAll} aria-label="toggle all">
+                                    {allChaptersExpanded ? (
                                         <ExpandLessIcon sx={{ borderRadius: 2, boxShadow: 6 }} />
-                                    </IconButton>
-                                </Tooltip>
-                            </Box>
+                                    ) : (
+                                        <ExpandMoreIcon sx={{ borderRadius: 2, boxShadow: 6 }} />
+                                    )}
+                                </IconButton>
+                            </Tooltip>
                         </Box>
                         <List sx={{ maxHeight: 350, overflow: 'auto' }}>
                             {memoizedChapters ? (
@@ -368,7 +377,7 @@ export const BookDetail: React.FC = () => {
                     </Box>
 
                     {/* Кнопка Назад */}
-                    <Button component={RouterLink} to="/booklist" variant="outlined" color="primary" sx={{ mt: 4 }}>
+                    <Button component={RouterLink} to="/booklist" variant="outlined" color="primary" sx={{ mt: 2 }}>
                         Назад к списку книг
                     </Button>
 
