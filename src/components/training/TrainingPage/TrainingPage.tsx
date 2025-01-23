@@ -9,16 +9,19 @@ import {
     Alert,
     Collapse,
     IconButton,
-    Checkbox, Dialog, DialogTitle, DialogContent, DialogActions,
+    Checkbox,
+    Dialog,
+    DialogTitle, DialogContent, DialogActions,
 } from '@mui/material';
 import {
     Close as CloseIcon,
     ExpandLessOutlined as ExpandLessOutlinedIcon,
-    ExpandMoreOutlined as ExpandMoreOutlinedIcon
+    ExpandMoreOutlined as ExpandMoreOutlinedIcon,
+    DeleteForever as DeleteForeverIcon,
+    ArrowUpward as ArrowUpwardIcon,
+    ArrowDownward as ArrowDownwardIcon,
 } from '@mui/icons-material';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+
 
 import {clearTrainingWords, removeWordFromTraining} from '@/redux/slices/trainingSlice';
 import {trainingSessions} from "@/utils/index.ts";
@@ -73,7 +76,6 @@ export const TrainingPage: React.FC = () => {
     // Функция переключения показа списка
     const toggleWordList = () => {
         setListOpen((prev) => !prev);
-        setFilterOpen(!isFilterOpen);
     };
 
     // Хендлер для одиночного выбора слова
@@ -122,8 +124,6 @@ export const TrainingPage: React.FC = () => {
     const truncateText = (text: string, maxLength = 20) =>
         text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 
-    const [isFilterOpen, setFilterOpen] = useState<boolean>(false);
-
     return (
         <Container
             sx={{
@@ -143,7 +143,7 @@ export const TrainingPage: React.FC = () => {
                 {/* Кнопка для открытия/закрытия списка слов */}
                 <Button variant="contained" color="primary" onClick={toggleWordList}
                         startIcon={
-                            isFilterOpen
+                            isListOpen
                                 ? <ExpandLessOutlinedIcon/>
                                 : <ExpandMoreOutlinedIcon/>
                         }
@@ -159,13 +159,13 @@ export const TrainingPage: React.FC = () => {
 
             {/* Свертывающийся список слов */}
             <Collapse in={isListOpen}>
-                <Box
-                    sx={{
-                        mb: 3,
-                        p: 2,
-                        border: '1px solid #ccc',
-                        borderRadius: 2,
-                    }}
+                <Box data-name="CollapseListWords"
+                     sx={{
+                         mb: 3,
+                         p: 2,
+                         border: '1px solid #ccc',
+                         borderRadius: 2,
+                     }}
                 >
 
                     {/* Шапка списка: "Select All" и Bulk кнопка */}
@@ -274,6 +274,20 @@ export const TrainingPage: React.FC = () => {
                             </Box>
                         ))
                     )}
+                    <Box data-name="CollapseListButton"
+                         display="flex"
+                         justifyContent="center"
+                    >
+                        <MyIconButton
+                            color="primary"
+                            startIcon={<ExpandLessOutlinedIcon/>}
+                            onClick={toggleWordList}
+                            tooltipTitle="Свернуть список"
+                            bgColor="rgba(64,66,75,0.42)"
+                            hoverBgColor="rgba(64,66,75,0.9)"
+                        />
+                    </Box>
+
                 </Box>
             </Collapse>
 
