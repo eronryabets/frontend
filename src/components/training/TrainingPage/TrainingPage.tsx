@@ -157,7 +157,8 @@ export const TrainingPage: React.FC = () => {
 
             </Box>
 
-            {/* Свертывающийся список слов */}
+
+            {/* Свертывающийся СПИСОК СЛОВ */}
             <Collapse in={isListOpen}>
                 <Box data-name="CollapseListWords"
                      sx={{
@@ -165,9 +166,10 @@ export const TrainingPage: React.FC = () => {
                          p: 2,
                          border: '1px solid #ccc',
                          borderRadius: 2,
+                         maxHeight: '800px',          // Ограничение по высоте
+                         overflowY: 'auto',           // Добавление вертикальной прокрутки
                      }}
                 >
-
                     {/* Шапка списка: "Select All" и Bulk кнопка */}
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
                         {/* Левая группа: чекбокс, текст, кнопка удаления */}
@@ -291,7 +293,8 @@ export const TrainingPage: React.FC = () => {
                 </Box>
             </Collapse>
 
-            {/* Карточки тренировок (пример) */}
+
+            {/* КАРТОЧКИ тренировок (пример) */}
             <TrainingCardGrid sessions={trainingSessions}/>
 
             {/* Snackbar для уведомлений */}
