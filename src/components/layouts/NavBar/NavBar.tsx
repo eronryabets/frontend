@@ -47,15 +47,6 @@ export const NavBar = () => {
         setUserMenuAnchorEl(null);
     };
 
-    // Handlers for Books Menu
-    // const handleBooksMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    //     setBooksMenuAnchorEl(event.currentTarget);
-    // };
-
-    // const handleBooksMenuClose = () => {
-    //     setBooksMenuAnchorEl(null);
-    // };
-
     const handleThemeToggle = () => {
         dispatch(toggleTheme());
     };
@@ -74,19 +65,25 @@ export const NavBar = () => {
 
     // Проверка открытости меню
     const isUserMenuOpen = Boolean(userMenuAnchorEl);
-    // const isBooksMenuOpen = Boolean(booksMenuAnchorEl);
 
-    // Функция для определения, является ли путь активным
-    const isActive = (path: string) => {
-        return location.pathname === path;
+    // Подсветка active для нескольких путей
+    const isActive = (paths: string[] | string) => {
+        if (Array.isArray(paths)) {
+            return paths.some((p) => location.pathname.startsWith(p));
+        }
+        return location.pathname.startsWith(paths);
     };
+
+    const vocabularyActive = isActive(['/dictionaries', '/dictionary']);
+    const trainingActive = isActive('/training');
+    const booksActive = isActive(['/books', '/book']);
 
     return (
         <AppBar position="static">
             {/* заменил с fixed на static */}
             <Toolbar>
                 {/* Название приложения */}
-                {/* Кликабельная надпись "Smart Reader" */}
+                {/* Кликабельная надпись "Readeri" */}
                 <Typography
                     variant="h6"
                     component={Link}
@@ -121,14 +118,14 @@ export const NavBar = () => {
                             to="/dictionaries"
                             sx={{
                                 textTransform: 'none',
-                                backgroundColor: isActive('/dictionaries')
+                                backgroundColor: vocabularyActive
                                     ? 'rgba(255,255,255,0.2)'
                                     : 'transparent',
                                 borderRadius: 1,
                                 mr: 2,
                                 transition: 'background-color 0.3s',
                                 '&:hover': {
-                                    backgroundColor: isActive('/dictionaries')
+                                    backgroundColor: vocabularyActive
                                         ? 'rgba(255,255,255,0.3)'
                                         : 'rgba(255,255,255,0.1)',
                                 },
@@ -144,14 +141,14 @@ export const NavBar = () => {
                         to="/training"
                         sx={{
                             textTransform: 'none', // убираем заглавные буквы
-                            backgroundColor: isActive('/training')
+                            backgroundColor: trainingActive
                                 ? 'rgba(255,255,255,0.2)' // затемнённый фон для активной вкладки
                                 : 'transparent',
                             borderRadius: 1, // для аккуратного скругления углов
                             mr: 2,           // отступ справа
                             transition: 'background-color 0.3s', // плавный переход цвета
                             '&:hover': {
-                                backgroundColor: isActive('/training')
+                                backgroundColor: trainingActive
                                     ? 'rgba(255,255,255,0.3)' // немного более тёмный при наведении, если активна
                                     : 'rgba(255,255,255,0.1)', // легкое затемнение при наведении, если не активна
                             },
@@ -167,14 +164,14 @@ export const NavBar = () => {
                             to="/books"
                             sx={{
                                 textTransform: 'none',
-                                backgroundColor: isActive('/dictionaries')
+                                backgroundColor: booksActive
                                     ? 'rgba(255,255,255,0.2)'
                                     : 'transparent',
                                 borderRadius: 1,
                                 mr: 2,
                                 transition: 'background-color 0.3s',
                                 '&:hover': {
-                                    backgroundColor: isActive('/dictionaries')
+                                    backgroundColor: booksActive
                                         ? 'rgba(255,255,255,0.3)'
                                         : 'rgba(255,255,255,0.1)',
                                 },
@@ -183,48 +180,6 @@ export const NavBar = () => {
                             Books
                         </Button>
                     </Box>
-
-                    {/* Кнопка "Books" с выпадающим меню */}
-                    {/*<Box*/}
-                    {/*    sx={{position: 'relative'}}*/}
-                    {/*    onMouseEnter={handleBooksMenuOpen}*/}
-                    {/*    onMouseLeave={handleBooksMenuClose}*/}
-                    {/*>*/}
-                    {/*    <Button*/}
-                    {/*        color="inherit"*/}
-                    {/*        aria-controls={isBooksMenuOpen ? 'books-menu' : undefined}*/}
-                    {/*        aria-haspopup="true"*/}
-                    {/*        aria-expanded={isBooksMenuOpen ? 'true' : undefined}*/}
-                    {/*    >*/}
-                    {/*        Books*/}
-                    {/*    </Button>*/}
-                    {/*    <Menu*/}
-                    {/*        id="books-menu"*/}
-                    {/*        anchorEl={booksMenuAnchorEl}*/}
-                    {/*        open={isBooksMenuOpen}*/}
-                    {/*        onClose={handleBooksMenuClose}*/}
-                    {/*        MenuListProps={{*/}
-                    {/*            onMouseEnter: () => setBooksMenuAnchorEl(booksMenuAnchorEl),*/}
-                    {/*            onMouseLeave: handleBooksMenuClose,*/}
-                    {/*        }}*/}
-                    {/*        anchorOrigin={{*/}
-                    {/*            vertical: 'bottom',*/}
-                    {/*            horizontal: 'left',*/}
-                    {/*        }}*/}
-                    {/*        transformOrigin={{*/}
-                    {/*            vertical: 'top',*/}
-                    {/*            horizontal: 'left',*/}
-                    {/*        }}*/}
-                    {/*        TransitionComponent={Fade}*/}
-                    {/*    >*/}
-                    {/*        <MenuItem component={Link} to="/bookUpload" onClick={handleBooksMenuClose}>*/}
-                    {/*            Book Upload*/}
-                    {/*        </MenuItem>*/}
-                    {/*        <MenuItem component={Link} to="/books" onClick={handleBooksMenuClose}>*/}
-                    {/*            Book List*/}
-                    {/*        </MenuItem>*/}
-                    {/*    </Menu>*/}
-                    {/*</Box>*/}
 
                     {/* Кнопка переключения темы */}
                     <IconButton onClick={handleThemeToggle}
@@ -277,6 +232,7 @@ export const NavBar = () => {
                 </Box>
             </Toolbar>
         </AppBar>
-    )
-        ;
+    );
 };
+
+export default NavBar;
