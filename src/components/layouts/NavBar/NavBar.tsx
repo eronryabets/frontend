@@ -1,11 +1,11 @@
 import React from 'react';
-import {Link, useLocation} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {useAppDispatch} from '@/redux/hooks.ts';
+import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useAppDispatch } from '@/redux/hooks.ts';
 
-import {RootState} from "@/redux/store.ts";
-import {toggleTheme} from "@/redux/slices/themeSlice.ts";
-import {logout} from "@/redux/slices/authorizationSlice.ts";
+import { RootState } from "@/redux/store.ts";
+import { toggleTheme } from "@/redux/slices/themeSlice.ts";
+import { logout } from "@/redux/slices/authorizationSlice.ts";
 
 import {
     AppBar,
@@ -19,41 +19,61 @@ import {
     Button,
     Box,
     Fade,
+    useTheme,
+    useMediaQuery
 } from '@mui/material';
 
 import {
     Brightness7 as Brightness7Icon,
     Brightness4 as Brightness4Icon,
+    Menu as MenuIcon
 } from '@mui/icons-material';
 
-import {USER_API_MEDIA_URL} from "@/config/urls.ts";
-
+import { USER_API_MEDIA_URL } from "@/config/urls.ts";
 
 export const NavBar = () => {
     const dispatch = useAppDispatch();
-    const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-    // const [booksMenuAnchorEl, setBooksMenuAnchorEl] = React.useState<null | HTMLElement>(null);
     const location = useLocation();
 
+    // Текущее состояние темы и данные юзера
     const themeMode = useSelector((state: RootState) => state.theme.mode);
     const userData = useSelector((state: RootState) => state.userInfo.userData);
 
-    // Handlers for User Menu
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+    // *** Состояния для меню user'а
+    const [userMenuAnchorEl, setUserMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+    const isUserMenuOpen = Boolean(userMenuAnchorEl);
+
+    // *** Состояние для «мобильного» меню (бургер) ***
+    const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = React.useState<null | HTMLElement>(null);
+    const isMobileMenuOpen = Boolean(mobileMenuAnchorEl);
+
+    // === Обработчики для user-menu ===
     const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setUserMenuAnchorEl(event.currentTarget);
     };
-
     const handleUserMenuClose = () => {
         setUserMenuAnchorEl(null);
     };
 
+    // === Обработчики для mobile-menu (бургер) ===
+    const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setMobileMenuAnchorEl(event.currentTarget);
+    };
+    const handleMobileMenuClose = () => {
+        setMobileMenuAnchorEl(null);
+    };
+
+    // Функция переключения темы
     const handleThemeToggle = () => {
         dispatch(toggleTheme());
     };
 
     // Logout Handler
     const handleLogout = () => {
-        handleUserMenuClose(); // Сначала закрываем меню
+        handleUserMenuClose();
         dispatch(logout()).then((result) => {
             if (logout.fulfilled.match(result)) {
                 console.log("Logout successful");
@@ -63,35 +83,28 @@ export const NavBar = () => {
         });
     };
 
-    // Проверка открытости меню
-    const isUserMenuOpen = Boolean(userMenuAnchorEl);
-
-    // Подсветка active для нескольких путей
+    // Подсветка кнопок
     const isActive = (paths: string[] | string) => {
         if (Array.isArray(paths)) {
             return paths.some((p) => location.pathname.startsWith(p));
         }
         return location.pathname.startsWith(paths);
     };
-
     const vocabularyActive = isActive(['/dictionaries', '/dictionary']);
     const trainingActive = isActive('/training');
     const booksActive = isActive(['/books', '/book']);
 
     return (
         <AppBar position="static">
-            {/* заменил с fixed на static */}
             <Toolbar>
-                {/* Название приложения */}
-                {/* Кликабельная надпись "Readeri" */}
                 <Typography
                     variant="h6"
                     component={Link}
-                    to="/booklist"
+                    to="/books"
                     sx={{
                         flexGrow: 1,
                         textDecoration: 'none',
-                        color: 'inherit', // остальной текст наследует цвет темы
+                        color: 'inherit',
                         cursor: 'pointer',
                     }}
                 >
@@ -99,137 +112,194 @@ export const NavBar = () => {
                     <Box
                         component="span"
                         sx={{
-                            fontFamily: 'inherit',         // Наследуем шрифт основного текста
-                            fontSize: '1.0em',               // делаем букву "i" чуть крупнее
-                            color: 'orange',                 // устанавливаем оранжевый цвет для буквы "i"
-                            // WebkitTextStroke: '1px black',   // добавляем обводку (контура) черного цвета
+                            fontFamily: 'inherit',
+                            fontSize: '1.0em',
+                            color: 'orange',
                         }}
                     >
                         i
                     </Box>
                 </Typography>
 
-                {/* Основные кнопки навигации */}
-                <Box sx={{display: 'flex', alignItems: 'center',}}>
-                    <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <Button
-                            color="inherit"
-                            component={Link}
-                            to="/dictionaries"
-                            sx={{
-                                textTransform: 'none',
-                                backgroundColor: vocabularyActive
-                                    ? 'rgba(255,255,255,0.2)'
-                                    : 'transparent',
-                                borderRadius: 1,
-                                mr: 2,
-                                transition: 'background-color 0.3s',
-                                '&:hover': {
+                {/* Если НЕ мобильное устройство, показываем кнопки. Иначе — иконку меню */}
+                {isMobile ? (
+                    <>
+                        {/* Кнопка-иконка «бургер», по клику открываем меню (Menu) */}
+                        <IconButton color="inherit" onClick={handleMobileMenuOpen}>
+                            <MenuIcon/>
+                        </IconButton>
+                    </>
+                ) : (
+                    <>
+                        <Box sx={{display: 'flex', alignItems: 'center'}}>
+                            <Button
+                                color="inherit"
+                                component={Link}
+                                to="/dictionaries"
+                                sx={{
+                                    textTransform: 'none',
                                     backgroundColor: vocabularyActive
-                                        ? 'rgba(255,255,255,0.3)'
-                                        : 'rgba(255,255,255,0.1)',
-                                },
-                            }}
-                        >
-                            Vocabulary
-                        </Button>
-                    </Box>
+                                        ? 'rgba(255,255,255,0.2)'
+                                        : 'transparent',
+                                    borderRadius: 1,
+                                    mr: 2,
+                                    transition: 'background-color 0.3s',
+                                    '&:hover': {
+                                        backgroundColor: vocabularyActive
+                                            ? 'rgba(255,255,255,0.3)'
+                                            : 'rgba(255,255,255,0.1)',
+                                    },
+                                }}
+                            >
+                                Vocabulary
+                            </Button>
 
-                    <Button
-                        color="inherit"
+                            <Button
+                                color="inherit"
+                                component={Link}
+                                to="/training"
+                                sx={{
+                                    textTransform: 'none',
+                                    backgroundColor: trainingActive
+                                        ? 'rgba(255,255,255,0.2)'
+                                        : 'transparent',
+                                    borderRadius: 1,
+                                    mr: 2,
+                                    transition: 'background-color 0.3s',
+                                    '&:hover': {
+                                        backgroundColor: trainingActive
+                                            ? 'rgba(255,255,255,0.3)'
+                                            : 'rgba(255,255,255,0.1)',
+                                    },
+                                }}
+                            >
+                                Training
+                            </Button>
+
+                            <Button
+                                color="inherit"
+                                component={Link}
+                                to="/books"
+                                sx={{
+                                    textTransform: 'none',
+                                    backgroundColor: booksActive
+                                        ? 'rgba(255,255,255,0.2)'
+                                        : 'transparent',
+                                    borderRadius: 1,
+                                    mr: 2,
+                                    transition: 'background-color 0.3s',
+                                    '&:hover': {
+                                        backgroundColor: booksActive
+                                            ? 'rgba(255,255,255,0.3)'
+                                            : 'rgba(255,255,255,0.1)',
+                                    },
+                                }}
+                            >
+                                Books
+                            </Button>
+                        </Box>
+                    </>
+                )}
+
+                {/* Кнопка переключения темы */}
+                <IconButton onClick={handleThemeToggle} color="inherit" sx={{mr: 1}}>
+                    {themeMode === 'dark' ? <Brightness7Icon/> : <Brightness4Icon/>}
+                </IconButton>
+
+                {/* Кнопка-аватар пользователя */}
+                <Tooltip title="Открыть меню">
+                    <IconButton onClick={handleUserMenuOpen} sx={{p: 0}}>
+                        <Avatar
+                            alt="User Avatar"
+                            src={`${USER_API_MEDIA_URL}${userData.avatar}`}
+                        />
+                    </IconButton>
+                </Tooltip>
+
+                {/* Меню пользователя */}
+                <Menu
+                    id="user-menu"
+                    anchorEl={userMenuAnchorEl}
+                    open={isUserMenuOpen}
+                    onClose={handleUserMenuClose}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    TransitionComponent={Fade}
+                >
+                    <MenuItem component={Link} to="/profile" onClick={handleUserMenuClose}>
+                        My Profile
+                    </MenuItem>
+                    <MenuItem component={Link} to="/settings" onClick={handleUserMenuClose}>
+                        Settings
+                    </MenuItem>
+                    <MenuItem component={Link} to="/dictionaries" onClick={handleUserMenuClose}>
+                        Dictionaries
+                    </MenuItem>
+                    <MenuItem component={Link} to="/books" onClick={handleUserMenuClose}>
+                        Books
+                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                </Menu>
+
+                {/* Мобильное меню (Menu), вместо PC меню */}
+                <Menu
+                    id="mobile-menu"
+                    anchorEl={mobileMenuAnchorEl}
+                    open={isMobileMenuOpen}
+                    onClose={handleMobileMenuClose}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    TransitionComponent={Fade}
+                >
+                    <MenuItem
+                        component={Link}
+                        to="/dictionaries"
+                        onClick={handleMobileMenuClose}
+                        sx={{
+                            backgroundColor: vocabularyActive
+                                ? 'rgba(255,255,255,0.2)'
+                                : 'transparent',
+                        }}
+                    >
+                        Vocabulary
+                    </MenuItem>
+                    <MenuItem
                         component={Link}
                         to="/training"
+                        onClick={handleMobileMenuClose}
                         sx={{
-                            textTransform: 'none', // убираем заглавные буквы
                             backgroundColor: trainingActive
-                                ? 'rgba(255,255,255,0.2)' // затемнённый фон для активной вкладки
+                                ? 'rgba(255,255,255,0.2)'
                                 : 'transparent',
-                            borderRadius: 1, // для аккуратного скругления углов
-                            mr: 2,           // отступ справа
-                            transition: 'background-color 0.3s', // плавный переход цвета
-                            '&:hover': {
-                                backgroundColor: trainingActive
-                                    ? 'rgba(255,255,255,0.3)' // немного более тёмный при наведении, если активна
-                                    : 'rgba(255,255,255,0.1)', // легкое затемнение при наведении, если не активна
-                            },
                         }}
                     >
                         Training
-                    </Button>
-
-                    <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <Button
-                            color="inherit"
-                            component={Link}
-                            to="/books"
-                            sx={{
-                                textTransform: 'none',
-                                backgroundColor: booksActive
-                                    ? 'rgba(255,255,255,0.2)'
-                                    : 'transparent',
-                                borderRadius: 1,
-                                mr: 2,
-                                transition: 'background-color 0.3s',
-                                '&:hover': {
-                                    backgroundColor: booksActive
-                                        ? 'rgba(255,255,255,0.3)'
-                                        : 'rgba(255,255,255,0.1)',
-                                },
-                            }}
-                        >
-                            Books
-                        </Button>
-                    </Box>
-
-                    {/* Кнопка переключения темы */}
-                    <IconButton onClick={handleThemeToggle}
-                                color="inherit"
-                                sx={{mr: 1}}
-                    >
-                        {themeMode === 'dark' ? <Brightness7Icon/> : <Brightness4Icon/>}
-                    </IconButton>
-
-                    {/* Аватар пользователя с меню */}
-                    <Tooltip title="Открыть меню">
-                        <IconButton onClick={handleUserMenuOpen} sx={{p: 0}}>
-                            <Avatar
-                                alt="User Avatar"
-                                src={`${USER_API_MEDIA_URL}${userData.avatar}`}
-                            />
-                        </IconButton>
-                    </Tooltip>
-
-                    {/* Меню пользователя */}
-                    <Menu
-                        id="user-menu"
-                        anchorEl={userMenuAnchorEl}
-                        open={isUserMenuOpen}
-                        onClose={handleUserMenuClose}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'right',
+                    </MenuItem>
+                    <MenuItem
+                        component={Link}
+                        to="/books"
+                        onClick={handleMobileMenuClose}
+                        sx={{
+                            backgroundColor: booksActive
+                                ? 'rgba(255,255,255,0.2)'
+                                : 'transparent',
                         }}
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        TransitionComponent={Fade}
                     >
-                        <MenuItem component={Link} to="/profile" onClick={handleUserMenuClose}>
-                            My Profile
-                        </MenuItem>
-                        <MenuItem component={Link} to="/settings" onClick={handleUserMenuClose}>
-                            Settings
-                        </MenuItem>
-                        <MenuItem component={Link} to="/dictionaries" onClick={handleUserMenuClose}>
-                            Dictionaries
-                        </MenuItem>
-                        <MenuItem component={Link} to="/books" onClick={handleUserMenuClose}>
-                            Books
-                        </MenuItem>
-                        <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                    </Menu>
-                </Box>
+                        Books
+                    </MenuItem>
+                </Menu>
             </Toolbar>
         </AppBar>
     );
