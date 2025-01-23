@@ -9,4 +9,5 @@ export * from './SimpleTTS/SimpleTTS.tsx';
 export * from './TextRenderer/TextRenderer.tsx';
 export * from './TextToSpeech/TextToSpeech.tsx';
 export * from './TranslationDialog/TranslationDialog.tsx';
+export * from './BooksFilterPanel/BooksFilterPanel.tsx';
 
