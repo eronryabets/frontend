@@ -112,6 +112,33 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
                     },
                 },
             },
+            //  Указываем стили по умолчанию для Drawer
+            MuiDrawer: {
+                defaultProps: {
+                    PaperProps: {
+                        sx: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.11)',   // Полупрозрачный цвет 07
+                            backdropFilter: 'blur(15px)',                    // Применяем blur, эффект размытия 11-15
+                            // boxShadow: 'none',                           //Убираем/упрощаем тень
+                        },
+                    },
+                    slotProps: {
+                        backdrop: {
+                            sx: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                            },
+                        },
+                    },
+                },
+                // изменить стили root или paper через styleOverrides:
+                // styleOverrides: {
+                //   paper: {
+                //     // что-то вроде
+                //     backgroundColor: 'rgba(255,255,255,0.07)',
+                //     backdropFilter: 'blur(3px)',
+                //   },
+                // },
+            },
             // Настройка другие компонентов
         },
         //брейкпоинты для настройки стилей в зависимости от размера экрана

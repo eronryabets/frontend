@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {
     Box,
@@ -21,7 +21,8 @@ import {
     Stop as StopIcon,
 } from '@mui/icons-material';
 
-import { languageOptions } from '@/config/languageOptions.ts';
+import { useTheme } from '@mui/material/styles';
+import {languageOptions} from '@/config/languageOptions.ts';
 
 interface TextToSpeechProps {
     text: string;
@@ -29,9 +30,10 @@ interface TextToSpeechProps {
     languages?: Array<{ code: string; name: string }>;
 }
 
-export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, languages }) => {
+export const TextToSpeech: React.FC<TextToSpeechProps> = ({text, bookLanguage, languages}) => {
 
     const availableLanguages = languages && languages.length > 0 ? languages : languageOptions;
+    const theme = useTheme();
 
     // Состояния для параметров озвучивания
     const [language, setLanguage] = useState<string>(bookLanguage); // Установили язык который указан в книге
@@ -204,24 +206,37 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                     // top: 80,
                     // left: 10,
                     // zIndex: 1000
-            }}
+                }}
             >
-                <VolumeUpIcon fontSize="medium" />
-            </IconButton >
+                <VolumeUpIcon fontSize="medium"/>
+            </IconButton>
 
             {/* Выдвижная панель */}
             <Drawer
                 anchor="left"
                 open={isDrawerOpen}
                 onClose={() => setIsDrawerOpen(false)}
+                PaperProps={{
+                    // sx: {
+                    //     width: 330, // Устанавливаем ширину Drawer
+                    //     overflowX: 'hidden', // Отключаем горизонтальную прокрутку
+                    //      // Применяем фон из темы
+                    //     // backgroundColor: 'rgba(255, 255, 255, 0.8)', // Слегка прозрачный белый фон
+                    //     backgroundColor: theme.customBackground.paperGradient,
+                    // },
+                }}
             >
-                <Box sx={{ width: 300, p: 2 }}>
+                <Box sx={{
+                    width: '100%', // Занимает всю ширину Drawer
+                    p: 2,
+                    mt: 7
+                }}>
                     <Typography variant="h6" gutterBottom>
-                        Настройки озвучивания
+                        Voice Settings:
                     </Typography>
 
                     {/* Выбор языка */}
-                    <FormControl fullWidth sx={{ mb: 2 }}>
+                    <FormControl fullWidth sx={{mb: 2}}>
                         <InputLabel id="tts-language-select-label">Язык</InputLabel>
                         <Select
                             labelId="tts-language-select-label"
@@ -241,7 +256,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                     </FormControl>
 
                     {/* Выбор голоса */}
-                    <FormControl fullWidth sx={{ mb: 2 }} disabled={!language}>
+                    <FormControl fullWidth sx={{mb: 2}} disabled={!language}>
                         <InputLabel id="tts-voice-select-label">Голос</InputLabel>
                         <Select
                             labelId="tts-voice-select-label"
@@ -263,7 +278,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                     </FormControl>
 
                     {/* Настройки озвучивания */}
-                    <Box sx={{ mb: 2 }}>
+                    <Box sx={{mb: 2}}>
                         <Typography gutterBottom>Высота тона: {pitch.toFixed(1)}</Typography>
                         <Slider
                             value={pitch}
@@ -275,7 +290,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                         />
                     </Box>
 
-                    <Box sx={{ mb: 2 }}>
+                    <Box sx={{mb: 2}}>
                         <Typography gutterBottom>Скорость речи: {rate.toFixed(1)}</Typography>
                         <Slider
                             value={rate}
@@ -287,7 +302,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                         />
                     </Box>
 
-                    <Box sx={{ mb: 2 }}>
+                    <Box sx={{mb: 2}}>
                         <Typography gutterBottom>Громкость: {volume.toFixed(1)}</Typography>
                         <Slider
                             value={volume}
@@ -300,7 +315,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                     </Box>
 
                     {/* Кнопки управления озвучкой с иконками */}
-                    <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 2 }}>
+                    <Stack direction="row" spacing={2} justifyContent="center" sx={{mb: 2}}>
                         {!isSpeaking && (
                             <Tooltip title="Воспроизвести">
                                 <IconButton
@@ -308,7 +323,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                                     onClick={handlePlay}
                                     disabled={!voicesLoaded || !language || !selectedVoiceName}
                                 >
-                                    <PlayArrowIcon />
+                                    <PlayArrowIcon/>
                                 </IconButton>
                             </Tooltip>
                         )}
@@ -318,7 +333,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                                     color="secondary"
                                     onClick={handlePause}
                                 >
-                                    <PauseIcon />
+                                    <PauseIcon/>
                                 </IconButton>
                             </Tooltip>
                         )}
@@ -328,7 +343,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                                     color="primary"
                                     onClick={handleResume}
                                 >
-                                    <PlayArrowIcon />
+                                    <PlayArrowIcon/>
                                 </IconButton>
                             </Tooltip>
                         )}
@@ -338,7 +353,7 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({ text, bookLanguage, 
                                     color="error"
                                     onClick={handleStop}
                                 >
-                                    <StopIcon />
+                                    <StopIcon/>
                                 </IconButton>
                             </Tooltip>
                         )}

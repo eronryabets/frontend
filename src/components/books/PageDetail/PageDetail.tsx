@@ -417,13 +417,14 @@ export const PageDetail: React.FC = () => {
             >
                 <Box
                     sx={{
-                        width: 250,
+                        mt: 7,
+                        minWidth: 250,
                         padding: theme.spacing(2),
                     }}
                     role="presentation"
                 >
                     <Typography variant="h6" gutterBottom>
-                        Настройки отображения
+                        Display settings:
                     </Typography>
                     <Typography gutterBottom>
                         Размер текста
@@ -442,7 +443,7 @@ export const PageDetail: React.FC = () => {
                             {value: 6, label: '6'},
                             {value: 7, label: '7'},
                         ]}
-                        valueLabelDisplay="on"
+                        valueLabelDisplay="off"
                         onChange={handleFontSizeChange}
                     />
                     <Typography variant="body2" sx={{mt: 2}}>
