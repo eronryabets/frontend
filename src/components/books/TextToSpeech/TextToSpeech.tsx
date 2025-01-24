@@ -21,7 +21,6 @@ import {
     Stop as StopIcon,
 } from '@mui/icons-material';
 
-import { useTheme } from '@mui/material/styles';
 import {languageOptions} from '@/config/languageOptions.ts';
 
 interface TextToSpeechProps {
@@ -33,7 +32,6 @@ interface TextToSpeechProps {
 export const TextToSpeech: React.FC<TextToSpeechProps> = ({text, bookLanguage, languages}) => {
 
     const availableLanguages = languages && languages.length > 0 ? languages : languageOptions;
-    const theme = useTheme();
 
     // Состояния для параметров озвучивания
     const [language, setLanguage] = useState<string>(bookLanguage); // Установили язык который указан в книге
@@ -217,13 +215,12 @@ export const TextToSpeech: React.FC<TextToSpeechProps> = ({text, bookLanguage, l
                 open={isDrawerOpen}
                 onClose={() => setIsDrawerOpen(false)}
                 PaperProps={{
-                    // sx: {
-                    //     width: 330, // Устанавливаем ширину Drawer
-                    //     overflowX: 'hidden', // Отключаем горизонтальную прокрутку
-                    //      // Применяем фон из темы
-                    //     // backgroundColor: 'rgba(255, 255, 255, 0.8)', // Слегка прозрачный белый фон
-                    //     backgroundColor: theme.customBackground.paperGradient,
-                    // },
+                    sx: {
+                        width: 330, // Устанавливаем ширину Drawer
+                        overflowX: 'hidden', // Отключаем горизонтальную прокрутку
+                        // Не задаём backgroundColor и backdropFilter здесь
+                        // Они будут наследоваться из темы через styleOverrides.paper
+                    },
                 }}
             >
                 <Box sx={{

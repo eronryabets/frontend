@@ -14,6 +14,7 @@ declare module '@mui/material/styles' {
             gradientEnd: string;
             paperGradientStart: string;
             paperGradientEnd: string;
+            backdropFilter: string;
         };
     }
 
@@ -27,6 +28,7 @@ declare module '@mui/material/styles' {
             gradientEnd?: string;
             paperGradientStart?: string;
             paperGradientEnd?: string;
+            backdropFilter?: string;
         }
     }
 }
@@ -114,14 +116,14 @@ export const MuiTheme = (themeMode: 'light' | 'dark') => {
             },
             //  Указываем стили по умолчанию для Drawer
             MuiDrawer: {
-                defaultProps: {
-                    PaperProps: {
-                        sx: {
-                            backgroundColor: 'rgba(255, 255, 255, 0.11)',   // Полупрозрачный цвет 07
-                            backdropFilter: 'blur(15px)',                    // Применяем blur, эффект размытия 11-15
-                            // boxShadow: 'none',                           //Убираем/упрощаем тень
-                        },
+                styleOverrides: {
+                    paper: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.11)',   // Полупрозрачный цвет
+                        backdropFilter: 'blur(15px)',                    // Эффект размытия
+                        // boxShadow: 'none', // Убираем/упрощаем тень, если нужно
                     },
+                },
+                defaultProps: {
                     slotProps: {
                         backdrop: {
                             sx: {

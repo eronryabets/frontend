@@ -414,11 +414,19 @@ export const PageDetail: React.FC = () => {
                 anchor="left"
                 open={isSettingsOpen}
                 onClose={handleSettingsClose}
+                PaperProps={{
+                    sx: {
+                        width: 250, // Устанавливаем ширину Drawer
+                        overflowX: 'hidden', // Отключаем горизонтальную прокрутку
+                        // Не задаём backgroundColor и backdropFilter здесь
+                        // Они будут наследоваться из темы через styleOverrides.paper
+                    },
+                }}
             >
                 <Box
                     sx={{
                         mt: 7,
-                        minWidth: 250,
+                        width: '100%', // Занимает всю ширину Drawer
                         padding: theme.spacing(2),
                     }}
                     role="presentation"
